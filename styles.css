@@ -14,20 +14,16 @@ body {
     color: #333;
 }
 
-#game-container, #menu-container {
+#game-container,
+#menu-container {
     position: relative;
     width: 400px;
-    height: 600px;
+    height: 777px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
-#game-container {
-    display: none;
-    background-color: #fff;
-    height: 700px;
-}
 
 #menu-container {
     background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
@@ -162,5 +158,76 @@ canvas {
 #game-canvas {
     width: 100%;
     height: auto;
+}
+#evolution-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+}
+
+.evolution-row {
+    display: flex;
+    flex-direction: column; /* Isso garante que as frutas fiquem em linha */
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    margin: 5px 0;
+    width: 100%;
+}
+
+
+
+@media (max-width: 768px) {
+    #game-area {
+        flex-direction: column;
+    }
+    
+    #fruit-evolution {
+        width: 100%;
+        height: auto;
+        border-top: 1px solid #eaeaea;
+        border-left: none;
+        max-height: 150px;
+        overflow-x: auto;
+        margin-top: 10px;
+    }
+    
+    #evolution-diagram {
+        flex-direction: row;
+        justify-content: flex-start;
+        width: max-content;
+        padding: 10px;
+    }
+    
+    .evolution-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+}
+
+
+/* Diagrama */
+#game-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+}
+#fruit-evolution{
+ margin: auto;
+}
+
+#fruit-evolution h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+#evolution-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
