@@ -3,50 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Suika Game</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        #game-container {
-            position: relative;
-            width: 400px;
-            height: 600px;
-        }
-        canvas {
-            border: 2px solid #333;
-            background-color: #fff;
-        }
-        #score {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
-            font-family: Arial, sans-serif;
-        }
-        #next-fruit {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 18px;
-            font-family: Arial, sans-serif;
-        }
-    </style>
+    <title>Suika Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="menu-container">
+        <h1 id="game-title">Suika Game</h1>
+        <div id="high-score">Melhor pontuação: 0</div>
+        <div id="difficulty-buttons">
+            <button id="easy-button" class="menu-button">Fácil</button>
+            <button id="normal-button" class="menu-button">Normal</button>
+            <button id="hard-button" class="menu-button">Difícil</button>
+            <button id="back-button" class="menu-button">Voltar</button>
+        </div>
+        <button id="start-button" class="menu-button">Iniciar Jogo</button>
+        <button id="options-button" class="menu-button">Opções</button>
+    </div>
+    
     <div id="game-container">
+        <div id="game-header">
+            <div id="score">Pontos: 0</div>
+            <div id="next-fruit-container">
+                <span>Próxima:</span>
+                <div id="next-fruit-preview"></div>
+            </div>
+        </div>
         <canvas id="game-canvas"></canvas>
-        <div id="score">Pontos: 0</div>
-        <div id="next-fruit">Próxima: 🍒</div>
+        <div id="mobile-controls">
+            <div id="left-button" class="control-button">←</div>
+            <div id="drop-button" class="control-button">↓</div>
+            <div id="right-button" class="control-button">→</div>
+        </div>
+        
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="game.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/fruits.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/physics.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
 </body>
 </html>
