@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div id="menu-container">
         <h1 id="game-title">Suika Game</h1>
@@ -20,23 +22,26 @@
         <button id="start-button" class="menu-button">Iniciar Jogo</button>
         <button id="options-button" class="menu-button">Opções</button>
     </div>
-    
-    <div id="game-container">
-        <div id="game-header">
-            <div id="score">Pontos: 0</div>
-            <div id="next-fruit-container">
-                <span>Próxima:</span>
-                <div id="next-fruit-preview"></div>
+
+
+
+    <div id="game-area">
+        <div id="game-container">
+            <div id="game-header">
+                <div id="score">Pontos: 0</div>
+                <div id="next-fruit-container">
+                    <span>Próxima:</span>
+                    <div id="next-fruit-preview"></div>
+                </div>
             </div>
+            <canvas id="game-canvas" width="400" height="700"></canvas>
         </div>
-        <canvas id="game-canvas"></canvas>
-        <div id="mobile-controls">
-            <div id="left-button" class="control-button">←</div>
-            <div id="drop-button" class="control-button">↓</div>
-            <div id="right-button" class="control-button">→</div>
+        <div id="fruit-evolution">
+            <h3>Fruits</h3>
+            <div id="evolution-diagram"></div>
         </div>
-        
     </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="js/config.js"></script>
@@ -46,4 +51,5 @@
     <script src="js/ui.js"></script>
     <script src="js/game.js"></script>
 </body>
+
 </html>
