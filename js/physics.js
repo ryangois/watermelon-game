@@ -86,60 +86,116 @@ SuikaGame.physics = {
 
 
     setupCollisionEvents: function () {
-        const { Events, Bodies, World } = Matter;
-
-        // Array para rastrear frutas que estão cruzando a linha
+        const { Events, Composite } = Matter;
+    
+        // Mapa para rastrear frutas que estão cruzando a linha
         const fruitsOverLine = new Map();
-
+    
         Events.on(SuikaGame.config.engine, 'collisionStart', function (event) {
             const pairs = event.pairs;
             for (let i = 0; i < pairs.length; i++) {
                 const pair = pairs[i];
-
+    
                 // Verificar colisões entre frutas
                 if (pair.bodyA.isFruit && pair.bodyB.isFruit) {
                     SuikaGame.game.handleFruitCollision(pair.bodyA, pair.bodyB);
                 }
-
-                // Verificar colisão com a linha de fim de jogo (apenas para frutas não estáticas)
-                if ((pair.bodyA.isGameOverLine && pair.bodyB.isFruit && !pair.bodyB.isStatic) ||
-                    (pair.bodyB.isGameOverLine && pair.bodyA.isFruit && !pair.bodyA.isStatic)) {
-
-                    const fruitBody = pair.bodyA.isFruit ? pair.bodyA : pair.bodyB;
-
-                    // Iniciar o rastreamento desta fruta
-                    if (!fruitsOverLine.has(fruitBody.id)) {
-                        fruitsOverLine.set(fruitBody.id, {
-                            body: fruitBody,
-                            timestamp: Date.now(),
+            }
+        });
+    
+        Events.on(SuikaGame.config.engine, 'afterUpdate', function () {
+            const gameOverLine = Composite.allBodies(SuikaGame.config.engine.world)
+                .find(body => body.isGameOverLine);
+    
+            if (!gameOverLine || SuikaGame.config.gameOver) return;
+    
+            const lineY = gameOverLine.position.y;
+    
+            // Verificar cada fruta no rastreador
+            fruitsOverLine.forEach((data, id) => {
+                const fruit = data.body;
+    
+                // Verificar se a fruta ainda existe no mundo
+                if (!Composite.get(SuikaGame.config.engine.world, id, 'body')) {
+                    clearInterval(data.interval);
+                    fruitsOverLine.delete(id);
+                    return;
+                }
+    
+                const fruitRadius = fruit.circleRadius;
+                const fruitBottomY = fruit.position.y + fruitRadius;
+    
+                if (fruitBottomY < lineY) {
+                    // A fruta está completamente acima da linha
+                    const timeElapsedSinceLaunch = Date.now() - data.launchTimestamp;
+                    const timeElapsedAboveLine = Date.now() - data.timestamp;
+    
+                    // Iniciar o contador apenas 2 segundos após o lançamento
+                    if (timeElapsedSinceLaunch >= 2000 && timeElapsedAboveLine >= 5000 && !SuikaGame.config.gameOver) {
+                        clearInterval(data.interval);
+                        fruitsOverLine.clear();
+                        SuikaGame.game.endGame();
+                    }
+                } else {
+                    // A fruta voltou para baixo da linha ou não está completamente acima
+                    clearInterval(data.interval);
+                    fruitsOverLine.delete(id);
+    
+                    // Restaurar a aparência original da fruta
+                    if (fruit.render.originalFillStyle) {
+                        fruit.render.fillStyle = fruit.render.originalFillStyle;
+                        if (fruit.render.originalSprite) {
+                            fruit.render.sprite = fruit.render.originalSprite;
+                        }
+                        fruit.render.originalFillStyle = null;
+                        fruit.render.originalSprite = null;
+                    }
+                }
+            });
+    
+            // Adicionar frutas novas ao rastreador
+            Composite.allBodies(SuikaGame.config.engine.world).forEach(body => {
+                if (
+                    body.isFruit &&
+                    !body.isStatic && // Apenas frutas que já foram lançadas
+                    !fruitsOverLine.has(body.id)
+                ) {
+                    const fruitRadius = body.circleRadius;
+                    const fruitBottomY = body.position.y + fruitRadius;
+    
+                    if (fruitBottomY < lineY) {
+                        fruitsOverLine.set(body.id, {
+                            body: body,
+                            timestamp: Date.now(), // Quando cruzou a linha
+                            launchTimestamp: body.launchTimestamp || Date.now(), // Quando foi lançado
                             interval: setInterval(() => {
                                 // Fazer a fruta piscar em vermelho
-                                if (!fruitBody.render.originalFillStyle) {
-                                    fruitBody.render.originalFillStyle = fruitBody.render.fillStyle;
-                                    fruitBody.render.originalSprite = fruitBody.render.sprite ? { ...fruitBody.render.sprite } : null;
+                                if (!body.render.originalFillStyle) {
+                                    body.render.originalFillStyle = body.render.fillStyle;
+                                    body.render.originalSprite = body.render.sprite ? { ...body.render.sprite } : null;
                                 }
-
-                                if (fruitBody.render.fillStyle === 'rgba(255, 0, 0, 0.7)') {
+    
+                                if (body.render.fillStyle === 'rgba(255, 0, 0, 0.7)') {
                                     // Voltar para a cor original
-                                    fruitBody.render.fillStyle = fruitBody.render.originalFillStyle;
-                                    if (fruitBody.render.originalSprite) {
-                                        fruitBody.render.sprite = fruitBody.render.originalSprite;
+                                    body.render.fillStyle = body.render.originalFillStyle;
+                                    if (body.render.originalSprite) {
+                                        body.render.sprite = body.render.originalSprite;
                                     }
                                 } else {
                                     // Mudar para vermelho
-                                    fruitBody.render.fillStyle = 'rgba(255, 0, 0, 0.7)';
-                                    if (fruitBody.render.sprite) {
-                                        fruitBody.render.sprite = null;
+                                    body.render.fillStyle = 'rgba(255, 0, 0, 0.7)';
+                                    if (body.render.sprite) {
+                                        body.render.sprite = null;
                                     }
                                 }
                             }, 500) // Piscar a cada 500ms
                         });
                     }
                 }
-            }
+            });
         });
 
-        // Verificar continuamente as frutas que cruzaram a linha
+
         Events.on(SuikaGame.config.engine, 'afterUpdate', function () {
             const gameOverLine = Matter.Composite.allBodies(SuikaGame.config.engine.world)
                 .find(body => body.isGameOverLine);
@@ -159,12 +215,11 @@ SuikaGame.physics = {
                     return;
                 }
 
-                // Verificar se a fruta cruzou completamente a linha
                 const fruitRadius = fruit.circleRadius;
-                const fruitTopY = fruit.position.y - fruitRadius;
+                const fruitBottomY = fruit.position.y + fruitRadius;
 
-                if (fruitTopY > lineY) {
-                    // A fruta cruzou completamente
+                if (fruitBottomY < lineY) {
+                    // A fruta está completamente acima da linha
                     const timeElapsed = Date.now() - data.timestamp;
 
                     // Se passou 5 segundos, terminar o jogo
@@ -173,12 +228,12 @@ SuikaGame.physics = {
                         fruitsOverLine.clear();
                         SuikaGame.game.endGame();
                     }
-
                 } else {
-                    // A fruta não está mais completamente abaixo da linha
+                    // A fruta voltou para baixo da linha ou não está completamente acima
                     clearInterval(data.interval);
+                    fruitsOverLine.delete(id);
 
-                    // Restaurar a aparência original
+                    // Restaurar a aparência original da fruta
                     if (fruit.render.originalFillStyle) {
                         fruit.render.fillStyle = fruit.render.originalFillStyle;
                         if (fruit.render.originalSprite) {
@@ -187,11 +242,10 @@ SuikaGame.physics = {
                         fruit.render.originalFillStyle = null;
                         fruit.render.originalSprite = null;
                     }
-
-                    fruitsOverLine.delete(id);
                 }
             });
         });
+
     },
 
 
