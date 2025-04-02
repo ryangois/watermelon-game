@@ -107,6 +107,7 @@ SuikaGame.game = {
             this.resetGame();
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('menu-container').style.display = 'flex';
+            document.getElementById('fruit-evolution').style.display = 'none'
         }, 1000);
     }
 };
