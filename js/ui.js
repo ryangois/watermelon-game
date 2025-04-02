@@ -80,15 +80,14 @@ SuikaGame.ui = {
             fruitIcon.style.justifyContent = 'center';
             fruitIcon.style.alignItems = 'center';
             fruitIcon.style.borderRadius = '50%';
-            fruitIcon.style.margin = '0 5px';
+            fruitIcon.style.margin = '0 2px';
             fruitIcon.style.fontSize = '20px';
             fruitIcon.textContent = fruits[i];
             row.appendChild(fruitIcon);
             
             if (i < fruits.length - 1) {
                 const arrow = document.createElement('div');
-                arrow.className = 'arrow';
-                arrow.textContent = ''; // Adicionando a seta
+                
                 arrow.style.fontSize = '16px';
                 arrow.style.color = '#666';
                 row.appendChild(arrow);

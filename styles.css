@@ -22,6 +22,7 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    margin: auto;
 }
 
 
@@ -192,19 +193,26 @@ canvas {
         border-left: none;
         max-height: 150px;
         overflow-x: auto;
-        margin-top: 10px;
+        margin-top: 0px;
+        margin: auto;
+    }
+
+    .fruit-icon{
+        width: 10px;
     }
     
     #evolution-diagram {
         flex-direction: row;
         justify-content: flex-start;
         width: max-content;
-        padding: 10px;
+        padding: 1px;
+        margin: auto;
     }
     
     .evolution-row {
         flex-direction: row;
         flex-wrap: nowrap;
+        margin: auto;
     }
 }
 
@@ -214,7 +222,6 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 20px;
 }
 #fruit-evolution{
  margin: auto;
