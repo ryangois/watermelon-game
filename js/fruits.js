@@ -15,7 +15,7 @@ SuikaGame.fruits = {
         { name: 'Abacaxi', emoji: '🍍', radius: 90, baseRadius: 90, score: 36 },
         { name: 'Melão', emoji: '🍈', radius: 100, baseRadius: 100, score: 45 },
         { name: 'Melancia', emoji: '🍉', radius: 110, baseRadius: 110, score: 55 },
-        {name:'Jaca', emoji: '🍒', radius: 130, baseRadius: 130, score: 555}
+        { name: 'Jaca', emoji: '🍒', radius: 130, baseRadius: 130, score: 555 }
     ],
 
     // Fruta atual e próxima
@@ -76,23 +76,23 @@ SuikaGame.fruits = {
     },
 
 
-createNewFruit: function() {
-    // Criar fruta atual com o índice da próxima fruta
-    const fruitData = this.types[this.nextFruitIndex];
-    this.currentFruit = this.createFruitBody(SuikaGame.config.dropPosition, 80, fruitData); // Aumentar a posição Y para 80
-    this.currentFruit.isStatic = true;
-    
-    // Adicionar ao mundo
-    Matter.World.add(SuikaGame.config.engine.world, this.currentFruit);
-    
-    // Gerar próxima fruta (uma das 5 menores)
-    this.nextFruitIndex = Math.floor(Math.random() * 5);
-    
-    // Atualizar visualização da próxima fruta
-    this.updateNextFruitPreview();
-    
-    SuikaGame.config.canDropFruit = true;
-},
+    createNewFruit: function () {
+        // Criar fruta atual com o índice da próxima fruta
+        const fruitData = this.types[this.nextFruitIndex];
+        this.currentFruit = this.createFruitBody(SuikaGame.config.dropPosition, 80, fruitData); // Aumentar a posição Y para 80
+        this.currentFruit.isStatic = true;
+
+        // Adicionar ao mundo
+        Matter.World.add(SuikaGame.config.engine.world, this.currentFruit);
+
+        // Gerar próxima fruta (uma das 5 menores)
+        this.nextFruitIndex = Math.floor(Math.random() * 5);
+
+        // Atualizar visualização da próxima fruta
+        this.updateNextFruitPreview();
+
+        SuikaGame.config.canDropFruit = true;
+    },
 
 
 

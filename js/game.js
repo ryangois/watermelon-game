@@ -10,8 +10,11 @@ SuikaGame.game = {
         document.getElementById('menu-container').style.display = 'none';
         document.getElementById('game-container').style.display = 'block';
         document.getElementById('fruit-evolution').style.display = 'block';
-        SuikaGame.fruits.createNewFruit(); // Alterado para chamar a função correta
+        SuikaGame.fruits.createNewFruit();
+        SuikaGame.audio.playBackgroundMusic();
     },
+
+
 
     resetGame: function () {
         SuikaGame.config.score = 0;
@@ -92,26 +95,58 @@ SuikaGame.game = {
 
     endGame: function () {
         SuikaGame.config.gameOver = true;
+
         const isNewHighScore = this.saveHighScore(SuikaGame.config.score);
-
-        // Mostrar tela de fim de jogo
         const highScore = this.getHighScore();
-        let message = `Game Over!\nPontuação: ${SuikaGame.config.score}\nMelhor pontuação: ${highScore}`;
 
-        if (isNewHighScore) {
-            message += "\n\nNova pontuação recorde!";
-        }
+        const message = isNewHighScore
+            ? `Nova pontuação recorde!\nPontuação: ${SuikaGame.config.score}\nMelhor pontuação: ${highScore}`
+            : `Fim de Jogo!\nPontuação: ${SuikaGame.config.score}\nMelhor pontuação: ${highScore}`;
 
-        setTimeout(() => {
-            alert(message);
+        document.getElementById('game-over-message').textContent = message;
+
+        const gameOverCard = document.getElementById('game-over-card');
+        gameOverCard.style.display = 'block';
+
+        document.getElementById('restart-button').onclick = () => {
+            gameOverCard.style.display = 'none';
             this.resetGame();
-            document.getElementById('game-container').style.display = 'none';
+            SuikaGame.audio.playBackgroundMusic(); // Reinicia a música
+            SuikaGame.game.startGame();
+        };
+
+        document.getElementById('return-button').onclick = () => {
+            gameOverCard.style.display = 'none';
+            SuikaGame.audio.stopBackgroundMusic(); // Para a música
             document.getElementById('menu-container').style.display = 'flex';
+            document.getElementById('game-container').style.display = 'none';
             document.getElementById('fruit-evolution').style.display = 'none';
-            location.reload();
-        }, 1000);
+        }
     }
 };
+
+
+// Adicionar música de fundo
+SuikaGame.audio = {
+    backgroundMusic: null,
+
+    playBackgroundMusic: function () {
+        if (!this.backgroundMusic) {
+            this.backgroundMusic = new Audio('../assets/music-fruits.mp3');
+            this.backgroundMusic.loop = true;
+        }
+        this.backgroundMusic.play();
+    },
+
+    stopBackgroundMusic: function () {
+        if (this.backgroundMusic) {
+            this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0; // Reinicia a música
+        }
+    }
+};
+
+
 
 // Inicialização do jogo - CORRIGIDO para preservar o contexto 'this'
 document.addEventListener('DOMContentLoaded', function () {

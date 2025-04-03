@@ -7,6 +7,7 @@
 html, body {
     max-width: 100%;
     overflow-x: hidden;
+    background-color: hsl(41, 100%, 90%);
 }
 
 body {
@@ -295,4 +296,22 @@ canvas {
         flex-wrap: nowrap;
         margin: auto;
     }
+}
+
+#game-over-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#game-over-card button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
 }
