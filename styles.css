@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -45,7 +50,7 @@ canvas {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 15px 10px;
     background-color: #f8f9fa;
     border-bottom: 1px solid #eaeaea;
 }
@@ -239,3 +244,55 @@ canvas {
     align-items: center;
 }
 
+@media (max-width: 400px) {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        width: 10%;
+    }
+    #game-container,
+#menu-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin: auto;
+}
+
+    #game-area {
+        flex-direction: column;
+    }
+    
+    #fruit-evolution {
+        display: none;
+        width: 100%;
+        height: auto;
+        border-top: 1px solid #eaeaea;
+        border-left: none;
+        max-height: 150px;
+        overflow-x: auto;
+        margin-top: 0px;
+        margin: auto;
+    }
+
+    .fruit-icon{
+        width: 10px;
+    }
+    
+    #evolution-diagram {
+        flex-direction: row;
+        justify-content: flex-start;
+        width: max-content;
+        padding: 1px;
+        margin: auto;
+    }
+    
+    .evolution-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        margin: auto;
+    }
+}
