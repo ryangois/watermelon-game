@@ -132,7 +132,7 @@ SuikaGame.audio = {
 
     playBackgroundMusic: function () {
         if (!this.backgroundMusic) {
-            this.backgroundMusic = new Audio('../assets/music-fruits.mp3');
+            this.backgroundMusic = new Audio('../assets/music/music-fruits.mp3');
             this.backgroundMusic.loop = true;
         }
         this.backgroundMusic.play();
