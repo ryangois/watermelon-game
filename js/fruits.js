@@ -14,7 +14,8 @@ SuikaGame.fruits = {
         { name: 'Pêssego', emoji: '🍑', radius: 80, baseRadius: 80, score: 28 },
         { name: 'Abacaxi', emoji: '🍍', radius: 90, baseRadius: 90, score: 36 },
         { name: 'Melão', emoji: '🍈', radius: 100, baseRadius: 100, score: 45 },
-        { name: 'Melancia', emoji: '🍉', radius: 110, baseRadius: 110, score: 55 }
+        { name: 'Melancia', emoji: '🍉', radius: 110, baseRadius: 110, score: 55 },
+        {name:'Jaca', emoji: '🍒', radius: 130, baseRadius: 130, score: 555}
     ],
 
     // Fruta atual e próxima

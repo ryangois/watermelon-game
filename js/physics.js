@@ -72,7 +72,7 @@ SuikaGame.physics = {
                 render: { fillStyle: '#333' }
             }),
             // Linha de fim de jogo (abaixo da fruta no topo)
-            Bodies.rectangle(SuikaGame.config.GAME_WIDTH / 2, 150, SuikaGame.config.GAME_WIDTH, 2, {
+            Bodies.rectangle(SuikaGame.config.GAME_WIDTH / 2, 130, SuikaGame.config.GAME_WIDTH, 2, {
                 isStatic: true,
                 isSensor: true,
                 render: { fillStyle: 'rgba(255, 0, 0, 0.5)' },
