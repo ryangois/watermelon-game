@@ -1,11 +1,29 @@
-##Halloween SKINS
+# Halloween skins
+
+Coloque aqui os PNGs do pacote de Halloween quando estiverem prontos.
+
+Nomes recomendados para ligar direto em `js/skins.js`:
+
+- cherries_emoji.png
+- strawberry_emoji.png
+- grapes_emoji.png
+- orange_emoji.png
+- apple_emoji.png
+- pear_emoji.png
+- peach_emoji.png
+- pineapple_emoji.png
+- melon_emoji.png
+- watermelon_emoji.png
+- jackfruit_emoji.png
+
+Ideias:
 
 - watermelon as a pumpkin watermelon
--grapes as ghost
-- pear as frankestain
--peach as ghost
+- grapes as ghost
+- pear as Frankenstein
+- peach as ghost
 - orange as zombie
 - melon as mummy
-- strawberry as sucubus 
-_ jack fruit as jack the riper
-- pineapple as michael myers or jason
+- strawberry as succubus
+- jackfruit as Jack the Ripper
+- pineapple as Michael Myers or Jason

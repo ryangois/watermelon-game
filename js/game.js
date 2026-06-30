@@ -12,6 +12,7 @@ SuikaGame.game = {
         SuikaGame.config.gameActive = true;
 
         document.getElementById('menu-container').style.display = 'none';
+        document.getElementById('shop-container').style.display = 'none';
         document.getElementById('game-container').style.display = 'block';
         document.getElementById('fruit-evolution').style.display = 'block';
 
@@ -27,6 +28,7 @@ SuikaGame.game = {
         SuikaGame.fruits.currentFruit = null;
         SuikaGame.particles.activeParticles = [];
         SuikaGame.ui.updateScore(0);
+        SuikaGame.ui.updateCoinDisplays();
 
         if (SuikaGame.config.engine && SuikaGame.config.engine.world) {
             const bodies = Matter.Composite.allBodies(SuikaGame.config.engine.world);
@@ -82,7 +84,7 @@ SuikaGame.game = {
     },
 
     getHighScore: function () {
-        return parseInt(localStorage.getItem('suikaHighScore') || 0, 10);
+        return parseInt(localStorage.getItem('suikaHighScore') || '0', 10);
     },
 
     saveHighScore: function (score) {
@@ -97,15 +99,21 @@ SuikaGame.game = {
     },
 
     endGame: function () {
+        if (SuikaGame.config.gameOver) {
+            return;
+        }
+
         SuikaGame.config.gameOver = true;
         SuikaGame.config.gameActive = false;
 
+        const earnedCoins = SuikaGame.skins.addCoins(SuikaGame.skins.getCoinsForScore(SuikaGame.config.score));
         const isNewHighScore = this.saveHighScore(SuikaGame.config.score);
         const highScore = this.getHighScore();
         const message = isNewHighScore
-            ? `Nova pontuação recorde!\nPontuação: ${SuikaGame.config.score}\nMelhor pontuação: ${highScore}`
-            : `Fim de jogo!\nPontuação: ${SuikaGame.config.score}\nMelhor pontuação: ${highScore}`;
+            ? `Nova pontuação recorde!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`
+            : `Fim de jogo!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`;
 
+        SuikaGame.ui.updateCoinDisplays();
         document.getElementById('game-over-message').textContent = message;
 
         const gameOverCard = document.getElementById('game-over-card');
@@ -120,10 +128,7 @@ SuikaGame.game = {
             gameOverCard.style.display = 'none';
             SuikaGame.game.resetGame();
             SuikaGame.audio.stopBackgroundMusic();
-            SuikaGame.ui.updateHighScoreDisplay();
-            document.getElementById('menu-container').style.display = 'flex';
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('fruit-evolution').style.display = 'none';
+            SuikaGame.ui.showMainMenu();
         };
     }
 };

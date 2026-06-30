@@ -11,23 +11,41 @@
 
 <body>
     <main id="app">
-        <div id="menu-container">
+        <section id="menu-container" class="panel">
             <h1 id="game-title">Suika Game</h1>
-            <div id="high-score">Melhor pontuação: 0</div>
+            <div class="menu-stats">
+                <div id="high-score">Melhor pontuação: 0</div>
+                <div id="coin-balance">Moedas: 0</div>
+            </div>
+
             <div id="difficulty-buttons">
                 <button id="easy-button" class="menu-button">Fácil</button>
                 <button id="normal-button" class="menu-button">Normal</button>
                 <button id="hard-button" class="menu-button">Difícil</button>
                 <button id="back-button" class="menu-button secondary">Voltar</button>
             </div>
-            <button id="start-button" class="menu-button">Iniciar jogo</button>
-            <button id="options-button" class="menu-button secondary">Opções</button>
-        </div>
 
-        <div id="game-area">
+            <button id="start-button" class="menu-button">Iniciar jogo</button>
+            <button id="shop-button" class="menu-button accent">Loja de skins</button>
+            <button id="options-button" class="menu-button secondary">Opções</button>
+        </section>
+
+        <section id="shop-container" class="panel" aria-label="Loja de skins">
+            <div class="shop-header">
+                <div>
+                    <h2>Loja de skins</h2>
+                    <p id="shop-coins">Moedas: 0</p>
+                </div>
+                <button id="shop-close-button" class="icon-button" aria-label="Voltar ao menu">×</button>
+            </div>
+            <div id="skin-list"></div>
+        </section>
+
+        <section id="game-area">
             <div id="game-container">
                 <div id="game-header">
-                    <div id="score">Pontos: 0</div>
+                    <div class="game-stat" id="score">Pontos: 0</div>
+                    <div class="game-stat" id="game-coins">Moedas: 0</div>
                     <div id="next-fruit-container">
                         <span>Próxima</span>
                         <div id="next-fruit-preview"></div>
@@ -39,7 +57,7 @@
             <aside id="fruit-evolution" aria-label="Evolução das frutas">
                 <div id="evolution-diagram"></div>
             </aside>
-        </div>
+        </section>
 
         <div id="game-over-card" style="display: none;">
             <h2 id="game-over-message"></h2>
@@ -50,6 +68,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/skins.js"></script>
     <script src="js/fruits.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/physics.js"></script>
