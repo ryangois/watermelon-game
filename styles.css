@@ -162,31 +162,43 @@ button {
 #game-header {
     min-height: clamp(62px, 9vh, 78px);
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     border-bottom: var(--line);
     background: var(--panel);
     padding: 10px clamp(10px, 2vw, 16px);
 }
 
+#game-stats {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
 .game-stat {
     min-width: 0;
-    font-size: clamp(15px, 2.2vw, 22px);
+    overflow: hidden;
+    font-size: clamp(14px, 1.75vw, 21px);
     font-weight: 700;
+    line-height: 1.12;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 #game-coins {
     color: #805100;
+    font-size: clamp(12px, 1.45vw, 16px);
 }
 
 #next-fruit-container {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: clamp(14px, 1.8vw, 17px);
+    justify-content: flex-end;
+    gap: 7px;
+    font-size: clamp(13px, 1.65vw, 17px);
     font-weight: 700;
+    min-width: 112px;
     white-space: nowrap;
 }
 
@@ -361,6 +373,30 @@ button {
     background: linear-gradient(135deg, #f2fff4, #fff7f7);
 }
 
+.skin-sideral {
+    background: linear-gradient(135deg, #edf2ff, #f5e8ff);
+}
+
+.skin-mythology {
+    background: linear-gradient(135deg, #fff9db, #f3e9dc);
+}
+
+.skin-ocean {
+    background: linear-gradient(135deg, #e0fbfc, #caf0f8);
+}
+
+.skin-robot {
+    background: linear-gradient(135deg, #edf6f9, #e7ecef);
+}
+
+.skin-candy {
+    background: linear-gradient(135deg, #fff0f6, #f3d9fa);
+}
+
+.skin-luxury {
+    background: linear-gradient(135deg, #fff8dc, #f8edc8);
+}
+
 #game-over-card {
     position: fixed;
     top: 50%;
@@ -429,7 +465,7 @@ button {
     }
 
     #game-coins {
-        display: none;
+        display: block;
     }
 
     #fruit-evolution {
