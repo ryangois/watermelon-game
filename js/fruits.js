@@ -4,6 +4,7 @@ var SuikaGame = SuikaGame || {};
 // Configuração e gerenciamento das frutas
 SuikaGame.fruits = {
     imageSize: 1024,
+    spriteFillScale: 1.18,
     spawnableCount: 5,
 
     types: [
@@ -47,7 +48,7 @@ SuikaGame.fruits = {
     },
 
     getSpriteScale: function (fruitData) {
-        return (fruitData.radius * 2) / this.imageSize;
+        return ((fruitData.radius * 2) / this.imageSize) * this.spriteFillScale;
     },
 
     getColorForFruit: function (fruitData) {
