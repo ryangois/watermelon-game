@@ -1,21 +1,9 @@
 var SuikaGame = SuikaGame || {};
 
-// Configuração e gerenciamento da física do jogo
 SuikaGame.physics = {
-    // Inicializar o engine de física
     setupEngine: function () {
-        // Configurar Matter.js
-        const { Engine, Render, Runner, Bodies, World, Events } = Matter;
-        // Adicione isso ao arquivo physics.js na função setupEngine
-        // Substitua os event listeners existentes por:
-        document.addEventListener('mousemove', this.handleMouseMove);
-        document.addEventListener('mousedown', this.dropFruit);
-        document.addEventListener('touchmove', this.handleTouchMove);
-        document.addEventListener('touchend', this.dropFruit); // Mudado de touchstart para touchend
+        const { Engine, Render, Runner, Events } = Matter;
 
-
-
-        // Criar engine
         SuikaGame.config.engine = Engine.create({
             gravity: {
                 x: 0,
@@ -24,7 +12,6 @@ SuikaGame.physics = {
             }
         });
 
-        // Criar renderizador
         SuikaGame.config.render = Render.create({
             element: document.getElementById('game-container'),
             engine: SuikaGame.config.engine,
@@ -33,70 +20,82 @@ SuikaGame.physics = {
                 width: SuikaGame.config.GAME_WIDTH,
                 height: SuikaGame.config.GAME_HEIGHT,
                 wireframes: false,
-                background: '#ffffff'
+                background: '#fff8ea'
             }
         });
 
-        // Iniciar renderizador
         Render.run(SuikaGame.config.render);
 
-        // Criar runner
         SuikaGame.config.runner = Runner.create();
         Runner.run(SuikaGame.config.runner, SuikaGame.config.engine);
 
-        // Criar paredes
         this.createWalls();
-
-        // Configurar eventos de colisão
         this.setupCollisionEvents();
+
+        const canvas = document.getElementById('game-canvas');
+        canvas.addEventListener('mousemove', this.handlePointerMove);
+        canvas.addEventListener('mousedown', this.dropFruit);
+        canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+        canvas.addEventListener('touchend', this.dropFruit);
+
+        Events.on(SuikaGame.config.render, 'afterRender', function () {
+            SuikaGame.particles.updateParticles();
+        });
     },
-
-
 
     createWalls: function () {
         const { Bodies, World } = Matter;
+        const wallOptions = {
+            isStatic: true,
+            render: { fillStyle: '#3f3425' }
+        };
         const walls = [
-            // Base
-            Bodies.rectangle(SuikaGame.config.GAME_WIDTH / 2, SuikaGame.config.GAME_HEIGHT + SuikaGame.config.WALL_THICKNESS / 2, SuikaGame.config.GAME_WIDTH, SuikaGame.config.WALL_THICKNESS, {
-                isStatic: true,
-                render: { fillStyle: '#333' }
-            }),
-            // Parede esquerda
-            Bodies.rectangle(-SuikaGame.config.WALL_THICKNESS / 2, SuikaGame.config.GAME_HEIGHT / 2, SuikaGame.config.WALL_THICKNESS, SuikaGame.config.GAME_HEIGHT, {
-                isStatic: true,
-                render: { fillStyle: '#333' }
-            }),
-            // Parede direita
-            Bodies.rectangle(SuikaGame.config.GAME_WIDTH + SuikaGame.config.WALL_THICKNESS / 2, SuikaGame.config.GAME_HEIGHT / 2, SuikaGame.config.WALL_THICKNESS, SuikaGame.config.GAME_HEIGHT, {
-                isStatic: true,
-                render: { fillStyle: '#333' }
-            }),
-            // Linha de fim de jogo (abaixo da fruta no topo)
-            Bodies.rectangle(SuikaGame.config.GAME_WIDTH / 2, 130, SuikaGame.config.GAME_WIDTH, 2, {
-                isStatic: true,
-                isSensor: true,
-                render: { fillStyle: 'rgba(255, 0, 0, 0.5)' },
-                isGameOverLine: true
-            })
+            Bodies.rectangle(
+                SuikaGame.config.GAME_WIDTH / 2,
+                SuikaGame.config.GAME_HEIGHT + SuikaGame.config.WALL_THICKNESS / 2,
+                SuikaGame.config.GAME_WIDTH,
+                SuikaGame.config.WALL_THICKNESS,
+                wallOptions
+            ),
+            Bodies.rectangle(
+                -SuikaGame.config.WALL_THICKNESS / 2,
+                SuikaGame.config.GAME_HEIGHT / 2,
+                SuikaGame.config.WALL_THICKNESS,
+                SuikaGame.config.GAME_HEIGHT,
+                wallOptions
+            ),
+            Bodies.rectangle(
+                SuikaGame.config.GAME_WIDTH + SuikaGame.config.WALL_THICKNESS / 2,
+                SuikaGame.config.GAME_HEIGHT / 2,
+                SuikaGame.config.WALL_THICKNESS,
+                SuikaGame.config.GAME_HEIGHT,
+                wallOptions
+            ),
+            Bodies.rectangle(
+                SuikaGame.config.GAME_WIDTH / 2,
+                SuikaGame.config.gameOverLine,
+                SuikaGame.config.GAME_WIDTH,
+                2,
+                {
+                    isStatic: true,
+                    isSensor: true,
+                    isGameOverLine: true,
+                    render: { fillStyle: 'rgba(214, 40, 40, 0.55)' }
+                }
+            )
         ];
 
         World.add(SuikaGame.config.engine.world, walls);
     },
 
-
-
     setupCollisionEvents: function () {
         const { Events, Composite } = Matter;
-
-        // Mapa para rastrear frutas que estão cruzando a linha
         const fruitsOverLine = new Map();
 
         Events.on(SuikaGame.config.engine, 'collisionStart', function (event) {
-            const pairs = event.pairs;
-            for (let i = 0; i < pairs.length; i++) {
-                const pair = pairs[i];
+            for (let i = 0; i < event.pairs.length; i++) {
+                const pair = event.pairs[i];
 
-                // Verificar colisões entre frutas
                 if (pair.bodyA.isFruit && pair.bodyB.isFruit) {
                     SuikaGame.game.handleFruitCollision(pair.bodyA, pair.bodyB);
                 }
@@ -107,163 +106,142 @@ SuikaGame.physics = {
             const gameOverLine = Composite.allBodies(SuikaGame.config.engine.world)
                 .find(body => body.isGameOverLine);
 
-            if (!gameOverLine || SuikaGame.config.gameOver) return;
+            if (!gameOverLine || SuikaGame.config.gameOver || !SuikaGame.config.gameActive) {
+                return;
+            }
 
             const lineY = gameOverLine.position.y;
 
-            // Verificar cada fruta no rastreador
             fruitsOverLine.forEach((data, id) => {
                 const fruit = data.body;
 
-                // Verificar se a fruta ainda existe no mundo
                 if (!Composite.get(SuikaGame.config.engine.world, id, 'body')) {
                     clearInterval(data.interval);
                     fruitsOverLine.delete(id);
                     return;
                 }
 
-                const fruitRadius = fruit.circleRadius;
-                const fruitBottomY = fruit.position.y + fruitRadius;
+                if (fruit.position.y + fruit.circleRadius < lineY) {
+                    const timeSinceLaunch = Date.now() - data.launchTimestamp;
+                    const timeAboveLine = Date.now() - data.timestamp;
 
-                if (fruitBottomY < lineY) {
-                    // A fruta está completamente acima da linha
-                    const timeElapsedSinceLaunch = Date.now() - data.launchTimestamp;
-                    const timeElapsedAboveLine = Date.now() - data.timestamp;
-
-                    // Iniciar o contador apenas 2 segundos após o lançamento
-                    if (timeElapsedSinceLaunch >= 2000 && timeElapsedAboveLine >= 5000 && !SuikaGame.config.gameOver) {
+                    if (timeSinceLaunch >= 2000 && timeAboveLine >= 5000) {
                         clearInterval(data.interval);
                         fruitsOverLine.clear();
-
                         SuikaGame.game.endGame();
-
                     }
                 } else {
-                    // A fruta voltou para baixo da linha ou não está completamente acima
                     clearInterval(data.interval);
                     fruitsOverLine.delete(id);
-
-                    // Restaurar a aparência original da fruta
-                    if (fruit.render.originalFillStyle) {
-                        fruit.render.fillStyle = fruit.render.originalFillStyle;
-                        if (fruit.render.originalSprite) {
-                            fruit.render.sprite = fruit.render.originalSprite;
-                        }
-                        fruit.render.originalFillStyle = null;
-                        fruit.render.originalSprite = null;
-                    }
+                    SuikaGame.physics.restoreFruitRender(fruit);
                 }
             });
 
-            // Adicionar frutas novas ao rastreador
             Composite.allBodies(SuikaGame.config.engine.world).forEach(body => {
                 if (
                     body.isFruit &&
-                    !body.isStatic && // Apenas frutas que já foram lançadas
-                    !fruitsOverLine.has(body.id)
+                    !body.isStatic &&
+                    !fruitsOverLine.has(body.id) &&
+                    body.position.y + body.circleRadius < lineY
                 ) {
-                    const fruitRadius = body.circleRadius;
-                    const fruitBottomY = body.position.y + fruitRadius;
-
-                    if (fruitBottomY < lineY) {
-                        fruitsOverLine.set(body.id, {
-                            body: body,
-                            timestamp: Date.now(), // Quando cruzou a linha
-                            launchTimestamp: body.launchTimestamp || Date.now(), // Quando foi lançado
-                            interval: setInterval(() => {
-                                // Fazer a fruta piscar em vermelho
-                                if (!body.render.originalFillStyle) {
-                                    body.render.originalFillStyle = body.render.fillStyle;
-                                    body.render.originalSprite = body.render.sprite ? { ...body.render.sprite } : null;
-                                }
-
-                                if (body.render.fillStyle === 'rgba(255, 0, 0, 0.7)') {
-                                    // Voltar para a cor original
-                                    body.render.fillStyle = body.render.originalFillStyle;
-                                    if (body.render.originalSprite) {
-                                        body.render.sprite = body.render.originalSprite;
-                                    }
-                                } else {
-                                    // Mudar para vermelho
-                                    body.render.fillStyle = 'rgba(255, 0, 0, 0.7)';
-                                    if (body.render.sprite) {
-                                        body.render.sprite = null;
-                                    }
-                                }
-                            }, 500) // Piscar a cada 500ms
-                        });
-                    }
+                    fruitsOverLine.set(body.id, {
+                        body: body,
+                        timestamp: Date.now(),
+                        launchTimestamp: body.launchTimestamp || Date.now(),
+                        interval: setInterval(() => {
+                            SuikaGame.physics.toggleWarningRender(body);
+                        }, 500)
+                    });
                 }
             });
         });
     },
 
-    updateGravity: function (newGravity) {
-        SuikaGame.config.engine.gravity.scale = newGravity;
-    },
+    toggleWarningRender: function (body) {
+        if (!body.render.originalFillStyle) {
+            body.render.originalFillStyle = body.render.fillStyle;
+            body.render.originalSprite = body.render.sprite ? { ...body.render.sprite } : null;
+        }
 
-    // Adicione estas funções ao objeto SuikaGame.physics
-    handleMouseMove: function (e) {
-        if (SuikaGame.fruits.currentFruit && SuikaGame.fruits.currentFruit.isStatic && !SuikaGame.config.gameOver) {
-            const rect = document.getElementById('game-canvas').getBoundingClientRect();
-            SuikaGame.config.dropPosition = e.clientX - rect.left;
-
-            // Limitar dentro das bordas
-            const currentFruitRadius = SuikaGame.fruits.types[SuikaGame.fruits.nextFruitIndex].radius;
-            SuikaGame.config.dropPosition = Math.max(currentFruitRadius,
-                Math.min(SuikaGame.config.GAME_WIDTH - currentFruitRadius, SuikaGame.config.dropPosition));
-
-            Matter.Body.setPosition(SuikaGame.fruits.currentFruit, {
-                x: SuikaGame.config.dropPosition,
-                y: SuikaGame.fruits.currentFruit.position.y
-            });
+        if (body.render.fillStyle === 'rgba(214, 40, 40, 0.75)') {
+            this.restoreFruitRender(body);
+        } else {
+            body.render.fillStyle = 'rgba(214, 40, 40, 0.75)';
+            body.render.sprite = null;
         }
     },
 
-    // No arquivo physics.js, modifique:
+    restoreFruitRender: function (body) {
+        if (!body.render.originalFillStyle) {
+            return;
+        }
+
+        body.render.fillStyle = body.render.originalFillStyle;
+
+        if (body.render.originalSprite) {
+            body.render.sprite = body.render.originalSprite;
+        }
+
+        body.render.originalFillStyle = null;
+        body.render.originalSprite = null;
+    },
+
+    updateGravity: function (newGravity) {
+        if (SuikaGame.config.engine) {
+            SuikaGame.config.engine.gravity.scale = newGravity;
+        }
+    },
+
+    handlePointerMove: function (e) {
+        SuikaGame.physics.moveCurrentFruit(e.clientX);
+    },
+
     handleTouchMove: function (e) {
         e.preventDefault();
-        if (SuikaGame.fruits.currentFruit && SuikaGame.fruits.currentFruit.isStatic && !SuikaGame.config.gameOver) {
-            const rect = document.getElementById('game-canvas').getBoundingClientRect();
-            SuikaGame.config.dropPosition = e.touches[0].clientX - rect.left;
 
-            // Limitar dentro das bordas
-            const currentFruitRadius = SuikaGame.fruits.types[SuikaGame.fruits.currentFruit.fruitIndex].radius;
-            SuikaGame.config.dropPosition = Math.max(currentFruitRadius,
-                Math.min(SuikaGame.config.GAME_WIDTH - currentFruitRadius, SuikaGame.config.dropPosition));
-
-            Matter.Body.setPosition(SuikaGame.fruits.currentFruit, {
-                x: SuikaGame.config.dropPosition,
-                y: SuikaGame.fruits.currentFruit.position.y
-            });
+        if (e.touches.length > 0) {
+            SuikaGame.physics.moveCurrentFruit(e.touches[0].clientX);
         }
     },
 
-    dropFruit: function (e) {
-        // Para dispositivos móveis, só soltar a fruta no touchend
-        if (e.type === 'touchend') {
-            if (SuikaGame.fruits.currentFruit && SuikaGame.fruits.currentFruit.isStatic && SuikaGame.config.canDropFruit && !SuikaGame.config.gameOver) {
-                SuikaGame.config.canDropFruit = false;
-                Matter.Body.setStatic(SuikaGame.fruits.currentFruit, false);
+    moveCurrentFruit: function (clientX) {
+        const currentFruit = SuikaGame.fruits.currentFruit;
 
-                // Esperar um pouco antes de criar a próxima fruta
-                setTimeout(function () {
-                    SuikaGame.fruits.createNewFruit();
-                }, 500);
-            }
+        if (!currentFruit || !currentFruit.isStatic || SuikaGame.config.gameOver) {
+            return;
         }
-        // Para mouse, manter o comportamento de clique
-        else if (e.type === 'mousedown') {
-            if (SuikaGame.fruits.currentFruit && SuikaGame.fruits.currentFruit.isStatic && SuikaGame.config.canDropFruit && !SuikaGame.config.gameOver) {
-                SuikaGame.config.canDropFruit = false;
-                Matter.Body.setStatic(SuikaGame.fruits.currentFruit, false);
 
-                // Esperar um pouco antes de criar a próxima fruta
-                setTimeout(function () {
-                    SuikaGame.fruits.createNewFruit();
-                }, 500);
-            }
+        const rect = document.getElementById('game-canvas').getBoundingClientRect();
+        const scaleX = SuikaGame.config.GAME_WIDTH / rect.width;
+        const currentFruitRadius = SuikaGame.fruits.types[currentFruit.fruitIndex].radius;
+
+        SuikaGame.config.dropPosition = (clientX - rect.left) * scaleX;
+        SuikaGame.config.dropPosition = Math.max(
+            currentFruitRadius,
+            Math.min(SuikaGame.config.GAME_WIDTH - currentFruitRadius, SuikaGame.config.dropPosition)
+        );
+
+        Matter.Body.setPosition(currentFruit, {
+            x: SuikaGame.config.dropPosition,
+            y: currentFruit.position.y
+        });
+    },
+
+    dropFruit: function () {
+        const currentFruit = SuikaGame.fruits.currentFruit;
+
+        if (!currentFruit || !currentFruit.isStatic || !SuikaGame.config.canDropFruit || SuikaGame.config.gameOver) {
+            return;
         }
+
+        SuikaGame.config.canDropFruit = false;
+        currentFruit.launchTimestamp = Date.now();
+        Matter.Body.setStatic(currentFruit, false);
+
+        setTimeout(function () {
+            if (!SuikaGame.config.gameOver && SuikaGame.config.gameActive) {
+                SuikaGame.fruits.createNewFruit();
+            }
+        }, 500);
     }
-
-}
+};

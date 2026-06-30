@@ -10,43 +10,43 @@
 </head>
 
 <body>
-    <div id="menu-container">
-        <h1 id="game-title">Suika Game</h1>
-        <div id="high-score">Melhor pontuação: 0</div>
-        <div id="difficulty-buttons">
-            <button id="easy-button" class="menu-button">Fácil</button>
-            <button id="normal-button" class="menu-button">Normal</button>
-            <button id="hard-button" class="menu-button">Difícil</button>
-            <button id="back-button" class="menu-button">Voltar</button>
-        </div>
-        <button id="start-button" class="menu-button">Iniciar Jogo</button>
-        <button id="options-button" class="menu-button">Opções</button>
-    </div>
-
-
-
-    <div id="game-area">
-        <div id="game-container">
-            <div id="game-header">
-                <div id="score">Pontos: 0</div>
-                <div id="next-fruit-container">
-                    <span>Próxima:</span>
-                    <div id="next-fruit-preview"></div>
-                </div>
+    <main id="app">
+        <div id="menu-container">
+            <h1 id="game-title">Suika Game</h1>
+            <div id="high-score">Melhor pontuação: 0</div>
+            <div id="difficulty-buttons">
+                <button id="easy-button" class="menu-button">Fácil</button>
+                <button id="normal-button" class="menu-button">Normal</button>
+                <button id="hard-button" class="menu-button">Difícil</button>
+                <button id="back-button" class="menu-button secondary">Voltar</button>
             </div>
-            <canvas id="game-canvas" width="400" height="700"></canvas>
+            <button id="start-button" class="menu-button">Iniciar jogo</button>
+            <button id="options-button" class="menu-button secondary">Opções</button>
         </div>
-        <div id="fruit-evolution">
 
-            <div id="evolution-diagram"></div>
+        <div id="game-area">
+            <div id="game-container">
+                <div id="game-header">
+                    <div id="score">Pontos: 0</div>
+                    <div id="next-fruit-container">
+                        <span>Próxima</span>
+                        <div id="next-fruit-preview"></div>
+                    </div>
+                </div>
+                <canvas id="game-canvas" width="400" height="700"></canvas>
+            </div>
+
+            <aside id="fruit-evolution" aria-label="Evolução das frutas">
+                <div id="evolution-diagram"></div>
+            </aside>
         </div>
-    </div>
-    <div id="game-over-card" style="display: none;">
-        <h2 id="game-over-message"></h2>
-        <button id="restart-button">Reiniciar</button>
-        <button id="return-button">Retornar ao Menu</button>
-    </div>
 
+        <div id="game-over-card" style="display: none;">
+            <h2 id="game-over-message"></h2>
+            <button id="restart-button">Reiniciar</button>
+            <button id="return-button">Retornar ao menu</button>
+        </div>
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="js/config.js"></script>
