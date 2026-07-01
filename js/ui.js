@@ -81,7 +81,8 @@ SuikaGame.ui = {
     },
 
     showOptions: function () {
-        document.getElementById('game-title').style.display = 'none';
+        document.getElementById('game-title').textContent = 'Opções';
+        document.getElementById('game-title').style.display = 'block';
         document.querySelector('.menu-stats').style.display = 'none';
         document.querySelector('.menu-actions').style.display = 'none';
         document.getElementById('login-button').style.display = 'none';
@@ -106,6 +107,7 @@ SuikaGame.ui = {
         this.updateAccessibilityControls();
         this.renderMedalStrip();
 
+        document.getElementById('game-title').textContent = 'Suika Game';
         document.getElementById('game-title').style.display = 'block';
         document.querySelector('.menu-stats').style.display = 'grid';
         document.querySelector('.menu-actions').style.display = 'grid';
@@ -184,6 +186,7 @@ SuikaGame.ui = {
 
             action.disabled = !isUnlocked && coins < pack.price;
             action.textContent = isActive ? 'Equipada' : isUnlocked ? 'Equipar' : coins >= pack.price ? 'Comprar' : 'Bloqueada';
+            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= pack.price ? 'buy' : 'locked';
             action.addEventListener('click', () => {
                 if (isUnlocked) SuikaGame.skins.setActive(pack.id);
                 else SuikaGame.skins.buyPack(pack.id);
@@ -209,6 +212,7 @@ SuikaGame.ui = {
             preview.classList.add('music-preview');
             action.disabled = !isUnlocked && coins < track.price;
             action.textContent = isActive ? 'Tocando' : isUnlocked ? 'Equipar' : coins >= track.price ? 'Comprar' : 'Bloqueada';
+            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= track.price ? 'buy' : 'locked';
             action.addEventListener('click', () => {
                 if (isUnlocked) SuikaGame.skins.setActiveTrack(track.id);
                 else SuikaGame.skins.buyTrack(track.id);
@@ -233,6 +237,7 @@ SuikaGame.ui = {
             preview.classList.add('power-preview');
             action.disabled = coins < power.price;
             action.textContent = coins >= power.price ? 'Comprar' : 'Sem moedas';
+            action.dataset.state = coins >= power.price ? 'buy' : 'locked';
             action.addEventListener('click', () => {
                 SuikaGame.skins.buyPower(power.id);
                 this.afterShopAction();
@@ -249,8 +254,10 @@ SuikaGame.ui = {
             <div class="shop-card-body">
                 <h3>${title}</h3>
                 <p>${description}</p>
-                <span class="shop-price">${price}</span>
-                <button class="shop-action"></button>
+                <div class="shop-card-footer">
+                    <span class="shop-price">${price}</span>
+                    <button class="shop-action"></button>
+                </div>
             </div>
         `;
         return card;

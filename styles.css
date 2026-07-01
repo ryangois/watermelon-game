@@ -1,15 +1,20 @@
 :root {
-    --ink: #34291f;
-    --paper: #fff8ea;
+    --ink: #2f261f;
+    --paper: #fffaf0;
     --panel: #ffffff;
-    --red: #d62828;
-    --teal: #2a9d8f;
-    --purple: #7b2cbf;
-    --gold: #f4a261;
-    --game-width: clamp(340px, min(72vw, calc((100vh - 32px) * 0.55)), 480px);
-    --line: 3px solid var(--ink);
+    --panel-soft: #fffdf8;
+    --red: #e03131;
+    --teal: #22998d;
+    --purple: #7c2ec5;
+    --gold: #f2b84b;
+    --muted: rgba(47, 38, 31, 0.64);
+    --border-soft: rgba(47, 38, 31, 0.12);
+    --menu-width: 420px;
+    --shop-width: 560px;
+    --game-width: clamp(360px, min(74vw, calc((100vh - 32px) * 0.58)), 500px);
+    --line: 1px solid var(--border-soft);
     --radius: 8px;
-    --soft-shadow: 0 18px 38px rgba(63, 52, 37, 0.18);
+    --soft-shadow: 0 18px 44px rgba(63, 52, 37, 0.16);
 }
 
 * {
@@ -28,10 +33,8 @@ body {
 body {
     min-height: 100vh;
     background:
-        radial-gradient(circle at 26% 14%, rgba(255, 246, 202, 0.95), transparent 30%),
-        radial-gradient(circle at 80% 92%, rgba(150, 227, 203, 0.6), transparent 36%),
-        linear-gradient(135deg, rgba(255, 236, 179, 0.92), rgba(184, 236, 217, 0.9)),
-        #f6f0df;
+        linear-gradient(145deg, #fff2bf 0%, #eef3d1 46%, #bdf0dc 100%),
+        #eef1d4;
     color: var(--ink);
     font-family: 'Poppins', sans-serif;
 }
@@ -40,13 +43,19 @@ button {
     font: inherit;
 }
 
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid rgba(124, 46, 197, 0.3);
+    outline-offset: 3px;
+}
+
 #app {
     width: 100%;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 14px;
+    padding: clamp(12px, 3vw, 28px);
     overflow-x: hidden;
 }
 
@@ -58,19 +67,21 @@ button {
     box-shadow: var(--soft-shadow);
 }
 
-#menu-container,
+#menu-container {
+    width: min(var(--menu-width), calc(100vw - 28px));
+    background: var(--paper);
+}
+
 #shop-container {
-    width: min(var(--game-width), calc(100vw - 24px));
+    width: min(var(--shop-width), calc(100vw - 28px));
     background: var(--paper);
 }
 
 #menu-container {
-    min-height: min(777px, calc(100vh - 32px));
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 11px;
-    padding: clamp(20px, 4vw, 30px);
+    gap: 14px;
+    padding: 28px;
 }
 
 .menu-top {
@@ -81,9 +92,10 @@ button {
 }
 
 #game-title {
-    font-size: clamp(42px, 12vw, 62px);
-    line-height: 0.95;
+    font-size: clamp(46px, 9vw, 60px);
+    line-height: 0.9;
     letter-spacing: 0;
+    max-width: 8ch;
 }
 
 .login-button {
@@ -92,13 +104,13 @@ button {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border: 2px solid rgba(52, 41, 31, 0.14);
+    border: 1px solid rgba(47, 38, 31, 0.2);
     border-radius: var(--radius);
     background: #fff;
     color: var(--ink);
     cursor: default;
     font-weight: 800;
-    box-shadow: inset 0 -2px 0 rgba(52, 41, 31, 0.05);
+    box-shadow: 0 5px 14px rgba(63, 52, 37, 0.06);
 }
 
 .login-button span {
@@ -109,7 +121,7 @@ button {
 .menu-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 10px;
 }
 
 #high-score,
@@ -119,9 +131,9 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgba(63, 52, 37, 0.12);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius);
-    background: var(--panel);
+    background: rgba(255, 255, 255, 0.78);
     padding: 8px 10px;
     text-align: center;
     font-size: 15px;
@@ -129,8 +141,9 @@ button {
 }
 
 #difficulty-status {
-    min-height: 38px;
+    min-height: 40px;
     color: #805100;
+    background: rgba(255, 255, 255, 0.72);
 }
 
 .menu-actions,
@@ -144,12 +157,12 @@ button {
 }
 
 .settings-toggle {
-    min-height: 54px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    border: 2px solid rgba(63, 52, 37, 0.12);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     background: #fff;
     padding: 10px 14px;
@@ -171,10 +184,10 @@ button {
     background: var(--red);
     color: #fff;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     transition: filter 160ms ease, transform 160ms ease;
-    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 18px rgba(63, 52, 37, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.12);
 }
 
 .menu-button.secondary {
@@ -197,14 +210,14 @@ button {
 .power-button:hover,
 .shop-tab:hover {
     filter: brightness(1.05);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 #how-to-play {
-    border: 2px solid rgba(63, 52, 37, 0.12);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius);
-    background: #fff;
-    padding: 12px;
+    background: rgba(255, 255, 255, 0.78);
+    padding: 14px;
 }
 
 #how-to-play h2 {
@@ -213,7 +226,7 @@ button {
 }
 
 #how-to-play p {
-    color: rgba(52, 41, 31, 0.76);
+    color: var(--muted);
     font-size: 13px;
     line-height: 1.35;
 }
@@ -227,7 +240,7 @@ button {
 .medal,
 .earned-medal {
     border-radius: 999px;
-    background: rgba(52, 41, 31, 0.1);
+    background: rgba(52, 41, 31, 0.08);
     color: rgba(52, 41, 31, 0.62);
     padding: 5px 8px;
     font-size: 11px;
@@ -256,7 +269,7 @@ footer {
     background: var(--red);
     color: #fff;
     cursor: pointer;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 800;
     line-height: 1;
     transition: filter 160ms ease, transform 160ms ease;
@@ -273,10 +286,11 @@ footer {
     display: none;
     flex-direction: column;
     gap: 12px;
-    max-height: calc(100vh - 24px);
+    max-height: min(760px, calc(100vh - 32px));
     padding: 16px;
     overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-gutter: stable;
 }
 
 .shop-header {
@@ -288,21 +302,21 @@ footer {
     top: -16px;
     z-index: 2;
     margin: -16px -16px 0;
-    border-bottom: 2px solid rgba(52, 41, 31, 0.12);
+    border-bottom: 1px solid var(--border-soft);
     background: rgba(255, 248, 234, 0.96);
     padding: 16px 16px 12px;
     backdrop-filter: blur(8px);
 }
 
 .shop-header h2 {
-    font-size: clamp(34px, 9vw, 48px);
-    line-height: 0.95;
+    font-size: 42px;
+    line-height: 0.9;
 }
 
 #shop-coins {
-    margin-top: 6px;
+    margin-top: 4px;
     color: #805100;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 800;
 }
 
@@ -310,12 +324,12 @@ footer {
     display: flex;
     gap: 6px;
     position: sticky;
-    top: 72px;
+    top: 70px;
     z-index: 2;
     margin: 0 -2px;
     border-radius: var(--radius);
-    background: rgba(255, 248, 234, 0.92);
-    padding: 2px;
+    background: rgba(255, 248, 234, 0.95);
+    padding: 4px;
     backdrop-filter: blur(8px);
 }
 
@@ -328,7 +342,7 @@ footer {
     color: var(--ink);
     cursor: pointer;
     font-weight: 800;
-    font-size: 15px;
+    font-size: 14px;
     white-space: nowrap;
 }
 
@@ -339,31 +353,36 @@ footer {
 
 .shop-list {
     display: none;
-    gap: 10px;
+    gap: 9px;
 }
 
 .shop-list.active {
     display: grid;
+    align-content: start;
 }
 
 .shop-card {
     display: grid;
-    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-columns: 82px minmax(0, 1fr);
     gap: 12px;
-    border: 2px solid rgba(63, 52, 37, 0.14);
+    align-items: center;
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius);
-    background: var(--panel);
-    padding: 11px;
+    background: var(--panel-soft);
+    padding: 10px;
     overflow: hidden;
-    box-shadow: 0 8px 18px rgba(63, 52, 37, 0.08);
+    box-shadow: 0 8px 18px rgba(63, 52, 37, 0.07);
 }
 
 .shop-preview {
-    min-height: 104px;
+    min-height: 82px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    place-items: center;
     align-content: center;
-    gap: 5px;
+    gap: 4px;
+    border-radius: var(--radius);
+    background: rgba(52, 41, 31, 0.06);
 }
 
 .music-preview,
@@ -372,14 +391,14 @@ footer {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius);
-    background: rgba(52, 41, 31, 0.08);
-    font-size: 40px;
+    background: rgba(52, 41, 31, 0.06);
+    font-size: 34px;
     font-weight: 800;
 }
 
 .skin-preview-fruit {
-    width: 42px;
-    height: 42px;
+    width: 32px;
+    height: 32px;
 }
 
 #next-fruit-preview,
@@ -413,40 +432,60 @@ footer {
 
 .shop-card h3 {
     overflow-wrap: anywhere;
-    font-size: 21px;
-    line-height: 1.05;
+    font-size: 18px;
+    line-height: 1.08;
 }
 
 .shop-card p {
-    color: rgba(52, 41, 31, 0.76);
+    color: var(--muted);
     font-size: 13px;
-    line-height: 1.3;
+    line-height: 1.32;
 }
 
 .shop-price {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
 }
 
+.shop-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
 .shop-action {
-    width: fit-content;
-    min-width: 108px;
-    min-height: 36px;
+    width: 108px;
+    min-height: 38px;
     border: 0;
     border-radius: var(--radius);
     background: var(--teal);
     color: #fff;
     cursor: pointer;
-    padding: 7px 12px;
+    padding: 8px 10px;
     font-weight: 800;
+    font-size: 14px;
     box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+}
+
+.shop-action[data-state="active"] {
+    background: #268a7e;
+}
+
+.shop-action[data-state="available"] {
+    background: var(--purple);
+}
+
+.shop-action[data-state="locked"] {
+    background: #8dbbb3;
+    color: #fff;
 }
 
 .shop-action:disabled,
 .power-button:disabled {
     cursor: not-allowed;
-    filter: grayscale(0.35);
-    opacity: 0.6;
+    filter: grayscale(0.22);
+    opacity: 0.72;
     transform: none;
 }
 
@@ -684,13 +723,15 @@ footer {
 @media (max-width: 720px) {
     :root {
         --game-width: 100%;
-        --line: 3px solid var(--ink);
+        --menu-width: 420px;
+        --shop-width: 440px;
+        --line: 2px solid var(--ink);
     }
 
     #app {
         align-items: flex-start;
         justify-content: center;
-        padding: 8px 6px;
+        padding: 10px;
     }
 
     #game-area {
@@ -701,17 +742,19 @@ footer {
     }
 
     #menu-container,
-    #shop-container,
+    #shop-container {
+        width: min(420px, calc(100vw - 20px));
+        max-width: none;
+    }
+
     #game-container {
-        width: min(430px, calc(100vw - 12px));
+        width: min(440px, calc(100vw - 20px));
         max-width: none;
     }
 
     #menu-container {
-        min-height: calc(100vh - 16px);
-        justify-content: flex-start;
-        gap: 10px;
-        padding: 22px 22px 18px;
+        gap: 12px;
+        padding: 20px 16px 16px;
     }
 
     .menu-top {
@@ -719,12 +762,13 @@ footer {
     }
 
     #game-title {
-        font-size: clamp(48px, 16vw, 70px);
+        font-size: clamp(42px, 14vw, 58px);
     }
 
     .login-button {
-        justify-content: space-between;
-        padding: 0 14px;
+        justify-content: center;
+        padding: 0 12px;
+        font-size: 13px;
     }
 
     .menu-stats {
@@ -733,30 +777,31 @@ footer {
 
     #high-score,
     #coin-balance {
-        min-height: 74px;
-        font-size: 16px;
+        min-height: 54px;
+        font-size: 14px;
+        line-height: 1.15;
     }
 
     #difficulty-status {
-        min-height: 44px;
-        font-size: 16px;
+        min-height: 40px;
+        font-size: 14px;
     }
 
     .menu-button {
-        min-height: 58px;
-        font-size: 20px;
+        min-height: 50px;
+        font-size: 17px;
     }
 
     #how-to-play {
-        padding: 14px;
+        padding: 12px;
     }
 
     #how-to-play h2 {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     #how-to-play p {
-        font-size: 15px;
+        font-size: 13px;
     }
 
     #medal-strip {
@@ -764,11 +809,11 @@ footer {
     }
 
     .medal {
-        padding: 7px 10px;
+        padding: 5px 8px;
     }
 
     #shop-container {
-        max-height: calc(100vh - 16px);
+        max-height: calc(100dvh - 20px);
         padding: 12px;
         gap: 10px;
     }
@@ -776,32 +821,32 @@ footer {
     .shop-header {
         top: -12px;
         margin: -12px -12px 0;
-        padding: 14px 12px 10px;
+        padding: 12px;
     }
 
     .shop-header h2 {
-        font-size: clamp(38px, 13vw, 54px);
+        font-size: 38px;
     }
 
     #shop-coins {
-        font-size: 20px;
+        font-size: 15px;
         line-height: 1.15;
     }
 
     .icon-button {
-        width: 58px;
-        height: 58px;
-        font-size: 34px;
+        width: 44px;
+        height: 44px;
+        font-size: 28px;
     }
 
     .icon-button.small {
-        width: 58px;
-        height: 58px;
-        font-size: 24px;
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
     }
 
     .shop-tabs {
-        top: 84px;
+        top: 66px;
         gap: 4px;
         padding: 4px;
         overflow: visible;
@@ -809,32 +854,30 @@ footer {
 
     .shop-tab {
         min-width: 0;
-        min-height: 46px;
+        min-height: 40px;
         padding: 0 4px;
-        font-size: clamp(13px, 4.1vw, 17px);
+        font-size: clamp(12px, 3.7vw, 14px);
     }
 
     .shop-card {
-        grid-template-columns: 86px minmax(0, 1fr);
+        grid-template-columns: 76px minmax(0, 1fr);
         gap: 10px;
         padding: 10px;
         align-items: center;
     }
 
     .shop-preview {
-        min-height: 86px;
+        min-height: 76px;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         align-content: center;
         gap: 4px;
-        border-radius: var(--radius);
-        background: rgba(255, 255, 255, 0.55);
     }
 
     .skin-preview-fruit {
-        width: 34px;
-        height: 34px;
+        width: 29px;
+        height: 29px;
     }
 
     .music-preview,
@@ -843,12 +886,12 @@ footer {
     }
 
     .shop-card h3 {
-        font-size: 22px;
-        line-height: 1.05;
+        font-size: clamp(17px, 5vw, 20px);
+        line-height: 1.08;
     }
 
     .shop-card p {
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1.25;
     }
 
@@ -858,8 +901,8 @@ footer {
 
     .shop-action {
         width: 100%;
-        min-height: 42px;
-        font-size: 17px;
+        min-height: 38px;
+        font-size: 15px;
     }
 
     #game-header {
@@ -899,7 +942,7 @@ footer {
     }
 
     #fruit-evolution {
-        width: min(430px, calc(100vw - 12px));
+        width: min(440px, calc(100vw - 20px));
         max-width: none;
         max-height: none;
         padding: 8px;
@@ -920,48 +963,54 @@ footer {
 
 @media (max-width: 380px) {
     #app {
-        padding: 6px 4px;
+        padding: 8px;
     }
 
     #menu-container,
     #shop-container,
     #game-container,
     #fruit-evolution {
-        width: calc(100vw - 8px);
+        width: calc(100vw - 16px);
     }
 
     #menu-container {
-        padding: 20px 18px 16px;
+        padding: 18px 14px 14px;
     }
 
     #game-title {
-        font-size: 54px;
+        font-size: 48px;
     }
 
     .shop-card {
-        grid-template-columns: 78px minmax(0, 1fr);
+        grid-template-columns: 70px minmax(0, 1fr);
         gap: 8px;
     }
 
     .shop-preview {
-        min-height: 78px;
+        min-height: 70px;
     }
 
     .skin-preview-fruit {
-        width: 31px;
-        height: 31px;
+        width: 27px;
+        height: 27px;
     }
 
     .shop-card h3 {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .shop-card p {
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .shop-tab {
-        font-size: 13px;
+        font-size: 12px;
+    }
+
+    .shop-card-footer {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 6px;
     }
 
     #next-fruit-container {
