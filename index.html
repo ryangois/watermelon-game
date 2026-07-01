@@ -83,9 +83,12 @@
                         <div class="game-stat" id="score">Pontos: 0</div>
                         <div class="game-stat" id="game-coins">Moedas: 0</div>
                     </div>
-                    <div id="next-fruit-container">
-                        <span>Próxima</span>
-                        <div id="next-fruit-preview"></div>
+                    <div id="game-header-actions">
+                        <div id="next-fruit-container">
+                            <span>Próxima</span>
+                            <div id="next-fruit-preview"></div>
+                        </div>
+                        <button id="game-options-button" class="icon-button small settings-button" aria-label="Abrir opções">⚙</button>
                     </div>
                 </div>
                 <canvas id="game-canvas" width="400" height="700"></canvas>
@@ -95,6 +98,26 @@
                     <button id="move-right-button" class="control-action" aria-label="Mover para direita">→</button>
                 </div>
                 <div id="power-toolbar" aria-label="Poderes disponíveis"></div>
+                <div id="game-options-panel" aria-label="Opções do jogo">
+                    <div class="game-options-card">
+                        <div class="game-options-header">
+                            <h2>Opções</h2>
+                            <button id="game-options-close-button" class="icon-button" aria-label="Fechar opções">×</button>
+                        </div>
+                        <label class="settings-toggle">
+                            <input id="game-mute-toggle" type="checkbox">
+                            <span>Mutar música</span>
+                        </label>
+                        <label class="settings-toggle">
+                            <input id="game-accessibility-toggle" type="checkbox">
+                            <span>Controles na tela</span>
+                        </label>
+                        <label class="settings-toggle">
+                            <input id="game-fruit-radius-toggle" type="checkbox">
+                            <span>Mostrar raio das frutas</span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <aside id="fruit-evolution" aria-label="Evolução das frutas">

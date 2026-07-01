@@ -12,7 +12,7 @@
     --border-soft: rgba(47, 38, 31, 0.12);
     --menu-width: 420px;
     --shop-width: 560px;
-    --game-width: clamp(360px, min(74vw, calc((100vh - 32px) * 0.58)), 500px);
+    --game-width: clamp(300px, min(74vw, calc((100dvh - 150px) * 0.571)), 500px);
     --line: 1px solid var(--border-soft);
     --radius: 8px;
     --soft-shadow: 0 18px 44px rgba(63, 52, 37, 0.16);
@@ -55,10 +55,11 @@ input:focus-visible {
 #app {
     width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(12px, 3vw, 28px);
+    padding: clamp(8px, 2.5vw, 24px);
     overflow-x: hidden;
 }
 
@@ -535,6 +536,14 @@ footer {
     padding: 10px clamp(10px, 2vw, 16px);
 }
 
+#game-header-actions {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 #game-stats {
     min-width: 0;
     display: grid;
@@ -556,7 +565,7 @@ footer {
 }
 
 #next-fruit-container {
-    min-width: 112px;
+    min-width: 104px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -577,6 +586,11 @@ footer {
     height: auto;
     background: var(--canvas-bg);
     touch-action: none;
+}
+
+.settings-button {
+    background: var(--purple);
+    font-size: 19px;
 }
 
 #game-controls {
@@ -621,6 +635,45 @@ footer {
     flex-direction: column;
     gap: 7px;
     pointer-events: none;
+}
+
+#game-options-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    display: none;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 12px;
+    background: rgba(47, 38, 31, 0.18);
+    backdrop-filter: blur(3px);
+}
+
+#game-options-panel.open {
+    display: flex;
+}
+
+.game-options-card {
+    width: min(320px, calc(100% - 8px));
+    display: grid;
+    gap: 10px;
+    border: var(--line);
+    border-radius: var(--radius);
+    background: rgba(255, 250, 240, 0.96);
+    padding: 12px;
+    box-shadow: 0 18px 38px rgba(47, 38, 31, 0.22);
+}
+
+.game-options-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.game-options-header h2 {
+    font-size: 24px;
+    line-height: 1;
 }
 
 .power-button {
@@ -929,6 +982,7 @@ footer {
     #game-header {
         min-height: 66px;
         padding: 8px 10px;
+        gap: 8px;
     }
 
     #game-stats {
@@ -944,9 +998,15 @@ footer {
     }
 
     #next-fruit-container {
-        min-width: 92px;
+        min-width: 84px;
         gap: 6px;
         font-size: 12px;
+    }
+
+    .settings-button {
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
     }
 
     #next-fruit-preview {
@@ -1057,7 +1117,64 @@ footer {
     }
 
     #next-fruit-container {
-        min-width: 96px;
+        min-width: 78px;
+    }
+}
+
+@media (max-height: 860px) and (min-width: 721px) {
+    :root {
+        --game-width: clamp(280px, min(70vw, calc((100dvh - 130px) * 0.571)), 460px);
+    }
+
+    #app {
+        align-items: flex-start;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    #game-header {
+        min-height: 58px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .game-stat {
+        font-size: clamp(13px, 1.5vw, 18px);
+    }
+
+    #game-coins,
+    #next-fruit-container {
+        font-size: 13px;
+    }
+
+    #next-fruit-preview {
+        width: 42px;
+        height: 42px;
+    }
+
+    #power-toolbar {
+        top: 66px;
+    }
+
+    .power-button {
+        width: 38px;
+        height: 38px;
+        min-height: 38px;
+        font-size: 15px;
+    }
+
+    #fruit-evolution {
+        width: 58px;
+        padding: 8px;
+    }
+
+    .evolution-row {
+        gap: 6px;
+    }
+
+    .fruit-icon {
+        width: 38px;
+        height: 38px;
     }
 }
 

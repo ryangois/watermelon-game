@@ -12,6 +12,7 @@ SuikaGame.game = {
         SuikaGame.physics.applyTheme();
         this.resetGame();
         SuikaGame.config.gameActive = true;
+        SuikaGame.ui.setGameOptionsOpen(false);
 
         document.getElementById('menu-container').style.display = 'none';
         document.getElementById('shop-container').style.display = 'none';

@@ -29,6 +29,8 @@ SuikaGame.ui = {
         document.getElementById('shop-button').addEventListener('click', () => this.showShop());
         document.getElementById('shop-close-button').addEventListener('click', () => this.showMainMenu());
         document.getElementById('mute-button').addEventListener('click', () => SuikaGame.audio.toggleMute());
+        document.getElementById('game-options-button').addEventListener('click', () => this.setGameOptionsOpen(true));
+        document.getElementById('game-options-close-button').addEventListener('click', () => this.setGameOptionsOpen(false));
         document.getElementById('easy-button').addEventListener('click', () => this.setDifficulty('easy'));
         document.getElementById('normal-button').addEventListener('click', () => this.setDifficulty('normal'));
         document.getElementById('hard-button').addEventListener('click', () => this.setDifficulty('hard'));
@@ -41,6 +43,22 @@ SuikaGame.ui = {
             this.updateAccessibilityControls();
         });
         document.getElementById('fruit-radius-toggle').addEventListener('change', event => {
+            SuikaGame.skins.setFruitRadiusOverlayEnabled(event.target.checked);
+            this.updateAccessibilityControls();
+        });
+        document.getElementById('game-mute-toggle').addEventListener('change', event => {
+            SuikaGame.skins.setMuted(event.target.checked);
+            if (SuikaGame.audio.backgroundMusic) {
+                SuikaGame.audio.backgroundMusic.muted = event.target.checked;
+                if (!event.target.checked) SuikaGame.audio.backgroundMusic.play().catch(function () {});
+            }
+            this.updateMuteButton();
+        });
+        document.getElementById('game-accessibility-toggle').addEventListener('change', event => {
+            SuikaGame.skins.setAccessibilityControlsEnabled(event.target.checked);
+            this.updateAccessibilityControls();
+        });
+        document.getElementById('game-fruit-radius-toggle').addEventListener('change', event => {
             SuikaGame.skins.setFruitRadiusOverlayEnabled(event.target.checked);
             this.updateAccessibilityControls();
         });
@@ -73,8 +91,10 @@ SuikaGame.ui = {
 
     updateMuteButton: function () {
         const button = document.getElementById('mute-button');
+        const gameToggle = document.getElementById('game-mute-toggle');
         button.textContent = SuikaGame.skins.isMuted() ? '×♪' : '♪';
         button.setAttribute('aria-label', SuikaGame.skins.isMuted() ? 'Ativar música' : 'Mutar música');
+        if (gameToggle) gameToggle.checked = SuikaGame.skins.isMuted();
     },
 
     updateAccessibilityControls: function () {
@@ -82,11 +102,23 @@ SuikaGame.ui = {
         const radiusOverlayEnabled = SuikaGame.skins.isFruitRadiusOverlayEnabled();
         const toggle = document.getElementById('accessibility-toggle');
         const radiusToggle = document.getElementById('fruit-radius-toggle');
+        const gameToggle = document.getElementById('game-accessibility-toggle');
+        const gameRadiusToggle = document.getElementById('game-fruit-radius-toggle');
         const controls = document.getElementById('game-controls');
 
         if (toggle) toggle.checked = enabled;
         if (radiusToggle) radiusToggle.checked = radiusOverlayEnabled;
+        if (gameToggle) gameToggle.checked = enabled;
+        if (gameRadiusToggle) gameRadiusToggle.checked = radiusOverlayEnabled;
         if (controls) controls.classList.toggle('enabled', enabled);
+    },
+
+    setGameOptionsOpen: function (open) {
+        const panel = document.getElementById('game-options-panel');
+        if (!panel) return;
+        this.updateMuteButton();
+        this.updateAccessibilityControls();
+        panel.classList.toggle('open', open);
     },
 
     showOptions: function () {
@@ -108,6 +140,7 @@ SuikaGame.ui = {
         document.getElementById('game-area').style.display = 'none';
         document.getElementById('game-container').style.display = 'none';
         document.getElementById('fruit-evolution').style.display = 'none';
+        this.setGameOptionsOpen(false);
     },
 
     showMainMenu: function () {
@@ -131,6 +164,7 @@ SuikaGame.ui = {
         document.getElementById('game-area').style.display = 'none';
         document.getElementById('game-container').style.display = 'none';
         document.getElementById('fruit-evolution').style.display = 'none';
+        this.setGameOptionsOpen(false);
     },
 
     setDifficulty: function (level) {
