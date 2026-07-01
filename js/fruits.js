@@ -1,24 +1,22 @@
-// Namespace global para o jogo
 var SuikaGame = SuikaGame || {};
 
-// Configuração e gerenciamento das frutas
 SuikaGame.fruits = {
     imageSize: 1024,
-    spriteFillScale: 1.18,
+    spriteFillScale: 1.2,
     spawnableCount: 5,
 
     types: [
-        { id: 'cherry', name: 'Cereja', image: 'assets/images/cherries_emoji.png', color: '#ef476f', radius: 20, baseRadius: 20, score: 1 },
-        { id: 'strawberry', name: 'Morango', image: 'assets/images/strawberry_emoji.png', color: '#f94144', radius: 30, baseRadius: 30, score: 3 },
-        { id: 'grape', name: 'Uva', image: 'assets/images/grapes_emoji.png', color: '#7b2cbf', radius: 40, baseRadius: 40, score: 6 },
-        { id: 'orange', name: 'Laranja', image: 'assets/images/orange_emoji.png', color: '#f8961e', radius: 50, baseRadius: 50, score: 10 },
-        { id: 'apple', name: 'Maçã', image: 'assets/images/apple_emoji.png', color: '#d62828', radius: 60, baseRadius: 60, score: 15 },
-        { id: 'pear', name: 'Pêra', image: 'assets/images/pear_emoji.png', color: '#90be6d', radius: 70, baseRadius: 70, score: 21 },
-        { id: 'peach', name: 'Pêssego', image: 'assets/images/peach_emoji.png', color: '#ffb4a2', radius: 80, baseRadius: 80, score: 28 },
-        { id: 'pineapple', name: 'Abacaxi', image: 'assets/images/pineapple_emoji.png', color: '#f9c74f', radius: 90, baseRadius: 90, score: 36 },
-        { id: 'melon', name: 'Melão', image: 'assets/images/melon_emoji.png', color: '#80ed99', radius: 100, baseRadius: 100, score: 45 },
-        { id: 'watermelon', name: 'Melancia', image: 'assets/images/watermelon_emoji.png', color: '#43aa8b', radius: 110, baseRadius: 110, score: 55 },
-        { id: 'jackfruit', name: 'Jaca', image: 'assets/images/jackfruit_emoji.png', color: '#b5a642', radius: 130, baseRadius: 130, score: 89 }
+        { id: 'cherry', name: 'Cereja', image: 'assets/images/cherries_emoji.png', color: '#ef476f', radius: 19, baseRadius: 19, score: 1 },
+        { id: 'strawberry', name: 'Morango', image: 'assets/images/strawberry_emoji.png', color: '#f94144', radius: 29, baseRadius: 29, score: 3 },
+        { id: 'grape', name: 'Uva', image: 'assets/images/grapes_emoji.png', color: '#7b2cbf', radius: 39, baseRadius: 39, score: 6 },
+        { id: 'orange', name: 'Laranja', image: 'assets/images/orange_emoji.png', color: '#f8961e', radius: 49, baseRadius: 49, score: 10 },
+        { id: 'apple', name: 'Maçã', image: 'assets/images/apple_emoji.png', color: '#d62828', radius: 59, baseRadius: 59, score: 15 },
+        { id: 'pear', name: 'Pêra', image: 'assets/images/pear_emoji.png', color: '#90be6d', radius: 69, baseRadius: 69, score: 21 },
+        { id: 'peach', name: 'Pêssego', image: 'assets/images/peach_emoji.png', color: '#ffb4a2', radius: 79, baseRadius: 79, score: 28 },
+        { id: 'pineapple', name: 'Abacaxi', image: 'assets/images/pineapple_emoji.png', color: '#f9c74f', radius: 89, baseRadius: 89, score: 36 },
+        { id: 'melon', name: 'Melão', image: 'assets/images/melon_emoji.png', color: '#80ed99', radius: 99, baseRadius: 99, score: 45 },
+        { id: 'watermelon', name: 'Melancia', image: 'assets/images/watermelon_emoji.png', color: '#43aa8b', radius: 109, baseRadius: 109, score: 55 },
+        { id: 'jackfruit', name: 'Jaca', image: 'assets/images/jackfruit_emoji.png', color: '#b5a642', radius: 128, baseRadius: 128, score: 89, hiddenFromEvolution: true }
     ],
 
     currentFruit: null,

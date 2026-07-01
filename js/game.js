@@ -8,7 +8,7 @@ SuikaGame.game = {
     },
 
     startGame: function () {
-        SuikaGame.game.resetGame();
+        this.resetGame();
         SuikaGame.config.gameActive = true;
 
         document.getElementById('menu-container').style.display = 'none';
@@ -18,6 +18,7 @@ SuikaGame.game = {
 
         SuikaGame.fruits.createNewFruit();
         SuikaGame.audio.playBackgroundMusic();
+        SuikaGame.ui.updatePowerToolbar();
     },
 
     resetGame: function () {
@@ -32,7 +33,6 @@ SuikaGame.game = {
 
         if (SuikaGame.config.engine && SuikaGame.config.engine.world) {
             const bodies = Matter.Composite.allBodies(SuikaGame.config.engine.world);
-
             for (let i = 0; i < bodies.length; i++) {
                 if (bodies[i].isFruit) {
                     Matter.World.remove(SuikaGame.config.engine.world, bodies[i]);
@@ -42,6 +42,7 @@ SuikaGame.game = {
 
         SuikaGame.fruits.nextFruitIndex = Math.floor(Math.random() * Math.min(3, SuikaGame.fruits.spawnableCount));
         SuikaGame.fruits.updateNextFruitPreview();
+        SuikaGame.ui.updatePowerToolbar();
     },
 
     handleFruitCollision: function (fruitA, fruitB) {
@@ -81,6 +82,7 @@ SuikaGame.game = {
 
         SuikaGame.physics.updateGravity(diffSettings.gravity);
         SuikaGame.fruits.updateFruitSizes(diffSettings.fruitSizeMultiplier);
+        SuikaGame.ui.updateDifficultyDisplay();
     },
 
     getHighScore: function () {
@@ -89,19 +91,55 @@ SuikaGame.game = {
 
     saveHighScore: function (score) {
         const currentHighScore = this.getHighScore();
-
         if (score > currentHighScore) {
             localStorage.setItem('suikaHighScore', score);
             return true;
         }
-
         return false;
     },
 
-    endGame: function () {
-        if (SuikaGame.config.gameOver) {
-            return;
+    usePower: function (powerId) {
+        if (!SuikaGame.config.gameActive || SuikaGame.config.gameOver || !SuikaGame.skins.consumePower(powerId)) {
+            return false;
         }
+
+        if (powerId === 'clear-small') {
+            this.removeFruits(body => body.fruitIndex <= 1);
+        }
+
+        if (powerId === 'pop-lowest') {
+            const fruits = this.getLooseFruits().sort((a, b) => a.fruitIndex - b.fruitIndex || b.position.y - a.position.y);
+            if (fruits[0]) Matter.World.remove(SuikaGame.config.engine.world, fruits[0]);
+        }
+
+        if (powerId === 'slow-time') {
+            const currentGravity = SuikaGame.config.engine.gravity.scale;
+            SuikaGame.physics.updateGravity(currentGravity * 0.45);
+            setTimeout(() => {
+                SuikaGame.physics.updateGravity(SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty].gravity);
+            }, 6000);
+        }
+
+        SuikaGame.ui.updatePowerToolbar();
+        SuikaGame.ui.updateCoinDisplays();
+        return true;
+    },
+
+    getLooseFruits: function () {
+        return Matter.Composite.allBodies(SuikaGame.config.engine.world)
+            .filter(body => body.isFruit && !body.isStatic && !body.toRemove);
+    },
+
+    removeFruits: function (predicate) {
+        this.getLooseFruits().forEach(body => {
+            if (predicate(body)) {
+                Matter.World.remove(SuikaGame.config.engine.world, body);
+            }
+        });
+    },
+
+    endGame: function () {
+        if (SuikaGame.config.gameOver) return;
 
         SuikaGame.config.gameOver = true;
         SuikaGame.config.gameActive = false;
@@ -109,24 +147,24 @@ SuikaGame.game = {
         const earnedCoins = SuikaGame.skins.addCoins(SuikaGame.skins.getCoinsForScore(SuikaGame.config.score));
         const isNewHighScore = this.saveHighScore(SuikaGame.config.score);
         const highScore = this.getHighScore();
+        const medals = SuikaGame.progress.evaluateGame(SuikaGame.config.score);
         const message = isNewHighScore
             ? `Nova pontuação recorde!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`
             : `Fim de jogo!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`;
 
         SuikaGame.ui.updateCoinDisplays();
+        SuikaGame.ui.renderMedals(medals);
         document.getElementById('game-over-message').textContent = message;
-
-        const gameOverCard = document.getElementById('game-over-card');
-        gameOverCard.style.display = 'block';
+        document.getElementById('game-over-card').style.display = 'block';
 
         document.getElementById('restart-button').onclick = () => {
-            gameOverCard.style.display = 'none';
-            SuikaGame.game.startGame();
+            document.getElementById('game-over-card').style.display = 'none';
+            this.startGame();
         };
 
         document.getElementById('return-button').onclick = () => {
-            gameOverCard.style.display = 'none';
-            SuikaGame.game.resetGame();
+            document.getElementById('game-over-card').style.display = 'none';
+            this.resetGame();
             SuikaGame.audio.stopBackgroundMusic();
             SuikaGame.ui.showMainMenu();
         };
@@ -137,15 +175,19 @@ SuikaGame.audio = {
     backgroundMusic: null,
 
     playBackgroundMusic: function () {
-        if (!this.backgroundMusic) {
-            this.backgroundMusic = new Audio('assets/music/music-fruits.mp3');
+        const track = SuikaGame.skins.getActiveTrack();
+
+        if (!this.backgroundMusic || this.backgroundMusic.src.indexOf(track.src) === -1) {
+            if (this.backgroundMusic) this.backgroundMusic.pause();
+            this.backgroundMusic = new Audio(track.src);
             this.backgroundMusic.loop = true;
             this.backgroundMusic.volume = 0.35;
         }
 
-        this.backgroundMusic.play().catch(function () {
-            // O navegador pode bloquear autoplay até o primeiro gesto do usuário.
-        });
+        this.backgroundMusic.muted = SuikaGame.skins.isMuted();
+        if (!SuikaGame.skins.isMuted()) {
+            this.backgroundMusic.play().catch(function () {});
+        }
     },
 
     stopBackgroundMusic: function () {
@@ -153,6 +195,16 @@ SuikaGame.audio = {
             this.backgroundMusic.pause();
             this.backgroundMusic.currentTime = 0;
         }
+    },
+
+    toggleMute: function () {
+        const muted = !SuikaGame.skins.isMuted();
+        SuikaGame.skins.setMuted(muted);
+        if (this.backgroundMusic) {
+            this.backgroundMusic.muted = muted;
+            if (!muted) this.backgroundMusic.play().catch(function () {});
+        }
+        SuikaGame.ui.updateMuteButton();
     }
 };
 

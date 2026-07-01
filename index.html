@@ -6,39 +6,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suika Game</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <main id="app">
         <section id="menu-container" class="panel">
-            <h1 id="game-title">Suika Game</h1>
+            <div class="menu-top">
+                <h1 id="game-title">Suika Game</h1>
+                <button id="mute-button" class="icon-button small" aria-label="Mutar música">♪</button>
+            </div>
+
+            <button id="login-button" class="login-button">Entrar com Google <span>em breve</span></button>
+
             <div class="menu-stats">
                 <div id="high-score">Melhor pontuação: 0</div>
                 <div id="coin-balance">Moedas: 0</div>
             </div>
 
+            <div id="difficulty-status">Dificuldade: Normal</div>
+
             <div id="difficulty-buttons">
-                <button id="easy-button" class="menu-button">Fácil</button>
-                <button id="normal-button" class="menu-button">Normal</button>
-                <button id="hard-button" class="menu-button">Difícil</button>
+                <button id="easy-button" class="menu-button difficulty-button" data-level="easy">Fácil</button>
+                <button id="normal-button" class="menu-button difficulty-button" data-level="normal">Normal</button>
+                <button id="hard-button" class="menu-button difficulty-button" data-level="hard">Difícil</button>
                 <button id="back-button" class="menu-button secondary">Voltar</button>
             </div>
 
-            <button id="start-button" class="menu-button">Iniciar jogo</button>
-            <button id="shop-button" class="menu-button accent">Loja de skins</button>
-            <button id="options-button" class="menu-button secondary">Opções</button>
+            <div class="menu-actions">
+                <button id="start-button" class="menu-button">Iniciar jogo</button>
+                <button id="shop-button" class="menu-button accent">Loja</button>
+                <button id="options-button" class="menu-button secondary">Opções</button>
+            </div>
+
+            <section id="how-to-play">
+                <h2>Como jogar</h2>
+                <p>Mova a fruta, solte no pote e junte frutas iguais para evoluir. Se acumular acima da linha por muito tempo, acaba.</p>
+            </section>
+
+            <div id="medal-strip" aria-label="Medalhas"></div>
+            <footer>Feito por Ryan Gois</footer>
         </section>
 
-        <section id="shop-container" class="panel" aria-label="Loja de skins">
+        <section id="shop-container" class="panel" aria-label="Loja">
             <div class="shop-header">
                 <div>
-                    <h2>Loja de skins</h2>
+                    <h2>Loja</h2>
                     <p id="shop-coins">Moedas: 0</p>
                 </div>
                 <button id="shop-close-button" class="icon-button" aria-label="Voltar ao menu">×</button>
             </div>
-            <div id="skin-list"></div>
+
+            <div class="shop-tabs" role="tablist" aria-label="Categorias da loja">
+                <button class="shop-tab active" data-shop-tab="skins">Skins</button>
+                <button class="shop-tab" data-shop-tab="music">Músicas</button>
+                <button class="shop-tab" data-shop-tab="powers">Poderes</button>
+            </div>
+
+            <div id="skin-list" class="shop-list" data-panel="skins"></div>
+            <div id="music-list" class="shop-list" data-panel="music"></div>
+            <div id="power-list" class="shop-list" data-panel="powers"></div>
         </section>
 
         <section id="game-area">
@@ -54,6 +81,12 @@
                     </div>
                 </div>
                 <canvas id="game-canvas" width="400" height="700"></canvas>
+                <div id="game-controls" aria-label="Controles do jogo">
+                    <button id="move-left-button" class="control-action" aria-label="Mover para esquerda">←</button>
+                    <button id="drop-button" class="control-action primary" aria-label="Soltar fruta">Soltar</button>
+                    <button id="move-right-button" class="control-action" aria-label="Mover para direita">→</button>
+                </div>
+                <div id="power-toolbar" aria-label="Poderes disponíveis"></div>
             </div>
 
             <aside id="fruit-evolution" aria-label="Evolução das frutas">
@@ -63,6 +96,7 @@
 
         <div id="game-over-card" style="display: none;">
             <h2 id="game-over-message"></h2>
+            <div id="earned-medals"></div>
             <button id="restart-button">Reiniciar</button>
             <button id="return-button">Retornar ao menu</button>
         </div>
@@ -71,6 +105,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/skins.js"></script>
+    <script src="js/progress.js"></script>
     <script src="js/fruits.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/physics.js"></script>

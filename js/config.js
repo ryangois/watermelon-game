@@ -1,7 +1,5 @@
-// Namespace global para o jogo
 var SuikaGame = SuikaGame || {};
 
-// Configurações do jogo
 SuikaGame.config = {
     GAME_WIDTH: 400,
     GAME_HEIGHT: 700,
@@ -14,19 +12,25 @@ SuikaGame.config = {
 
     DIFFICULTY_LEVELS: {
         easy: {
+            label: 'Fácil',
             gravity: 0.0007,
             fruitSizeMultiplier: 1.15,
-            scoreMultiplier: 0.8
+            scoreMultiplier: 0.8,
+            coinMultiplier: 0.65
         },
         normal: {
+            label: 'Normal',
             gravity: 0.001,
             fruitSizeMultiplier: 1,
-            scoreMultiplier: 1
+            scoreMultiplier: 1,
+            coinMultiplier: 0.85
         },
         hard: {
+            label: 'Difícil',
             gravity: 0.0015,
             fruitSizeMultiplier: 0.85,
-            scoreMultiplier: 1.5
+            scoreMultiplier: 1.5,
+            coinMultiplier: 1
         }
     },
 

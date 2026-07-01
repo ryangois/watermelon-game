@@ -227,6 +227,15 @@ SuikaGame.physics = {
         });
     },
 
+    moveBy: function (deltaX) {
+        const canvas = document.getElementById('game-canvas');
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = SuikaGame.config.GAME_WIDTH / rect.width;
+        const currentX = rect.left + (SuikaGame.config.dropPosition / scaleX);
+
+        this.moveCurrentFruit(currentX + deltaX);
+    },
+
     dropFruit: function () {
         const currentFruit = SuikaGame.fruits.currentFruit;
 
