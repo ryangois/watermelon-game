@@ -31,6 +31,7 @@ SuikaGame.ui = {
         document.getElementById('mute-button').addEventListener('click', () => SuikaGame.audio.toggleMute());
         document.getElementById('game-options-button').addEventListener('click', () => this.setGameOptionsOpen(true));
         document.getElementById('game-options-close-button').addEventListener('click', () => this.setGameOptionsOpen(false));
+        document.getElementById('game-return-menu-button').addEventListener('click', () => this.returnToMenuFromGame());
         document.getElementById('easy-button').addEventListener('click', () => this.setDifficulty('easy'));
         document.getElementById('normal-button').addEventListener('click', () => this.setDifficulty('normal'));
         document.getElementById('hard-button').addEventListener('click', () => this.setDifficulty('hard'));
@@ -119,6 +120,14 @@ SuikaGame.ui = {
         this.updateMuteButton();
         this.updateAccessibilityControls();
         panel.classList.toggle('open', open);
+    },
+
+    returnToMenuFromGame: function () {
+        this.setGameOptionsOpen(false);
+        SuikaGame.config.gameActive = false;
+        SuikaGame.game.resetGame();
+        SuikaGame.audio.stopBackgroundMusic();
+        this.showMainMenu();
     },
 
     showOptions: function () {
