@@ -30,8 +30,11 @@ SuikaGame.game = {
         SuikaGame.config.gameOver = false;
         SuikaGame.config.canDropFruit = true;
         SuikaGame.config.dropPosition = SuikaGame.config.GAME_WIDTH / 2;
+        SuikaGame.config.lineInvisibleUntil = 0;
+        clearTimeout(SuikaGame.config.lineInvisibleTimer);
         SuikaGame.fruits.currentFruit = null;
         SuikaGame.particles.activeParticles = [];
+        SuikaGame.physics.clearLineWarnings();
         SuikaGame.ui.updateScore(0);
         SuikaGame.ui.updateCoinDisplays();
 
@@ -42,6 +45,9 @@ SuikaGame.game = {
                     Matter.World.remove(SuikaGame.config.engine.world, bodies[i]);
                 }
             }
+            const line = SuikaGame.physics.getGameOverLine();
+            if (line) line.isLineHidden = false;
+            SuikaGame.physics.applyTheme();
         }
 
         SuikaGame.fruits.nextFruitIndex = Math.floor(Math.random() * Math.min(3, SuikaGame.fruits.spawnableCount));
@@ -116,12 +122,12 @@ SuikaGame.game = {
             if (fruits[0]) Matter.World.remove(SuikaGame.config.engine.world, fruits[0]);
         }
 
-        if (powerId === 'slow-time') {
-            const currentGravity = SuikaGame.config.engine.gravity.scale;
-            SuikaGame.physics.updateGravity(currentGravity * 0.45);
-            setTimeout(() => {
-                SuikaGame.physics.updateGravity(SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty].gravity);
-            }, 6000);
+        if (powerId === 'hide-line') {
+            SuikaGame.physics.hideGameOverLine(7000);
+        }
+
+        if (powerId === 'clear-medium') {
+            this.removeFruits(body => body.fruitIndex >= 2 && body.fruitIndex <= 3);
         }
 
         SuikaGame.ui.updatePowerToolbar();

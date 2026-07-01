@@ -1,6 +1,8 @@
 var SuikaGame = SuikaGame || {};
 
 SuikaGame.physics = {
+    fruitsOverLine: new Map(),
+
     setupEngine: function () {
         const { Engine, Render, Runner, Events } = Matter;
 
@@ -81,7 +83,7 @@ SuikaGame.physics = {
                     isStatic: true,
                     isSensor: true,
                     isGameOverLine: true,
-                    render: { fillStyle: 'rgba(214, 40, 40, 0.55)' }
+                    render: { fillStyle: SuikaGame.skins.getActiveTheme().vars['--danger-line'] }
                 }
             )
         ];
@@ -91,7 +93,7 @@ SuikaGame.physics = {
 
     setupCollisionEvents: function () {
         const { Events, Composite } = Matter;
-        const fruitsOverLine = new Map();
+        const fruitsOverLine = this.fruitsOverLine;
 
         Events.on(SuikaGame.config.engine, 'collisionStart', function (event) {
             for (let i = 0; i < event.pairs.length; i++) {
@@ -108,6 +110,10 @@ SuikaGame.physics = {
                 .find(body => body.isGameOverLine);
 
             if (!gameOverLine || SuikaGame.config.gameOver || !SuikaGame.config.gameActive) {
+                return;
+            }
+
+            if (SuikaGame.config.lineInvisibleUntil && Date.now() < SuikaGame.config.lineInvisibleUntil) {
                 return;
             }
 
@@ -159,6 +165,11 @@ SuikaGame.physics = {
     },
 
     toggleWarningRender: function (body) {
+        if (SuikaGame.config.lineInvisibleUntil && Date.now() < SuikaGame.config.lineInvisibleUntil) {
+            this.restoreFruitRender(body);
+            return;
+        }
+
         if (!body.render.originalFillStyle) {
             body.render.originalFillStyle = body.render.fillStyle;
             body.render.originalSprite = body.render.sprite ? { ...body.render.sprite } : null;
@@ -197,6 +208,42 @@ SuikaGame.physics = {
         if (SuikaGame.config.render) {
             SuikaGame.config.render.options.background = SuikaGame.skins.getActiveTheme().vars['--canvas-bg'];
         }
+
+        const line = this.getGameOverLine();
+        if (line && !line.isLineHidden) {
+            line.render.fillStyle = SuikaGame.skins.getActiveTheme().vars['--danger-line'];
+        }
+    },
+
+    getGameOverLine: function () {
+        if (!SuikaGame.config.engine) return null;
+        return Matter.Composite.allBodies(SuikaGame.config.engine.world)
+            .find(body => body.isGameOverLine) || null;
+    },
+
+    hideGameOverLine: function (durationMs) {
+        const line = this.getGameOverLine();
+        if (!line) return;
+
+        clearTimeout(SuikaGame.config.lineInvisibleTimer);
+        SuikaGame.config.lineInvisibleUntil = Date.now() + durationMs;
+        line.isLineHidden = true;
+        line.render.fillStyle = 'rgba(0, 0, 0, 0)';
+        this.clearLineWarnings();
+
+        SuikaGame.config.lineInvisibleTimer = setTimeout(() => {
+            line.isLineHidden = false;
+            line.render.fillStyle = SuikaGame.skins.getActiveTheme().vars['--danger-line'];
+            SuikaGame.config.lineInvisibleUntil = 0;
+        }, durationMs);
+    },
+
+    clearLineWarnings: function () {
+        this.fruitsOverLine.forEach(data => {
+            clearInterval(data.interval);
+            this.restoreFruitRender(data.body);
+        });
+        this.fruitsOverLine.clear();
     },
 
     drawFruitRadiusOverlay: function () {

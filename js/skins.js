@@ -1,4 +1,4 @@
-var SuikaGame = SuikaGame || {};
+﻿var SuikaGame = SuikaGame || {};
 
 SuikaGame.skins = {
     storageKeys: {
@@ -35,7 +35,8 @@ SuikaGame.skins = {
     powers: [
         { id: 'clear-small', name: 'Limpar pequenas', description: 'Remove cerejas e morangos já soltos', price: 90 },
         { id: 'pop-lowest', name: 'Estourar menor', description: 'Remove a menor fruta solta do pote', price: 130 },
-        { id: 'slow-time', name: 'Gravidade leve', description: 'Reduz a gravidade por alguns segundos', price: 160 }
+        { id: 'hide-line', name: 'Linha invisível', description: 'Esconde a linha final por 7 segundos', price: 160 },
+        { id: 'clear-medium', name: 'Limpar médias', description: 'Remove uvas e laranjas já soltas', price: 210 }
     ],
 
     testCoinGrant: 9999,
@@ -45,47 +46,47 @@ SuikaGame.skins = {
         classic: {
             background: 'linear-gradient(145deg, #fff2bf 0%, #eef3d1 46%, #bdf0dc 100%)',
             preview: 'linear-gradient(145deg, #fff2bf, #bdf0dc)',
-            vars: { '--ink': '#2f261f', '--paper': '#fffaf0', '--panel': '#ffffff', '--panel-soft': '#fffdf8', '--red': '#e03131', '--teal': '#22998d', '--purple': '#7c2ec5', '--gold': '#f2b84b', '--canvas-bg': '#fff8ea' }
+            vars: { '--ink': '#2f261f', '--paper': '#fffaf0', '--panel': '#ffffff', '--panel-soft': '#fffdf8', '--red': '#e03131', '--teal': '#22998d', '--purple': '#7c2ec5', '--gold': '#f2b84b', '--canvas-bg': '#fff8ea', '--evolution-bg': 'rgba(255, 255, 255, 0.86)', '--danger-line': 'rgba(224, 49, 49, 0.58)' }
         },
         halloween: {
             background: 'radial-gradient(circle at 20% 12%, #ffd166 0 12%, transparent 26%), linear-gradient(145deg, #2d173f 0%, #692052 48%, #ff8f3d 100%)',
             preview: 'linear-gradient(145deg, #2d173f, #ff8f3d)',
-            vars: { '--ink': '#2d1d18', '--paper': '#fff3e4', '--panel': '#fff9f1', '--panel-soft': '#fff1e9', '--red': '#f15a24', '--teal': '#6f42c1', '--purple': '#a41370', '--gold': '#ffb703', '--canvas-bg': '#fff4e8' }
+            vars: { '--ink': '#2d1d18', '--paper': '#fff3e4', '--panel': '#fff9f1', '--panel-soft': '#fff1e9', '--red': '#f15a24', '--teal': '#6f42c1', '--purple': '#a41370', '--gold': '#ffb703', '--canvas-bg': '#fff4e8', '--evolution-bg': 'rgba(58, 20, 62, 0.86)', '--danger-line': 'rgba(164, 19, 112, 0.62)' }
         },
         christmas: {
             background: 'radial-gradient(circle at 78% 14%, #ffffff 0 8%, transparent 22%), linear-gradient(145deg, #f7fff5 0%, #d8f3dc 42%, #b91c1c 100%)',
             preview: 'linear-gradient(145deg, #f7fff5, #b91c1c)',
-            vars: { '--ink': '#26351f', '--paper': '#fbfff5', '--panel': '#ffffff', '--panel-soft': '#f3fff0', '--red': '#c1121f', '--teal': '#2d6a4f', '--purple': '#8d1f2d', '--gold': '#f9c74f', '--canvas-bg': '#fbfff5' }
+            vars: { '--ink': '#26351f', '--paper': '#fbfff5', '--panel': '#ffffff', '--panel-soft': '#f3fff0', '--red': '#c1121f', '--teal': '#2d6a4f', '--purple': '#8d1f2d', '--gold': '#f9c74f', '--canvas-bg': '#fbfff5', '--evolution-bg': 'rgba(247, 255, 245, 0.9)', '--danger-line': 'rgba(193, 18, 31, 0.6)' }
         },
         sideral: {
             background: 'radial-gradient(circle at 25% 18%, #f8f7ff 0 4%, transparent 14%), radial-gradient(circle at 82% 76%, #80ffdb 0 8%, transparent 24%), linear-gradient(145deg, #191235 0%, #3a0ca3 48%, #4cc9f0 100%)',
             preview: 'linear-gradient(145deg, #191235, #4cc9f0)',
-            vars: { '--ink': '#201b35', '--paper': '#f5f2ff', '--panel': '#ffffff', '--panel-soft': '#f0f7ff', '--red': '#ff4d6d', '--teal': '#2ec4b6', '--purple': '#5a189a', '--gold': '#ffd60a', '--canvas-bg': '#f8f7ff' }
+            vars: { '--ink': '#201b35', '--paper': '#f5f2ff', '--panel': '#ffffff', '--panel-soft': '#f0f7ff', '--red': '#ff4d6d', '--teal': '#2ec4b6', '--purple': '#5a189a', '--gold': '#ffd60a', '--canvas-bg': '#f8f7ff', '--evolution-bg': 'rgba(25, 18, 53, 0.84)', '--danger-line': 'rgba(255, 77, 109, 0.62)' }
         },
         mythology: {
             background: 'linear-gradient(145deg, #fff8dc 0%, #e9d8a6 44%, #8ecae6 100%)',
             preview: 'linear-gradient(145deg, #fff8dc, #8ecae6)',
-            vars: { '--ink': '#3b2b16', '--paper': '#fff9e8', '--panel': '#fffdf5', '--panel-soft': '#fff4d6', '--red': '#bc6c25', '--teal': '#2a9d8f', '--purple': '#6d597a', '--gold': '#d4af37', '--canvas-bg': '#fff8e6' }
+            vars: { '--ink': '#3b2b16', '--paper': '#fff9e8', '--panel': '#fffdf5', '--panel-soft': '#fff4d6', '--red': '#bc6c25', '--teal': '#2a9d8f', '--purple': '#6d597a', '--gold': '#d4af37', '--canvas-bg': '#fff8e6', '--evolution-bg': 'rgba(255, 248, 220, 0.9)', '--danger-line': 'rgba(188, 108, 37, 0.62)' }
         },
         ocean: {
             background: 'linear-gradient(145deg, #caf0f8 0%, #48cae4 42%, #0077b6 100%)',
             preview: 'linear-gradient(145deg, #caf0f8, #0077b6)',
-            vars: { '--ink': '#12313f', '--paper': '#effcff', '--panel': '#ffffff', '--panel-soft': '#e6fbff', '--red': '#ef476f', '--teal': '#0077b6', '--purple': '#4361ee', '--gold': '#ffb703', '--canvas-bg': '#f0fdff' }
+            vars: { '--ink': '#12313f', '--paper': '#effcff', '--panel': '#ffffff', '--panel-soft': '#e6fbff', '--red': '#ef476f', '--teal': '#0077b6', '--purple': '#4361ee', '--gold': '#ffb703', '--canvas-bg': '#f0fdff', '--evolution-bg': 'rgba(224, 251, 252, 0.9)', '--danger-line': 'rgba(0, 119, 182, 0.62)' }
         },
         robot: {
             background: 'linear-gradient(145deg, #f1f5f9 0%, #cbd5e1 38%, #0f172a 100%)',
             preview: 'linear-gradient(145deg, #f1f5f9, #0f172a)',
-            vars: { '--ink': '#1e293b', '--paper': '#f8fafc', '--panel': '#ffffff', '--panel-soft': '#eef2f7', '--red': '#ff0054', '--teal': '#00a6a6', '--purple': '#8338ec', '--gold': '#fee440', '--canvas-bg': '#f8fafc' }
+            vars: { '--ink': '#1e293b', '--paper': '#f8fafc', '--panel': '#ffffff', '--panel-soft': '#eef2f7', '--red': '#ff0054', '--teal': '#00a6a6', '--purple': '#8338ec', '--gold': '#fee440', '--canvas-bg': '#f8fafc', '--evolution-bg': 'rgba(15, 23, 42, 0.84)', '--danger-line': 'rgba(0, 245, 212, 0.62)' }
         },
         candy: {
             background: 'linear-gradient(145deg, #fff0f6 0%, #ffc8dd 44%, #bde0fe 100%)',
             preview: 'linear-gradient(145deg, #fff0f6, #bde0fe)',
-            vars: { '--ink': '#47233b', '--paper': '#fff7fb', '--panel': '#ffffff', '--panel-soft': '#fff0f7', '--red': '#fb6f92', '--teal': '#48bfe3', '--purple': '#c77dff', '--gold': '#ffd166', '--canvas-bg': '#fff8fc' }
+            vars: { '--ink': '#47233b', '--paper': '#fff7fb', '--panel': '#ffffff', '--panel-soft': '#fff0f7', '--red': '#fb6f92', '--teal': '#48bfe3', '--purple': '#c77dff', '--gold': '#ffd166', '--canvas-bg': '#fff8fc', '--evolution-bg': 'rgba(255, 240, 246, 0.9)', '--danger-line': 'rgba(199, 125, 255, 0.62)' }
         },
         luxury: {
             background: 'linear-gradient(145deg, #fff8dc 0%, #f5cb5c 42%, #2f261f 100%)',
             preview: 'linear-gradient(145deg, #fff8dc, #2f261f)',
-            vars: { '--ink': '#2f261f', '--paper': '#fff8dc', '--panel': '#fffdf4', '--panel-soft': '#fff3bf', '--red': '#a4161a', '--teal': '#8a7a32', '--purple': '#5a3e85', '--gold': '#d4af37', '--canvas-bg': '#fff9e6' }
+            vars: { '--ink': '#2f261f', '--paper': '#fff8dc', '--panel': '#fffdf4', '--panel-soft': '#fff3bf', '--red': '#a4161a', '--teal': '#8a7a32', '--purple': '#5a3e85', '--gold': '#d4af37', '--canvas-bg': '#fff9e6', '--evolution-bg': 'rgba(255, 248, 220, 0.9)', '--danger-line': 'rgba(212, 175, 55, 0.7)' }
         }
     },
 

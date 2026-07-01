@@ -183,9 +183,10 @@ SuikaGame.ui = {
         diagram.innerHTML = '';
         row.className = 'evolution-row';
 
-        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).forEach(fruit => {
+        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).forEach((fruit, index) => {
             const fruitIcon = document.createElement('div');
             fruitIcon.className = 'fruit-icon';
+            fruitIcon.dataset.step = index + 1;
             fruitIcon.style.backgroundColor = SuikaGame.fruits.getColorForFruit(fruit);
             fruitIcon.title = fruit.name;
             fruitIcon.appendChild(SuikaGame.fruits.createFruitPreview(fruit, 30));
@@ -275,6 +276,12 @@ SuikaGame.ui = {
     renderPowerShop: function () {
         const list = document.getElementById('power-list');
         const coins = SuikaGame.skins.getCoins();
+        const icons = {
+            'clear-small': 'C',
+            'pop-lowest': 'X',
+            'hide-line': 'L',
+            'clear-medium': 'M'
+        };
 
         list.innerHTML = '';
         SuikaGame.skins.powers.forEach(power => {
@@ -282,7 +289,7 @@ SuikaGame.ui = {
             const card = this.createShopCard(power.name, power.description, `${power.price} moedas · Você tem ${count}`, 'power-card');
             const preview = card.querySelector('.shop-preview');
             const action = card.querySelector('.shop-action');
-            preview.textContent = '✦';
+            preview.textContent = icons[power.id] || '+';
             preview.classList.add('power-preview');
             action.disabled = coins < power.price;
             action.textContent = coins >= power.price ? 'Comprar' : 'Sem moedas';
@@ -327,7 +334,8 @@ SuikaGame.ui = {
         const icons = {
             'clear-small': 'C',
             'pop-lowest': 'X',
-            'slow-time': 'G'
+            'hide-line': 'L',
+            'clear-medium': 'M'
         };
 
         toolbar.innerHTML = '';
