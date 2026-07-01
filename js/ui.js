@@ -9,6 +9,7 @@ SuikaGame.ui = {
         this.updateCoinDisplays();
         this.updateDifficultyDisplay();
         this.updateMuteButton();
+        this.updateAccessibilityControls();
         this.createEvolutionDiagram();
         this.renderShop();
         this.renderMedalStrip();
@@ -33,6 +34,10 @@ SuikaGame.ui = {
         document.getElementById('move-left-button').addEventListener('click', () => SuikaGame.physics.moveBy(-34));
         document.getElementById('move-right-button').addEventListener('click', () => SuikaGame.physics.moveBy(34));
         document.getElementById('drop-button').addEventListener('click', () => SuikaGame.physics.dropFruit());
+        document.getElementById('accessibility-toggle').addEventListener('change', event => {
+            SuikaGame.skins.setAccessibilityControlsEnabled(event.target.checked);
+            this.updateAccessibilityControls();
+        });
 
         document.querySelectorAll('.shop-tab').forEach(tab => {
             tab.addEventListener('click', () => this.setShopTab(tab.dataset.shopTab));
@@ -66,6 +71,15 @@ SuikaGame.ui = {
         button.setAttribute('aria-label', SuikaGame.skins.isMuted() ? 'Ativar música' : 'Mutar música');
     },
 
+    updateAccessibilityControls: function () {
+        const enabled = SuikaGame.skins.areAccessibilityControlsEnabled();
+        const toggle = document.getElementById('accessibility-toggle');
+        const controls = document.getElementById('game-controls');
+
+        if (toggle) toggle.checked = enabled;
+        if (controls) controls.classList.toggle('enabled', enabled);
+    },
+
     showOptions: function () {
         document.getElementById('game-title').style.display = 'none';
         document.querySelector('.menu-stats').style.display = 'none';
@@ -89,6 +103,7 @@ SuikaGame.ui = {
         this.updateHighScoreDisplay();
         this.updateCoinDisplays();
         this.updateDifficultyDisplay();
+        this.updateAccessibilityControls();
         this.renderMedalStrip();
 
         document.getElementById('game-title').style.display = 'block';
@@ -252,13 +267,21 @@ SuikaGame.ui = {
 
     updatePowerToolbar: function () {
         const toolbar = document.getElementById('power-toolbar');
+        const icons = {
+            'clear-small': 'C',
+            'pop-lowest': 'X',
+            'slow-time': 'G'
+        };
+
         toolbar.innerHTML = '';
         SuikaGame.skins.powers.forEach(power => {
             const count = SuikaGame.skins.getPowerCount(power.id);
             const button = document.createElement('button');
             button.className = 'power-button';
             button.disabled = count <= 0 || !SuikaGame.config.gameActive;
-            button.textContent = `${power.name} (${count})`;
+            button.title = `${power.name} (${count})`;
+            button.setAttribute('aria-label', `${power.name}: ${count} disponiveis`);
+            button.innerHTML = `<span>${icons[power.id] || '?'}</span><strong>${count}</strong>`;
             button.addEventListener('click', () => SuikaGame.game.usePower(power.id));
             toolbar.appendChild(button);
         });

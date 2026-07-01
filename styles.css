@@ -143,6 +143,26 @@ button {
     display: none;
 }
 
+.settings-toggle {
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 2px solid rgba(63, 52, 37, 0.12);
+    border-radius: var(--radius);
+    background: #fff;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.settings-toggle input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--teal);
+}
+
 .menu-button {
     width: 100%;
     min-height: 50px;
@@ -448,6 +468,7 @@ footer {
 
 #game-container {
     display: none;
+    position: relative;
     width: min(var(--game-width), calc(100vw - 24px));
     overflow: hidden;
     background: var(--paper);
@@ -508,23 +529,32 @@ footer {
 }
 
 #game-controls {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr 1fr;
-    gap: 8px;
-    border-top: var(--line);
-    background: #fff;
-    padding: 8px;
+    display: none;
+    pointer-events: none;
 }
 
-.control-action,
-.power-button {
+#game-controls.enabled {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    z-index: 4;
+    display: grid;
+    grid-template-columns: 48px minmax(92px, 1fr) 48px;
+    gap: 8px;
+    background: transparent;
+}
+
+.control-action {
     min-height: 42px;
     border: 0;
-    border-radius: var(--radius);
+    border-radius: 999px;
     background: var(--teal);
     color: #fff;
     cursor: pointer;
     font-weight: 800;
+    pointer-events: auto;
+    box-shadow: 0 8px 18px rgba(63, 52, 37, 0.18), inset 0 -2px 0 rgba(0, 0, 0, 0.12);
 }
 
 .control-action.primary {
@@ -532,10 +562,50 @@ footer {
 }
 
 #power-toolbar {
+    position: absolute;
+    top: calc(clamp(62px, 9vh, 78px) + 8px);
+    right: 8px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    pointer-events: none;
+}
+
+.power-button {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
     display: grid;
-    gap: 6px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(42, 157, 143, 0.94);
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+    pointer-events: auto;
+    box-shadow: 0 8px 18px rgba(63, 52, 37, 0.18), inset 0 -2px 0 rgba(0, 0, 0, 0.13);
+}
+
+.power-button strong {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--paper);
+    border-radius: 999px;
     background: #fff;
-    padding: 0 8px 8px;
+    color: var(--ink);
+    font-size: 10px;
+    line-height: 1;
 }
 
 #fruit-evolution {
@@ -794,6 +864,38 @@ footer {
 
     #game-header {
         min-height: 72px;
+    }
+
+    #game-controls.enabled {
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+        grid-template-columns: 44px minmax(84px, 1fr) 44px;
+        gap: 7px;
+    }
+
+    .control-action {
+        min-height: 42px;
+        font-size: 16px;
+    }
+
+    #power-toolbar {
+        top: 82px;
+        right: 7px;
+        gap: 6px;
+    }
+
+    .power-button {
+        width: 38px;
+        height: 38px;
+        min-height: 38px;
+        font-size: 15px;
+    }
+
+    .power-button strong {
+        min-width: 17px;
+        height: 17px;
+        font-size: 9px;
     }
 
     #fruit-evolution {

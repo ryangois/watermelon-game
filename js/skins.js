@@ -8,7 +8,8 @@ SuikaGame.skins = {
         unlockedTracks: 'suikaUnlockedTracks',
         activeTrack: 'suikaActiveTrack',
         powers: 'suikaPowers',
-        muted: 'suikaMuted'
+        muted: 'suikaMuted',
+        accessibilityControls: 'suikaAccessibilityControls'
     },
 
     packs: [
@@ -166,6 +167,14 @@ SuikaGame.skins = {
 
     setMuted: function (muted) {
         localStorage.setItem(this.storageKeys.muted, muted ? 'true' : 'false');
+    },
+
+    areAccessibilityControlsEnabled: function () {
+        return localStorage.getItem(this.storageKeys.accessibilityControls) === 'true';
+    },
+
+    setAccessibilityControlsEnabled: function (enabled) {
+        localStorage.setItem(this.storageKeys.accessibilityControls, enabled ? 'true' : 'false');
     },
 
     getFruitView: function (fruit) {
