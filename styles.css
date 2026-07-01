@@ -6,9 +6,10 @@
     --teal: #2a9d8f;
     --purple: #7b2cbf;
     --gold: #f4a261;
-    --game-width: clamp(320px, min(70vw, calc((100vh - 32px) * 0.515)), 460px);
+    --game-width: clamp(340px, min(72vw, calc((100vh - 32px) * 0.55)), 480px);
     --line: 3px solid var(--ink);
     --radius: 8px;
+    --soft-shadow: 0 18px 38px rgba(63, 52, 37, 0.18);
 }
 
 * {
@@ -27,8 +28,9 @@ body {
 body {
     min-height: 100vh;
     background:
-        radial-gradient(circle at 28% 18%, rgba(255, 244, 194, 0.9), transparent 34%),
-        linear-gradient(135deg, rgba(255, 236, 179, 0.9), rgba(184, 236, 217, 0.86)),
+        radial-gradient(circle at 26% 14%, rgba(255, 246, 202, 0.95), transparent 30%),
+        radial-gradient(circle at 80% 92%, rgba(150, 227, 203, 0.6), transparent 36%),
+        linear-gradient(135deg, rgba(255, 236, 179, 0.92), rgba(184, 236, 217, 0.9)),
         #f6f0df;
     color: var(--ink);
     font-family: 'Poppins', sans-serif;
@@ -44,7 +46,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 14px;
     overflow-x: hidden;
 }
 
@@ -53,7 +55,7 @@ button {
 #fruit-evolution {
     border: var(--line);
     border-radius: var(--radius);
-    box-shadow: 0 18px 38px rgba(63, 52, 37, 0.18);
+    box-shadow: var(--soft-shadow);
 }
 
 #menu-container,
@@ -67,8 +69,8 @@ button {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 12px;
-    padding: clamp(18px, 4vw, 28px);
+    gap: 11px;
+    padding: clamp(20px, 4vw, 30px);
 }
 
 .menu-top {
@@ -79,22 +81,24 @@ button {
 }
 
 #game-title {
-    font-size: clamp(38px, 12vw, 58px);
+    font-size: clamp(42px, 12vw, 62px);
     line-height: 0.95;
+    letter-spacing: 0;
 }
 
 .login-button {
-    min-height: 42px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border: 2px solid rgba(52, 41, 31, 0.18);
+    border: 2px solid rgba(52, 41, 31, 0.14);
     border-radius: var(--radius);
     background: #fff;
     color: var(--ink);
     cursor: default;
     font-weight: 800;
+    box-shadow: inset 0 -2px 0 rgba(52, 41, 31, 0.05);
 }
 
 .login-button span {
@@ -115,7 +119,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgba(63, 52, 37, 0.14);
+    border: 2px solid rgba(63, 52, 37, 0.12);
     border-radius: var(--radius);
     background: var(--panel);
     padding: 8px 10px;
@@ -141,7 +145,7 @@ button {
 
 .menu-button {
     width: 100%;
-    min-height: 48px;
+    min-height: 50px;
     border: 0;
     border-radius: var(--radius);
     background: var(--red);
@@ -150,6 +154,7 @@ button {
     font-size: 18px;
     font-weight: 800;
     transition: filter 160ms ease, transform 160ms ease;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
 }
 
 .menu-button.secondary {
@@ -176,10 +181,10 @@ button {
 }
 
 #how-to-play {
-    border: 2px solid rgba(63, 52, 37, 0.14);
+    border: 2px solid rgba(63, 52, 37, 0.12);
     border-radius: var(--radius);
     background: #fff;
-    padding: 10px;
+    padding: 12px;
 }
 
 #how-to-play h2 {
@@ -259,10 +264,18 @@ footer {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    position: sticky;
+    top: -16px;
+    z-index: 2;
+    margin: -16px -16px 0;
+    border-bottom: 2px solid rgba(52, 41, 31, 0.12);
+    background: rgba(255, 248, 234, 0.96);
+    padding: 16px 16px 12px;
+    backdrop-filter: blur(8px);
 }
 
 .shop-header h2 {
-    font-size: clamp(32px, 9vw, 44px);
+    font-size: clamp(34px, 9vw, 48px);
     line-height: 0.95;
 }
 
@@ -274,12 +287,20 @@ footer {
 }
 
 .shop-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
     gap: 6px;
+    position: sticky;
+    top: 72px;
+    z-index: 2;
+    margin: 0 -2px;
+    border-radius: var(--radius);
+    background: rgba(255, 248, 234, 0.92);
+    padding: 2px;
+    backdrop-filter: blur(8px);
 }
 
 .shop-tab {
+    flex: 1 1 0;
     min-height: 40px;
     border: 0;
     border-radius: var(--radius);
@@ -287,6 +308,8 @@ footer {
     color: var(--ink);
     cursor: pointer;
     font-weight: 800;
+    font-size: 15px;
+    white-space: nowrap;
 }
 
 .shop-tab.active {
@@ -307,11 +330,12 @@ footer {
     display: grid;
     grid-template-columns: 104px minmax(0, 1fr);
     gap: 12px;
-    border: 2px solid rgba(63, 52, 37, 0.2);
+    border: 2px solid rgba(63, 52, 37, 0.14);
     border-radius: var(--radius);
     background: var(--panel);
-    padding: 10px;
+    padding: 11px;
     overflow: hidden;
+    box-shadow: 0 8px 18px rgba(63, 52, 37, 0.08);
 }
 
 .shop-preview {
@@ -329,7 +353,7 @@ footer {
     justify-content: center;
     border-radius: var(--radius);
     background: rgba(52, 41, 31, 0.08);
-    font-size: 42px;
+    font-size: 40px;
     font-weight: 800;
 }
 
@@ -369,7 +393,7 @@ footer {
 
 .shop-card h3 {
     overflow-wrap: anywhere;
-    font-size: 20px;
+    font-size: 21px;
     line-height: 1.05;
 }
 
@@ -395,6 +419,7 @@ footer {
     cursor: pointer;
     padding: 7px 12px;
     font-weight: 800;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
 }
 
 .shop-action:disabled,
@@ -588,12 +613,14 @@ footer {
 
 @media (max-width: 720px) {
     :root {
-        --game-width: min(100%, 430px);
+        --game-width: 100%;
+        --line: 3px solid var(--ink);
     }
 
     #app {
         align-items: flex-start;
-        padding: 8px;
+        justify-content: center;
+        padding: 8px 6px;
     }
 
     #game-area {
@@ -606,32 +633,163 @@ footer {
     #menu-container,
     #shop-container,
     #game-container {
-        width: calc(100vw - 16px);
-        max-width: 430px;
+        width: min(430px, calc(100vw - 12px));
+        max-width: none;
     }
 
     #menu-container {
         min-height: calc(100vh - 16px);
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 22px 22px 18px;
+    }
+
+    .menu-top {
+        align-items: flex-start;
+    }
+
+    #game-title {
+        font-size: clamp(48px, 16vw, 70px);
+    }
+
+    .login-button {
+        justify-content: space-between;
+        padding: 0 14px;
+    }
+
+    .menu-stats {
+        gap: 10px;
+    }
+
+    #high-score,
+    #coin-balance {
+        min-height: 74px;
+        font-size: 16px;
+    }
+
+    #difficulty-status {
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    .menu-button {
+        min-height: 58px;
+        font-size: 20px;
+    }
+
+    #how-to-play {
+        padding: 14px;
+    }
+
+    #how-to-play h2 {
+        font-size: 18px;
+    }
+
+    #how-to-play p {
+        font-size: 15px;
+    }
+
+    #medal-strip {
+        justify-content: center;
+    }
+
+    .medal {
+        padding: 7px 10px;
     }
 
     #shop-container {
         max-height: calc(100vh - 16px);
-        padding: 14px;
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .shop-header {
+        top: -12px;
+        margin: -12px -12px 0;
+        padding: 14px 12px 10px;
+    }
+
+    .shop-header h2 {
+        font-size: clamp(38px, 13vw, 54px);
+    }
+
+    #shop-coins {
+        font-size: 20px;
+        line-height: 1.15;
+    }
+
+    .icon-button {
+        width: 58px;
+        height: 58px;
+        font-size: 34px;
+    }
+
+    .icon-button.small {
+        width: 58px;
+        height: 58px;
+        font-size: 24px;
+    }
+
+    .shop-tabs {
+        top: 84px;
+        gap: 4px;
+        padding: 4px;
+        overflow: visible;
+    }
+
+    .shop-tab {
+        min-width: 0;
+        min-height: 46px;
+        padding: 0 4px;
+        font-size: clamp(13px, 4.1vw, 17px);
     }
 
     .shop-card {
-        grid-template-columns: 1fr;
+        grid-template-columns: 86px minmax(0, 1fr);
+        gap: 10px;
+        padding: 10px;
+        align-items: center;
     }
 
     .shop-preview {
-        min-height: auto;
+        min-height: 86px;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        align-content: center;
+        gap: 4px;
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.55);
+    }
+
+    .skin-preview-fruit {
+        width: 34px;
+        height: 34px;
+    }
+
+    .music-preview,
+    .power-preview {
+        font-size: 32px;
+    }
+
+    .shop-card h3 {
+        font-size: 22px;
+        line-height: 1.05;
+    }
+
+    .shop-card p {
+        font-size: 14px;
+        line-height: 1.25;
+    }
+
+    .shop-price {
+        font-size: 13px;
     }
 
     .shop-action {
         width: 100%;
+        min-height: 42px;
+        font-size: 17px;
     }
 
     #game-header {
@@ -639,8 +797,8 @@ footer {
     }
 
     #fruit-evolution {
-        width: calc(100vw - 16px);
-        max-width: 430px;
+        width: min(430px, calc(100vw - 12px));
+        max-width: none;
         max-height: none;
         padding: 8px;
     }
@@ -659,12 +817,49 @@ footer {
 }
 
 @media (max-width: 380px) {
-    .menu-stats {
-        grid-template-columns: 1fr;
+    #app {
+        padding: 6px 4px;
     }
 
-    .shop-tabs {
-        grid-template-columns: 1fr;
+    #menu-container,
+    #shop-container,
+    #game-container,
+    #fruit-evolution {
+        width: calc(100vw - 8px);
+    }
+
+    #menu-container {
+        padding: 20px 18px 16px;
+    }
+
+    #game-title {
+        font-size: 54px;
+    }
+
+    .shop-card {
+        grid-template-columns: 78px minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .shop-preview {
+        min-height: 78px;
+    }
+
+    .skin-preview-fruit {
+        width: 31px;
+        height: 31px;
+    }
+
+    .shop-card h3 {
+        font-size: 20px;
+    }
+
+    .shop-card p {
+        font-size: 13px;
+    }
+
+    .shop-tab {
+        font-size: 13px;
     }
 
     #next-fruit-container {
