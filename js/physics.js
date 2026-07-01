@@ -20,7 +20,7 @@ SuikaGame.physics = {
                 width: SuikaGame.config.GAME_WIDTH,
                 height: SuikaGame.config.GAME_HEIGHT,
                 wireframes: false,
-                background: '#fff8ea'
+                background: SuikaGame.skins.getActiveTheme().vars['--canvas-bg']
             }
         });
 
@@ -189,6 +189,12 @@ SuikaGame.physics = {
     updateGravity: function (newGravity) {
         if (SuikaGame.config.engine) {
             SuikaGame.config.engine.gravity.scale = newGravity;
+        }
+    },
+
+    applyTheme: function () {
+        if (SuikaGame.config.render) {
+            SuikaGame.config.render.options.background = SuikaGame.skins.getActiveTheme().vars['--canvas-bg'];
         }
     },
 

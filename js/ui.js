@@ -4,6 +4,8 @@ SuikaGame.ui = {
     activeShopTab: 'skins',
 
     initializeUI: function () {
+        SuikaGame.skins.ensureTestCoins();
+        SuikaGame.skins.applyActiveTheme();
         this.setupEventListeners();
         this.updateHighScoreDisplay();
         this.updateCoinDisplays();
@@ -96,11 +98,13 @@ SuikaGame.ui = {
         this.renderShop();
         document.getElementById('menu-container').style.display = 'none';
         document.getElementById('shop-container').style.display = 'flex';
+        document.getElementById('game-area').style.display = 'none';
         document.getElementById('game-container').style.display = 'none';
         document.getElementById('fruit-evolution').style.display = 'none';
     },
 
     showMainMenu: function () {
+        SuikaGame.skins.applyActiveTheme();
         this.updateHighScoreDisplay();
         this.updateCoinDisplays();
         this.updateDifficultyDisplay();
@@ -117,6 +121,7 @@ SuikaGame.ui = {
         document.getElementById('difficulty-buttons').style.display = 'none';
         document.getElementById('menu-container').style.display = 'flex';
         document.getElementById('shop-container').style.display = 'none';
+        document.getElementById('game-area').style.display = 'none';
         document.getElementById('game-container').style.display = 'none';
         document.getElementById('fruit-evolution').style.display = 'none';
     },
@@ -171,10 +176,13 @@ SuikaGame.ui = {
         SuikaGame.skins.packs.forEach(pack => {
             const isUnlocked = SuikaGame.skins.isUnlocked(pack.id);
             const isActive = activeId === pack.id;
-            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Desbloqueado' : `${pack.price} moedas`, pack.themeClass);
+            const card = this.createShopCard(pack.name, `${pack.description}. Tema de menu e jogo incluso`, isUnlocked ? 'Desbloqueado' : `${pack.price} moedas`, pack.themeClass);
             const preview = card.querySelector('.shop-preview');
             const action = card.querySelector('.shop-action');
+            const theme = SuikaGame.skins.getThemeForPack(pack);
 
+            preview.classList.add('theme-preview');
+            preview.style.background = theme.preview;
             SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).slice(0, 5).forEach(fruit => {
                 const icon = document.createElement('div');
                 const view = SuikaGame.skins.getFruitViewForPack(pack, fruit);
@@ -264,6 +272,7 @@ SuikaGame.ui = {
     },
 
     afterShopAction: function () {
+        SuikaGame.skins.applyActiveTheme();
         SuikaGame.fruits.updateNextFruitPreview();
         this.createEvolutionDiagram();
         this.updateCoinDisplays();

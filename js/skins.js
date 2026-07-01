@@ -37,10 +37,65 @@ SuikaGame.skins = {
         { id: 'slow-time', name: 'Gravidade leve', description: 'Reduz a gravidade por alguns segundos', price: 160 }
     ],
 
+    testCoinGrant: 9999,
     assetAvailability: {},
+
+    themes: {
+        classic: {
+            background: 'linear-gradient(145deg, #fff2bf 0%, #eef3d1 46%, #bdf0dc 100%)',
+            preview: 'linear-gradient(145deg, #fff2bf, #bdf0dc)',
+            vars: { '--ink': '#2f261f', '--paper': '#fffaf0', '--panel': '#ffffff', '--panel-soft': '#fffdf8', '--red': '#e03131', '--teal': '#22998d', '--purple': '#7c2ec5', '--gold': '#f2b84b', '--canvas-bg': '#fff8ea' }
+        },
+        halloween: {
+            background: 'radial-gradient(circle at 20% 12%, #ffd166 0 12%, transparent 26%), linear-gradient(145deg, #2d173f 0%, #692052 48%, #ff8f3d 100%)',
+            preview: 'linear-gradient(145deg, #2d173f, #ff8f3d)',
+            vars: { '--ink': '#2d1d18', '--paper': '#fff3e4', '--panel': '#fff9f1', '--panel-soft': '#fff1e9', '--red': '#f15a24', '--teal': '#6f42c1', '--purple': '#a41370', '--gold': '#ffb703', '--canvas-bg': '#fff4e8' }
+        },
+        christmas: {
+            background: 'radial-gradient(circle at 78% 14%, #ffffff 0 8%, transparent 22%), linear-gradient(145deg, #f7fff5 0%, #d8f3dc 42%, #b91c1c 100%)',
+            preview: 'linear-gradient(145deg, #f7fff5, #b91c1c)',
+            vars: { '--ink': '#26351f', '--paper': '#fbfff5', '--panel': '#ffffff', '--panel-soft': '#f3fff0', '--red': '#c1121f', '--teal': '#2d6a4f', '--purple': '#8d1f2d', '--gold': '#f9c74f', '--canvas-bg': '#fbfff5' }
+        },
+        sideral: {
+            background: 'radial-gradient(circle at 25% 18%, #f8f7ff 0 4%, transparent 14%), radial-gradient(circle at 82% 76%, #80ffdb 0 8%, transparent 24%), linear-gradient(145deg, #191235 0%, #3a0ca3 48%, #4cc9f0 100%)',
+            preview: 'linear-gradient(145deg, #191235, #4cc9f0)',
+            vars: { '--ink': '#201b35', '--paper': '#f5f2ff', '--panel': '#ffffff', '--panel-soft': '#f0f7ff', '--red': '#ff4d6d', '--teal': '#2ec4b6', '--purple': '#5a189a', '--gold': '#ffd60a', '--canvas-bg': '#f8f7ff' }
+        },
+        mythology: {
+            background: 'linear-gradient(145deg, #fff8dc 0%, #e9d8a6 44%, #8ecae6 100%)',
+            preview: 'linear-gradient(145deg, #fff8dc, #8ecae6)',
+            vars: { '--ink': '#3b2b16', '--paper': '#fff9e8', '--panel': '#fffdf5', '--panel-soft': '#fff4d6', '--red': '#bc6c25', '--teal': '#2a9d8f', '--purple': '#6d597a', '--gold': '#d4af37', '--canvas-bg': '#fff8e6' }
+        },
+        ocean: {
+            background: 'linear-gradient(145deg, #caf0f8 0%, #48cae4 42%, #0077b6 100%)',
+            preview: 'linear-gradient(145deg, #caf0f8, #0077b6)',
+            vars: { '--ink': '#12313f', '--paper': '#effcff', '--panel': '#ffffff', '--panel-soft': '#e6fbff', '--red': '#ef476f', '--teal': '#0077b6', '--purple': '#4361ee', '--gold': '#ffb703', '--canvas-bg': '#f0fdff' }
+        },
+        robot: {
+            background: 'linear-gradient(145deg, #f1f5f9 0%, #cbd5e1 38%, #0f172a 100%)',
+            preview: 'linear-gradient(145deg, #f1f5f9, #0f172a)',
+            vars: { '--ink': '#1e293b', '--paper': '#f8fafc', '--panel': '#ffffff', '--panel-soft': '#eef2f7', '--red': '#ff0054', '--teal': '#00a6a6', '--purple': '#8338ec', '--gold': '#fee440', '--canvas-bg': '#f8fafc' }
+        },
+        candy: {
+            background: 'linear-gradient(145deg, #fff0f6 0%, #ffc8dd 44%, #bde0fe 100%)',
+            preview: 'linear-gradient(145deg, #fff0f6, #bde0fe)',
+            vars: { '--ink': '#47233b', '--paper': '#fff7fb', '--panel': '#ffffff', '--panel-soft': '#fff0f7', '--red': '#fb6f92', '--teal': '#48bfe3', '--purple': '#c77dff', '--gold': '#ffd166', '--canvas-bg': '#fff8fc' }
+        },
+        luxury: {
+            background: 'linear-gradient(145deg, #fff8dc 0%, #f5cb5c 42%, #2f261f 100%)',
+            preview: 'linear-gradient(145deg, #fff8dc, #2f261f)',
+            vars: { '--ink': '#2f261f', '--paper': '#fff8dc', '--panel': '#fffdf4', '--panel-soft': '#fff3bf', '--red': '#a4161a', '--teal': '#8a7a32', '--purple': '#5a3e85', '--gold': '#d4af37', '--canvas-bg': '#fff9e6' }
+        }
+    },
 
     getCoins: function () {
         return parseInt(localStorage.getItem(this.storageKeys.coins) || '0', 10);
+    },
+
+    ensureTestCoins: function () {
+        if (this.getCoins() < this.testCoinGrant) {
+            this.setCoins(this.testCoinGrant);
+        }
     },
 
     setCoins: function (amount) {
@@ -80,6 +135,30 @@ SuikaGame.skins = {
 
     getActivePack: function () {
         return this.getPack(this.getActiveId()) || this.packs[0];
+    },
+
+    getThemeForPack: function (pack) {
+        return this.themes[pack.id] || this.themes.classic;
+    },
+
+    getActiveTheme: function () {
+        return this.getThemeForPack(this.getActivePack());
+    },
+
+    applyActiveTheme: function () {
+        const pack = this.getActivePack();
+        const theme = this.getThemeForPack(pack);
+
+        document.body.dataset.theme = pack.id;
+        document.body.style.background = theme.background;
+
+        Object.keys(theme.vars).forEach(key => {
+            document.documentElement.style.setProperty(key, theme.vars[key]);
+        });
+
+        if (SuikaGame.config && SuikaGame.config.render) {
+            SuikaGame.config.render.options.background = theme.vars['--canvas-bg'];
+        }
     },
 
     getPack: function (packId) {

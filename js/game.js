@@ -8,11 +8,14 @@ SuikaGame.game = {
     },
 
     startGame: function () {
+        SuikaGame.skins.applyActiveTheme();
+        SuikaGame.physics.applyTheme();
         this.resetGame();
         SuikaGame.config.gameActive = true;
 
         document.getElementById('menu-container').style.display = 'none';
         document.getElementById('shop-container').style.display = 'none';
+        document.getElementById('game-area').style.display = 'flex';
         document.getElementById('game-container').style.display = 'block';
         document.getElementById('fruit-evolution').style.display = 'block';
 
