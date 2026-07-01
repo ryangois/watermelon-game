@@ -718,27 +718,31 @@ footer {
     display: none;
     width: clamp(78px, 8vw, 96px);
     max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     background: var(--evolution-bg);
     padding: clamp(8px, 1.2vw, 10px);
-    overflow: auto;
+    overflow: hidden;
     backdrop-filter: blur(6px);
 }
 
 #evolution-diagram {
+    height: 100%;
     display: flex;
     justify-content: center;
 }
 
 .evolution-row {
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(9px, 1.2vh, 13px);
+    justify-content: space-between;
+    gap: clamp(4px, 0.8vh, 10px);
 }
 
 .fruit-icon {
-    width: clamp(44px, 5vw, 54px);
-    height: clamp(44px, 5vw, 54px);
+    width: clamp(36px, min(5vw, 5.8vh), 54px);
+    height: clamp(36px, min(5vw, 5.8vh), 54px);
     box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12), 0 4px 10px rgba(47, 38, 31, 0.14);
 }
 
@@ -1055,25 +1059,23 @@ footer {
         max-width: none;
         max-height: none;
         padding: 8px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scrollbar-width: none;
-    }
-
-    #fruit-evolution::-webkit-scrollbar {
-        display: none;
+        overflow: hidden;
     }
 
     .evolution-row {
-        min-width: max-content;
+        width: 100%;
+        height: auto;
         flex-direction: row;
-        justify-content: flex-start;
-        gap: 8px;
+        justify-content: space-between;
+        gap: 4px;
     }
 
     .fruit-icon {
-        width: clamp(36px, 10vw, 46px);
-        height: clamp(36px, 10vw, 46px);
+        flex: 1 1 0;
+        width: auto;
+        max-width: 46px;
+        height: auto;
+        aspect-ratio: 1;
     }
 }
 
@@ -1175,17 +1177,17 @@ footer {
     }
 
     #fruit-evolution {
-        width: 70px;
+        width: clamp(64px, 7vw, 78px);
         padding: 8px;
     }
 
     .evolution-row {
-        gap: 6px;
+        gap: 4px;
     }
 
     .fruit-icon {
-        width: 44px;
-        height: 44px;
+        width: clamp(34px, min(4.4vw, 5vh), 44px);
+        height: clamp(34px, min(4.4vw, 5vh), 44px);
     }
 }
 
