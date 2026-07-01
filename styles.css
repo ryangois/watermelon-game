@@ -737,29 +737,9 @@ footer {
 }
 
 .fruit-icon {
-    position: relative;
     width: clamp(44px, 5vw, 54px);
     height: clamp(44px, 5vw, 54px);
     box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12), 0 4px 10px rgba(47, 38, 31, 0.14);
-}
-
-.fruit-icon::after {
-    content: attr(data-step);
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    min-width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--paper);
-    border-radius: 999px;
-    background: var(--ink);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    line-height: 1;
 }
 
 #game-over-card {

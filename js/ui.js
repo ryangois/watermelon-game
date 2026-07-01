@@ -183,10 +183,9 @@ SuikaGame.ui = {
         diagram.innerHTML = '';
         row.className = 'evolution-row';
 
-        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).forEach((fruit, index) => {
+        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).forEach(fruit => {
             const fruitIcon = document.createElement('div');
             fruitIcon.className = 'fruit-icon';
-            fruitIcon.dataset.step = index + 1;
             fruitIcon.style.backgroundColor = SuikaGame.fruits.getColorForFruit(fruit);
             fruitIcon.title = fruit.name;
             fruitIcon.appendChild(SuikaGame.fruits.createFruitPreview(fruit, 30));
