@@ -40,6 +40,7 @@ SuikaGame.physics = {
 
         Events.on(SuikaGame.config.render, 'afterRender', function () {
             SuikaGame.particles.updateParticles();
+            SuikaGame.physics.drawFruitRadiusOverlay();
         });
     },
 
@@ -196,6 +197,32 @@ SuikaGame.physics = {
         if (SuikaGame.config.render) {
             SuikaGame.config.render.options.background = SuikaGame.skins.getActiveTheme().vars['--canvas-bg'];
         }
+    },
+
+    drawFruitRadiusOverlay: function () {
+        if (!SuikaGame.skins.isFruitRadiusOverlayEnabled() || !SuikaGame.config.render) {
+            return;
+        }
+
+        const { Composite } = Matter;
+        const render = SuikaGame.config.render;
+        const context = render.context;
+        const fruits = Composite.allBodies(SuikaGame.config.engine.world)
+            .filter(body => body.isFruit && body.circleRadius && !body.toRemove);
+
+        context.save();
+        context.lineWidth = 2;
+        context.strokeStyle = 'rgba(47, 38, 31, 0.72)';
+        context.fillStyle = 'rgba(255, 255, 255, 0.12)';
+
+        fruits.forEach(fruit => {
+            context.beginPath();
+            context.arc(fruit.position.x, fruit.position.y, fruit.circleRadius, 0, Math.PI * 2);
+            context.fill();
+            context.stroke();
+        });
+
+        context.restore();
     },
 
     handlePointerMove: function (e) {

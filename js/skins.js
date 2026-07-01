@@ -9,7 +9,8 @@ SuikaGame.skins = {
         activeTrack: 'suikaActiveTrack',
         powers: 'suikaPowers',
         muted: 'suikaMuted',
-        accessibilityControls: 'suikaAccessibilityControls'
+        accessibilityControls: 'suikaAccessibilityControls',
+        fruitRadiusOverlay: 'suikaFruitRadiusOverlay'
     },
 
     packs: [
@@ -254,6 +255,14 @@ SuikaGame.skins = {
 
     setAccessibilityControlsEnabled: function (enabled) {
         localStorage.setItem(this.storageKeys.accessibilityControls, enabled ? 'true' : 'false');
+    },
+
+    isFruitRadiusOverlayEnabled: function () {
+        return localStorage.getItem(this.storageKeys.fruitRadiusOverlay) === 'true';
+    },
+
+    setFruitRadiusOverlayEnabled: function (enabled) {
+        localStorage.setItem(this.storageKeys.fruitRadiusOverlay, enabled ? 'true' : 'false');
     },
 
     getFruitView: function (fruit) {

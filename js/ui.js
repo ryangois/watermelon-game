@@ -40,6 +40,10 @@ SuikaGame.ui = {
             SuikaGame.skins.setAccessibilityControlsEnabled(event.target.checked);
             this.updateAccessibilityControls();
         });
+        document.getElementById('fruit-radius-toggle').addEventListener('change', event => {
+            SuikaGame.skins.setFruitRadiusOverlayEnabled(event.target.checked);
+            this.updateAccessibilityControls();
+        });
 
         document.querySelectorAll('.shop-tab').forEach(tab => {
             tab.addEventListener('click', () => this.setShopTab(tab.dataset.shopTab));
@@ -75,10 +79,13 @@ SuikaGame.ui = {
 
     updateAccessibilityControls: function () {
         const enabled = SuikaGame.skins.areAccessibilityControlsEnabled();
+        const radiusOverlayEnabled = SuikaGame.skins.isFruitRadiusOverlayEnabled();
         const toggle = document.getElementById('accessibility-toggle');
+        const radiusToggle = document.getElementById('fruit-radius-toggle');
         const controls = document.getElementById('game-controls');
 
         if (toggle) toggle.checked = enabled;
+        if (radiusToggle) radiusToggle.checked = radiusOverlayEnabled;
         if (controls) controls.classList.toggle('enabled', enabled);
     },
 
