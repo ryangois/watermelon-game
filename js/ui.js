@@ -33,8 +33,10 @@ SuikaGame.ui = {
         document.getElementById('mute-button').addEventListener('click', () => SuikaGame.audio.toggleMute());
         document.getElementById('game-options-button').addEventListener('click', () => this.setGameOptionsOpen(true));
         document.getElementById('game-options-close-button').addEventListener('click', () => this.setGameOptionsOpen(false));
-        document.getElementById('fullscreen-button').addEventListener('click', () => this.requestFullscreen(false));
+        document.getElementById('fullscreen-button').addEventListener('click', () => this.toggleFullscreen());
         document.getElementById('game-return-menu-button').addEventListener('click', () => this.returnToMenuFromGame());
+        document.addEventListener('fullscreenchange', () => this.updateFullscreenButton());
+        document.addEventListener('webkitfullscreenchange', () => this.updateFullscreenButton());
         document.getElementById('easy-button').addEventListener('click', () => this.setDifficulty('easy'));
         document.getElementById('normal-button').addEventListener('click', () => this.setDifficulty('normal'));
         document.getElementById('hard-button').addEventListener('click', () => this.setDifficulty('hard'));
@@ -86,23 +88,74 @@ SuikaGame.ui = {
 
         if (!request) {
             if (!silent) this.showToast('Tela cheia não suportada neste navegador');
+            this.updateFullscreenButton();
             return Promise.resolve(false);
         }
 
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (this.getFullscreenElement()) {
             if (!silent) this.showToast('Tela cheia já ativa');
+            this.updateFullscreenButton();
             return Promise.resolve(true);
         }
 
         return Promise.resolve(request.call(target))
             .then(() => {
                 if (!silent) this.showToast('Tela cheia ativada');
+                this.updateFullscreenButton();
                 return true;
             })
             .catch(() => {
                 if (!silent) this.showToast('Use o botão do navegador ou instale o app');
+                this.updateFullscreenButton();
                 return false;
             });
+    },
+
+    exitFullscreen: function () {
+        const exit = document.exitFullscreen ||
+            document.webkitExitFullscreen ||
+            document.msExitFullscreen;
+
+        if (!exit || !this.getFullscreenElement()) {
+            this.updateFullscreenButton();
+            return Promise.resolve(false);
+        }
+
+        return Promise.resolve(exit.call(document))
+            .then(() => {
+                this.showToast('Tela cheia desativada');
+                this.updateFullscreenButton();
+                return true;
+            })
+            .catch(() => {
+                this.showToast('Não foi possível sair da tela cheia');
+                this.updateFullscreenButton();
+                return false;
+            });
+    },
+
+    toggleFullscreen: function () {
+        if (this.getFullscreenElement()) {
+            return this.exitFullscreen();
+        }
+
+        return this.requestFullscreen(false);
+    },
+
+    getFullscreenElement: function () {
+        return document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.msFullscreenElement ||
+            null;
+    },
+
+    updateFullscreenButton: function () {
+        const button = document.getElementById('fullscreen-button');
+        if (!button) return;
+
+        const isFullscreen = Boolean(this.getFullscreenElement());
+        button.textContent = isFullscreen ? 'Sair da tela cheia' : 'Tela cheia';
+        button.setAttribute('aria-label', isFullscreen ? 'Sair da tela cheia' : 'Abrir em tela cheia');
     },
 
     updateHighScoreDisplay: function () {
@@ -155,6 +208,7 @@ SuikaGame.ui = {
         if (!panel) return;
         this.updateMuteButton();
         this.updateAccessibilityControls();
+        this.updateFullscreenButton();
         panel.classList.toggle('open', open);
     },
 
