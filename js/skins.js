@@ -37,7 +37,7 @@ SuikaGame.skins = {
         { id: 'clear-small', name: 'Limpeza de menores', description: 'Remove cerejas e morangos já soltos', price: 90 },
         { id: 'hide-line', name: 'Linha invisível', description: 'Esconde a linha final por 7 segundos', price: 160 },
         { id: 'cherry-rain', name: 'Chuva de cerejas', description: 'Derruba cerejas extras para tentar combos', price: 120 },
-        { id: 'side-push', name: 'Empurrão lateral', description: 'Dá um impulso lateral nas frutas soltas', price: 140 },
+        { id: 'side-push', name: 'Chacoalhão', description: 'Chacoalha todas as frutas soltas no pote', price: 140 },
         { id: 'small-bomb', name: 'Bomba pequena', description: 'Escolha até 4 frutas soltas para eliminar', price: 240 }
     ],
 

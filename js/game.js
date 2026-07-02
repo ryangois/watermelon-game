@@ -150,12 +150,12 @@ SuikaGame.game = {
         if (powerId === 'side-push') {
             const fruits = this.getLooseFruits();
             if (!fruits.length) {
-                SuikaGame.ui.showToast('Não há frutas para empurrar');
+                SuikaGame.ui.showToast('Não há frutas para chacoalhar');
                 return false;
             }
             if (!SuikaGame.skins.consumePower(powerId)) return false;
-            this.pushFruitsSideways(fruits);
-            SuikaGame.ui.showToast('Empurrão lateral aplicado');
+            this.shakeFruits(fruits);
+            SuikaGame.ui.showToast('Chacoalhão aplicado');
         }
 
         if (powerId === 'small-bomb') {
@@ -200,15 +200,20 @@ SuikaGame.game = {
         }
     },
 
-    pushFruitsSideways: function (fruits) {
+    shakeFruits: function (fruits) {
         const center = SuikaGame.config.GAME_WIDTH / 2;
 
-        fruits.forEach(body => {
-            const direction = body.position.x < center ? -1 : 1;
+        fruits.forEach((body, index) => {
+            const edgeBias = body.position.x < center ? 1 : -1;
+            const alternating = index % 2 === 0 ? 1 : -1;
+            const horizontal = (edgeBias * 0.012) + (alternating * 0.016);
+            const vertical = body.position.y > SuikaGame.config.GAME_HEIGHT * 0.52 ? -0.014 : 0.006;
+
             Matter.Body.applyForce(body, body.position, {
-                x: direction * 0.018 * body.mass,
-                y: -0.002 * body.mass
+                x: horizontal * body.mass,
+                y: vertical * body.mass
             });
+            Matter.Body.setAngularVelocity(body, body.angularVelocity + alternating * 0.08);
         });
     },
 

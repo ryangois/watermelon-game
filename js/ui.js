@@ -368,7 +368,7 @@ SuikaGame.ui = {
         const icons = {
             'clear-small': 'S',
             'cherry-rain': 'C',
-            'side-push': '↔',
+            'side-push': '~',
             'hide-line': 'L',
             'small-bomb': 'B'
         };
@@ -487,7 +487,7 @@ SuikaGame.ui = {
         const icons = {
             'clear-small': 'S',
             'cherry-rain': 'C',
-            'side-push': '↔',
+            'side-push': '~',
             'hide-line': 'L',
             'small-bomb': 'B'
         };
