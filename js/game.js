@@ -123,6 +123,17 @@ SuikaGame.game = {
             return false;
         }
 
+        if (powerId === 'clear-small') {
+            const targets = this.getLooseFruits().filter(body => body.fruitIndex <= 1);
+            if (!targets.length) {
+                SuikaGame.ui.showToast('Não há cerejas ou morangos soltos');
+                return false;
+            }
+            if (!SuikaGame.skins.consumePower(powerId)) return false;
+            targets.forEach(body => Matter.World.remove(SuikaGame.config.engine.world, body));
+            SuikaGame.ui.showToast('Cerejas e morangos removidos');
+        }
+
         if (powerId === 'hide-line') {
             if (!SuikaGame.skins.consumePower(powerId)) return false;
             SuikaGame.physics.hideGameOverLine(7000);

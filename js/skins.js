@@ -5,6 +5,7 @@ SuikaGame.skins = {
         coins: 'suikaCoins',
         unlocked: 'suikaUnlockedSkins',
         active: 'suikaActiveSkin',
+        activeTheme: 'suikaActiveTheme',
         unlockedTracks: 'suikaUnlockedTracks',
         activeTrack: 'suikaActiveTrack',
         powers: 'suikaPowers',
@@ -33,6 +34,7 @@ SuikaGame.skins = {
     ],
 
     powers: [
+        { id: 'clear-small', name: 'Limpeza de menores', description: 'Remove cerejas e morangos já soltos', price: 90 },
         { id: 'hide-line', name: 'Linha invisível', description: 'Esconde a linha final por 7 segundos', price: 160 },
         { id: 'cherry-rain', name: 'Chuva de cerejas', description: 'Derruba cerejas extras para tentar combos', price: 120 },
         { id: 'side-push', name: 'Empurrão lateral', description: 'Dá um impulso lateral nas frutas soltas', price: 140 },
@@ -139,16 +141,25 @@ SuikaGame.skins = {
         return this.getPack(this.getActiveId()) || this.packs[0];
     },
 
+    getActiveThemeId: function () {
+        const activeId = localStorage.getItem(this.storageKeys.activeTheme) || 'classic';
+        return this.isUnlocked(activeId) ? activeId : 'classic';
+    },
+
+    getActiveThemePack: function () {
+        return this.getPack(this.getActiveThemeId()) || this.packs[0];
+    },
+
     getThemeForPack: function (pack) {
         return this.themes[pack.id] || this.themes.classic;
     },
 
     getActiveTheme: function () {
-        return this.getThemeForPack(this.getActivePack());
+        return this.getThemeForPack(this.getActiveThemePack());
     },
 
     applyActiveTheme: function () {
-        const pack = this.getActivePack();
+        const pack = this.getActiveThemePack();
         const theme = this.getThemeForPack(pack);
 
         document.body.dataset.theme = pack.id;
@@ -172,7 +183,6 @@ SuikaGame.skins = {
         if (!pack || this.isUnlocked(packId) || this.getCoins() < pack.price) return false;
         this.setCoins(this.getCoins() - pack.price);
         this.saveUnlockedIds(this.getUnlockedIds().concat(packId));
-        this.setActive(packId);
         SuikaGame.progress.unlock('collector');
         return true;
     },
@@ -180,6 +190,12 @@ SuikaGame.skins = {
     setActive: function (packId) {
         if (!this.isUnlocked(packId)) return false;
         localStorage.setItem(this.storageKeys.active, packId);
+        return true;
+    },
+
+    setActiveTheme: function (packId) {
+        if (!this.isUnlocked(packId)) return false;
+        localStorage.setItem(this.storageKeys.activeTheme, packId);
         return true;
     },
 

@@ -231,14 +231,13 @@ SuikaGame.ui = {
         SuikaGame.skins.packs.forEach(pack => {
             const isUnlocked = SuikaGame.skins.isUnlocked(pack.id);
             const isActive = activeId === pack.id;
-            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Desbloqueado' : `${pack.price} moedas`, pack.themeClass);
-            const preview = card.querySelector('.shop-preview');
+            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Desbloqueado' : `Compre o pacote ${pack.name} · ${pack.price} moedas`, pack.themeClass);
             const action = card.querySelector('.shop-action');
 
             this.decoratePackCard(card, pack, 'fruits');
 
             action.disabled = false;
-            action.textContent = isActive ? 'Equipada' : isUnlocked ? 'Equipar' : coins >= pack.price ? 'Comprar' : 'Bloqueada';
+            action.textContent = isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= pack.price ? 'Comprar pacote' : 'Compre pacote';
             action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= pack.price ? 'buy' : 'locked';
             action.addEventListener('click', event => {
                 event.stopPropagation();
@@ -248,9 +247,10 @@ SuikaGame.ui = {
                     SuikaGame.skins.setActive(pack.id);
                     this.afterShopAction('Skin equipada');
                 } else if (SuikaGame.skins.buyPack(pack.id)) {
-                    this.afterShopAction('Skin comprada e equipada');
+                    SuikaGame.skins.setActive(pack.id);
+                    this.afterShopAction('Pacote comprado. Skin equipada');
                 } else {
-                    this.showToast('Moedas insuficientes');
+                    this.showToast(`Compre o pacote ${pack.name}`);
                 }
             });
             list.appendChild(card);
@@ -259,32 +259,33 @@ SuikaGame.ui = {
 
     renderThemeShop: function () {
         const list = document.getElementById('theme-list');
-        const activeId = SuikaGame.skins.getActiveId();
+        const activeId = SuikaGame.skins.getActiveThemeId();
         const coins = SuikaGame.skins.getCoins();
 
         list.innerHTML = '';
         SuikaGame.skins.packs.forEach(pack => {
             const isUnlocked = SuikaGame.skins.isUnlocked(pack.id);
             const isActive = activeId === pack.id;
-            const card = this.createShopCard(pack.name, 'Tema do menu, pote, caixa de evolução e linha final', isUnlocked ? 'Desbloqueado' : `${pack.price} moedas`, pack.themeClass);
+            const card = this.createShopCard(pack.name, 'Tema do menu, pote, caixa de evolução e linha final', isUnlocked ? 'Desbloqueado' : `Compre o pacote ${pack.name} · ${pack.price} moedas`, pack.themeClass);
             const action = card.querySelector('.shop-action');
 
             this.decoratePackCard(card, pack, 'theme');
 
             action.disabled = false;
-            action.textContent = isActive ? 'Ativo' : isUnlocked ? 'Equipar' : coins >= pack.price ? 'Comprar' : 'Bloqueado';
+            action.textContent = isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= pack.price ? 'Comprar pacote' : 'Compre pacote';
             action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= pack.price ? 'buy' : 'locked';
             action.addEventListener('click', event => {
                 event.stopPropagation();
                 if (isActive) {
                     this.showToast('Tema já ativo');
                 } else if (isUnlocked) {
-                    SuikaGame.skins.setActive(pack.id);
+                    SuikaGame.skins.setActiveTheme(pack.id);
                     this.afterShopAction('Tema equipado');
                 } else if (SuikaGame.skins.buyPack(pack.id)) {
-                    this.afterShopAction('Tema comprado e equipado');
+                    SuikaGame.skins.setActiveTheme(pack.id);
+                    this.afterShopAction('Pacote comprado. Tema equipado');
                 } else {
-                    this.showToast('Moedas insuficientes');
+                    this.showToast(`Compre o pacote ${pack.name}`);
                 }
             });
             list.appendChild(card);
@@ -330,6 +331,7 @@ SuikaGame.ui = {
         const list = document.getElementById('power-list');
         const coins = SuikaGame.skins.getCoins();
         const icons = {
+            'clear-small': 'S',
             'cherry-rain': 'C',
             'side-push': '↔',
             'hide-line': 'L',
@@ -448,6 +450,7 @@ SuikaGame.ui = {
     updatePowerToolbar: function () {
         const toolbar = document.getElementById('power-toolbar');
         const icons = {
+            'clear-small': 'S',
             'cherry-rain': 'C',
             'side-push': '↔',
             'hide-line': 'L',
