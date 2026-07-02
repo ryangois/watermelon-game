@@ -27,18 +27,26 @@ SuikaGame.skins = {
     ],
 
     tracks: [
-        { id: 'fruit-groove', name: 'Fruit Groove', description: 'Trilha original animada', price: 0, src: 'assets/music/music-fruits.mp3' },
-        { id: 'calm-harvest', name: 'Calm Harvest', description: 'Vibe mais calma para jogar focado', price: 180, src: 'assets/music/music-fruits.mp3' },
-        { id: 'arcade-pop', name: 'Arcade Pop', description: 'Energia de fliperama para combos', price: 320, src: 'assets/music/music-fruits.mp3' },
-        { id: 'boss-fruit', name: 'Boss Fruit', description: 'Trilha intensa para pontuações altas', price: 520, src: 'assets/music/music-fruits.mp3' }
+        { id: 'fruit-groove', name: 'Fruit Groove', icon: '♪', description: 'Trilha original animada', price: 0, src: 'assets/music/music-fruits.mp3' },
+        { id: 'calm-harvest', name: 'Calm Harvest', icon: '~', description: 'Vibe mais calma para jogar focado', price: 180, src: 'assets/music/music-fruits.mp3' },
+        { id: 'arcade-pop', name: 'Arcade Pop', icon: '⚡', description: 'Energia de fliperama para combos', price: 320, src: 'assets/music/music-fruits.mp3' },
+        { id: 'boss-fruit', name: 'Boss Fruit', icon: '!', description: 'Trilha intensa para pontuações altas', price: 520, src: 'assets/music/music-fruits.mp3' },
+        { id: 'halloween-hop', name: 'Halloween Hop', icon: '☾', description: 'Beat travesso para pacotes assustadores', price: 260, src: 'assets/music/music-fruits.mp3' },
+        { id: 'snowy-sleigh', name: 'Snowy Sleigh', icon: '*', description: 'Natal leve com sinos e brilho arcade', price: 300, src: 'assets/music/music-fruits.mp3' },
+        { id: 'cosmic-bounce', name: 'Cosmic Bounce', icon: '✦', description: 'Synth espacial para skins siderais', price: 380, src: 'assets/music/music-fruits.mp3' },
+        { id: 'olympus-pop', name: 'Olympus Pop', icon: 'Ω', description: 'Mitologia pop com percussão heroica', price: 440, src: 'assets/music/music-fruits.mp3' },
+        { id: 'tidal-combo', name: 'Tidal Combo', icon: '≈', description: 'Groove oceânico relaxado para partidas longas', price: 500, src: 'assets/music/music-fruits.mp3' },
+        { id: 'neon-circuit', name: 'Neon Circuit', icon: '#', description: 'Eletrônica robótica com pulso neon', price: 560, src: 'assets/music/music-fruits.mp3' },
+        { id: 'candy-rush', name: 'Candy Rush', icon: '+', description: 'Pop doce, colorido e acelerado', price: 620, src: 'assets/music/music-fruits.mp3' },
+        { id: 'golden-fever', name: 'Golden Fever', icon: '$', description: 'Funk luxuoso para pontuações altas', price: 760, src: 'assets/music/music-fruits.mp3' }
     ],
 
     powers: [
-        { id: 'clear-small', name: 'Limpeza de menores', description: 'Remove cerejas e morangos já soltos', price: 90 },
-        { id: 'hide-line', name: 'Linha invisível', description: 'Esconde a linha final por 7 segundos', price: 160 },
-        { id: 'cherry-rain', name: 'Chuva de cerejas', description: 'Derruba cerejas extras para tentar combos', price: 120 },
-        { id: 'side-push', name: 'Chacoalhão', description: 'Chacoalha todas as frutas soltas no pote', price: 140 },
-        { id: 'small-bomb', name: 'Bomba pequena', description: 'Escolha até 4 frutas soltas para eliminar', price: 240 }
+        { id: 'clear-small', name: 'Limpeza de menores', icon: '🧹', description: 'Remove cerejas e morangos já soltos', price: 90 },
+        { id: 'hide-line', name: 'Linha invisível', icon: '👁', description: 'Esconde a linha final por 7 segundos', price: 160 },
+        { id: 'cherry-rain', name: 'Chuva de cerejas', icon: '🍒', description: 'Derruba cerejas extras para tentar combos', price: 120 },
+        { id: 'side-push', name: 'Chacoalhão', icon: '🌀', description: 'Chacoalha todas as frutas soltas no pote', price: 140 },
+        { id: 'small-bomb', name: 'Bomba pequena', icon: '💣', description: 'Escolha até 4 frutas soltas para eliminar', price: 240 }
     ],
 
     testCoinGrant: 9999,

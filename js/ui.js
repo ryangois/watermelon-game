@@ -339,7 +339,7 @@ SuikaGame.ui = {
             const card = this.createShopCard(track.name, track.description, isUnlocked ? 'Desbloqueada' : `${track.price} moedas`, 'music-card');
             const preview = card.querySelector('.shop-preview');
             const action = card.querySelector('.shop-action');
-            preview.textContent = '♪';
+            preview.textContent = track.icon || '♪';
             preview.classList.add('music-preview');
             action.disabled = false;
             action.textContent = isActive ? 'Tocando' : isUnlocked ? 'Equipar' : coins >= track.price ? 'Comprar' : 'Bloqueada';
@@ -365,13 +365,6 @@ SuikaGame.ui = {
     renderPowerShop: function () {
         const list = document.getElementById('power-list');
         const coins = SuikaGame.skins.getCoins();
-        const icons = {
-            'clear-small': 'S',
-            'cherry-rain': 'C',
-            'side-push': '~',
-            'hide-line': 'L',
-            'small-bomb': 'B'
-        };
 
         list.innerHTML = '';
         SuikaGame.skins.powers.forEach(power => {
@@ -379,7 +372,7 @@ SuikaGame.ui = {
             const card = this.createShopCard(power.name, power.description, `${power.price} moedas · Você tem ${count}`, 'power-card');
             const preview = card.querySelector('.shop-preview');
             const action = card.querySelector('.shop-action');
-            preview.textContent = icons[power.id] || '+';
+            preview.textContent = power.icon || '+';
             preview.classList.add('power-preview');
             action.disabled = false;
             action.textContent = coins >= power.price ? 'Comprar' : 'Sem moedas';
@@ -484,13 +477,6 @@ SuikaGame.ui = {
 
     updatePowerToolbar: function () {
         const toolbar = document.getElementById('power-toolbar');
-        const icons = {
-            'clear-small': 'S',
-            'cherry-rain': 'C',
-            'side-push': '~',
-            'hide-line': 'L',
-            'small-bomb': 'B'
-        };
 
         toolbar.innerHTML = '';
         SuikaGame.skins.powers.forEach(power => {
@@ -500,7 +486,7 @@ SuikaGame.ui = {
             button.disabled = count <= 0 || !SuikaGame.config.gameActive;
             button.title = `${power.name} (${count})`;
             button.setAttribute('aria-label', `${power.name}: ${count} disponiveis`);
-            button.innerHTML = `<span>${icons[power.id] || '?'}</span><strong>${count}</strong>`;
+            button.innerHTML = `<span>${power.icon || '?'}</span><strong>${count}</strong>`;
             button.addEventListener('click', () => SuikaGame.game.usePower(power.id));
             toolbar.appendChild(button);
         });
