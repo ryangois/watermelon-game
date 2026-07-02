@@ -8,6 +8,7 @@ SuikaGame.game = {
     },
 
     startGame: function () {
+        SuikaGame.ui.requestFullscreen(true);
         SuikaGame.skins.applyActiveTheme();
         SuikaGame.physics.applyTheme();
         this.resetGame();

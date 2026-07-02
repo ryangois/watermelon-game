@@ -6,6 +6,7 @@ SuikaGame.ui = {
     initializeUI: function () {
         SuikaGame.skins.ensureTestCoins();
         SuikaGame.skins.applyActiveTheme();
+        this.registerServiceWorker();
         this.setupEventListeners();
         this.updateHighScoreDisplay();
         this.updateCoinDisplays();
@@ -32,6 +33,7 @@ SuikaGame.ui = {
         document.getElementById('mute-button').addEventListener('click', () => SuikaGame.audio.toggleMute());
         document.getElementById('game-options-button').addEventListener('click', () => this.setGameOptionsOpen(true));
         document.getElementById('game-options-close-button').addEventListener('click', () => this.setGameOptionsOpen(false));
+        document.getElementById('fullscreen-button').addEventListener('click', () => this.requestFullscreen(false));
         document.getElementById('game-return-menu-button').addEventListener('click', () => this.returnToMenuFromGame());
         document.getElementById('easy-button').addEventListener('click', () => this.setDifficulty('easy'));
         document.getElementById('normal-button').addEventListener('click', () => this.setDifficulty('normal'));
@@ -68,6 +70,39 @@ SuikaGame.ui = {
         document.querySelectorAll('.shop-tab').forEach(tab => {
             tab.addEventListener('click', () => this.setShopTab(tab.dataset.shopTab));
         });
+    },
+
+    registerServiceWorker: function () {
+        if (!('serviceWorker' in navigator)) return;
+
+        navigator.serviceWorker.register('service-worker.js').catch(function () {});
+    },
+
+    requestFullscreen: function (silent) {
+        const target = document.documentElement;
+        const request = target.requestFullscreen ||
+            target.webkitRequestFullscreen ||
+            target.msRequestFullscreen;
+
+        if (!request) {
+            if (!silent) this.showToast('Tela cheia não suportada neste navegador');
+            return Promise.resolve(false);
+        }
+
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (!silent) this.showToast('Tela cheia já ativa');
+            return Promise.resolve(true);
+        }
+
+        return Promise.resolve(request.call(target))
+            .then(() => {
+                if (!silent) this.showToast('Tela cheia ativada');
+                return true;
+            })
+            .catch(() => {
+                if (!silent) this.showToast('Use o botão do navegador ou instale o app');
+                return false;
+            });
     },
 
     updateHighScoreDisplay: function () {

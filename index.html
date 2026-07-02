@@ -4,7 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fffaf0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Suika Game">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Suika Game</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/images/watermelon_emoji.png">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -124,6 +131,7 @@
                             <input id="game-fruit-radius-toggle" type="checkbox">
                             <span>Mostrar raio das frutas</span>
                         </label>
+                        <button id="fullscreen-button" class="menu-button accent">Tela cheia</button>
                         <button id="game-return-menu-button" class="menu-button secondary">Voltar ao menu</button>
                     </div>
                 </div>
@@ -145,14 +153,14 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js?v=20260702-skins-themes"></script>
-    <script src="js/skins.js?v=20260702-skins-themes"></script>
-    <script src="js/progress.js?v=20260702-skins-themes"></script>
-    <script src="js/fruits.js?v=20260702-skins-themes"></script>
-    <script src="js/particles.js?v=20260702-skins-themes"></script>
-    <script src="js/physics.js?v=20260702-skins-themes"></script>
-    <script src="js/ui.js?v=20260702-skins-themes"></script>
-    <script src="js/game.js?v=20260702-skins-themes"></script>
+    <script src="js/config.js?v=20260702-pwa-fullscreen"></script>
+    <script src="js/skins.js?v=20260702-pwa-fullscreen"></script>
+    <script src="js/progress.js?v=20260702-pwa-fullscreen"></script>
+    <script src="js/fruits.js?v=20260702-pwa-fullscreen"></script>
+    <script src="js/particles.js?v=20260702-pwa-fullscreen"></script>
+    <script src="js/physics.js?v=20260702-pwa-fullscreen"></script>
+    <script src="js/ui.js?v=20260702-pwa-fullscreen"></script>
+    <script src="js/game.js?v=20260702-pwa-fullscreen"></script>
 </body>
 
 </html>
