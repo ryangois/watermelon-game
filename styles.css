@@ -86,8 +86,8 @@ input:focus-visible {
 #menu-container {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 28px;
+    gap: 12px;
+    padding: 24px;
     transition: background 220ms ease;
 }
 
@@ -232,6 +232,23 @@ input:focus-visible {
     font-size: 16px;
 }
 
+#how-to-play ol {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 8px 0;
+    list-style: none;
+}
+
+#how-to-play li {
+    border-radius: var(--radius);
+    background: rgba(52, 41, 31, 0.07);
+    padding: 7px 8px;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
 #how-to-play p {
     color: var(--muted);
     font-size: 13px;
@@ -242,6 +259,40 @@ input:focus-visible {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+}
+
+#ranking-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+#ranking-stats span {
+    min-width: 0;
+    display: grid;
+    gap: 1px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.62);
+    padding: 7px 8px;
+    text-align: center;
+}
+
+#ranking-stats strong,
+#ranking-stats small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#ranking-stats strong {
+    font-size: 13px;
+    line-height: 1.05;
+}
+
+#ranking-stats small {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
 }
 
 .medal,
@@ -367,6 +418,7 @@ footer {
 .shop-list.active {
     display: grid;
     align-content: start;
+    grid-template-columns: 1fr;
 }
 
 .shop-card {
@@ -380,6 +432,7 @@ footer {
     padding: 10px;
     overflow: hidden;
     box-shadow: 0 8px 18px rgba(63, 52, 37, 0.07);
+    cursor: pointer;
 }
 
 .shop-preview {
@@ -467,6 +520,56 @@ footer {
     gap: 10px;
 }
 
+.pack-details {
+    grid-column: 1 / -1;
+    display: none;
+    gap: 9px;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 10px;
+}
+
+.shop-card.expanded .pack-details {
+    display: grid;
+}
+
+.pack-fruit-row {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 5px;
+    align-items: center;
+}
+
+.pack-fruit-row .skin-preview-fruit {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+.theme-swatches {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.theme-swatches span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.68);
+    padding: 6px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.theme-swatches i {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(47, 38, 31, 0.2);
+    border-radius: 50%;
+}
+
 .shop-action {
     width: 108px;
     min-height: 38px;
@@ -525,6 +628,26 @@ footer {
     overflow: hidden;
     background: var(--paper);
     transition: background 220ms ease;
+}
+
+#game-container.bomb-selecting #game-canvas {
+    cursor: crosshair;
+}
+
+#game-container.bomb-selecting::after {
+    content: "Escolha ate 4 frutas";
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    z-index: 6;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: rgba(47, 38, 31, 0.82);
+    color: #fff;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 800;
+    pointer-events: none;
 }
 
 #game-header {
@@ -793,6 +916,30 @@ footer {
     background: var(--teal);
 }
 
+#toast {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 30;
+    max-width: min(360px, calc(100vw - 36px));
+    border: 1px solid rgba(47, 38, 31, 0.16);
+    border-radius: var(--radius);
+    background: rgba(47, 38, 31, 0.92);
+    color: #fff;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 800;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+#toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 @media (max-width: 720px) {
     :root {
         --game-width: min(calc(100vw - 12px), calc((100dvh - 106px) * 0.571));
@@ -828,8 +975,8 @@ footer {
     #menu-container {
         min-height: calc(100dvh - 12px);
         justify-content: center;
-        gap: 12px;
-        padding: clamp(16px, 5vw, 24px);
+        gap: 10px;
+        padding: clamp(14px, 4vw, 20px);
     }
 
     .menu-top {
@@ -869,6 +1016,11 @@ footer {
 
     #how-to-play {
         padding: 12px;
+    }
+
+    #how-to-play ol {
+        grid-template-columns: 1fr;
+        gap: 5px;
     }
 
     #how-to-play h2 {
@@ -942,14 +1094,14 @@ footer {
     }
 
     .shop-card {
-        grid-template-columns: 76px minmax(0, 1fr);
-        gap: 10px;
-        padding: 10px;
+        grid-template-columns: 70px minmax(0, 1fr);
+        gap: 9px;
+        padding: 9px;
         align-items: center;
     }
 
     .shop-preview {
-        min-height: 76px;
+        min-height: 70px;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
@@ -958,8 +1110,8 @@ footer {
     }
 
     .skin-preview-fruit {
-        width: 29px;
-        height: 29px;
+        width: 26px;
+        height: 26px;
     }
 
     .music-preview,
@@ -973,7 +1125,7 @@ footer {
     }
 
     .shop-card p {
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1.25;
     }
 
@@ -983,8 +1135,16 @@ footer {
 
     .shop-action {
         width: 100%;
-        min-height: 38px;
+        min-height: 36px;
         font-size: 15px;
+    }
+
+    .pack-fruit-row {
+        gap: 3px;
+    }
+
+    .theme-swatches {
+        grid-template-columns: 1fr;
     }
 
     #game-header {
@@ -1038,7 +1198,7 @@ footer {
     #power-toolbar {
         top: 74px;
         right: 6px;
-        gap: 5px;
+        gap: 6px;
     }
 
     .power-button {
@@ -1170,10 +1330,10 @@ footer {
     }
 
     .power-button {
-        width: 38px;
-        height: 38px;
-        min-height: 38px;
-        font-size: 15px;
+        width: 36px;
+        height: 36px;
+        min-height: 36px;
+        font-size: 14px;
     }
 
     #fruit-evolution {
@@ -1188,6 +1348,14 @@ footer {
     .fruit-icon {
         width: clamp(34px, min(4.4vw, 5vh), 44px);
         height: clamp(34px, min(4.4vw, 5vh), 44px);
+    }
+
+    #toast {
+        right: 10px;
+        bottom: 10px;
+        left: 10px;
+        max-width: none;
+        text-align: center;
     }
 }
 

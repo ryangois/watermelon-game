@@ -2,6 +2,7 @@ var SuikaGame = SuikaGame || {};
 
 SuikaGame.progress = {
     storageKey: 'suikaMedals',
+    statsKey: 'suikaStats',
     newlyUnlocked: [],
 
     medals: [
@@ -10,7 +11,10 @@ SuikaGame.progress = {
         { id: 'score-1000', name: '1000 pontos', description: 'Chegue a 1000 pontos' },
         { id: 'hard-mode', name: 'Coragem', description: 'Jogue no difícil' },
         { id: 'collector', name: 'Colecionador', description: 'Desbloqueie uma skin' },
-        { id: 'power-user', name: 'Estratégia', description: 'Use um poder' }
+        { id: 'power-user', name: 'Estratégia', description: 'Use um poder' },
+        { id: 'combo-big', name: 'Combo grande', description: 'Faça 4 fusões em sequência' },
+        { id: 'first-watermelon', name: 'Melancia!', description: 'Crie a primeira melancia' },
+        { id: 'jackfruit-egg', name: 'Easter egg', description: 'Descubra a Jaca' }
     ],
 
     getUnlocked: function () {
@@ -19,6 +23,39 @@ SuikaGame.progress = {
         } catch (error) {
             return [];
         }
+    },
+
+    getStats: function () {
+        try {
+            return JSON.parse(localStorage.getItem(this.statsKey) || '{}');
+        } catch (error) {
+            return {};
+        }
+    },
+
+    saveStats: function (stats) {
+        localStorage.setItem(this.statsKey, JSON.stringify(stats));
+    },
+
+    recordGame: function (score) {
+        const stats = this.getStats();
+        stats.gamesPlayed = (stats.gamesPlayed || 0) + 1;
+        stats.bestScore = Math.max(stats.bestScore || 0, score);
+        this.saveStats(stats);
+    },
+
+    noteFruit: function (fruitId, fruitIndex) {
+        const stats = this.getStats();
+        const currentBestIndex = typeof stats.bestFruitIndex === 'number' ? stats.bestFruitIndex : -1;
+
+        if (fruitIndex > currentBestIndex) {
+            stats.bestFruitIndex = fruitIndex;
+            stats.bestFruitId = fruitId;
+            this.saveStats(stats);
+        }
+
+        if (fruitId === 'watermelon') this.unlock('first-watermelon');
+        if (fruitId === 'jackfruit') this.unlock('jackfruit-egg');
     },
 
     unlock: function (medalId) {

@@ -31,7 +31,11 @@ SuikaGame.game = {
         SuikaGame.config.canDropFruit = true;
         SuikaGame.config.dropPosition = SuikaGame.config.GAME_WIDTH / 2;
         SuikaGame.config.lineInvisibleUntil = 0;
+        SuikaGame.config.bombSelectionRemaining = 0;
+        SuikaGame.config.comboCount = 0;
+        SuikaGame.config.lastMergeAt = 0;
         clearTimeout(SuikaGame.config.lineInvisibleTimer);
+        document.getElementById('game-container').classList.remove('bomb-selecting');
         SuikaGame.fruits.currentFruit = null;
         SuikaGame.particles.activeParticles = [];
         SuikaGame.physics.clearLineWarnings();
@@ -75,6 +79,12 @@ SuikaGame.game = {
         const newFruitData = SuikaGame.fruits.types[newFruitIndex];
         const newFruit = SuikaGame.fruits.createFruitBody(midX, midY, newFruitData);
         const scoreMultiplier = SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty].scoreMultiplier;
+        const now = Date.now();
+
+        SuikaGame.config.comboCount = now - SuikaGame.config.lastMergeAt <= 1800 ? SuikaGame.config.comboCount + 1 : 1;
+        SuikaGame.config.lastMergeAt = now;
+        if (SuikaGame.config.comboCount >= 4) SuikaGame.progress.unlock('combo-big');
+        SuikaGame.progress.noteFruit(newFruitData.id, newFruitIndex);
 
         SuikaGame.particles.createParticles(midX, midY, SuikaGame.fruits.getColorForFruit(currentFruitData), 25);
         SuikaGame.config.score += Math.round(newFruitData.score * scoreMultiplier);
@@ -109,25 +119,41 @@ SuikaGame.game = {
     },
 
     usePower: function (powerId) {
-        if (!SuikaGame.config.gameActive || SuikaGame.config.gameOver || !SuikaGame.skins.consumePower(powerId)) {
+        if (!SuikaGame.config.gameActive || SuikaGame.config.gameOver || SuikaGame.skins.getPowerCount(powerId) <= 0) {
             return false;
         }
 
-        if (powerId === 'clear-small') {
-            this.removeFruits(body => body.fruitIndex <= 1);
-        }
-
-        if (powerId === 'pop-lowest') {
-            const fruits = this.getLooseFruits().sort((a, b) => a.fruitIndex - b.fruitIndex || b.position.y - a.position.y);
-            if (fruits[0]) Matter.World.remove(SuikaGame.config.engine.world, fruits[0]);
-        }
-
         if (powerId === 'hide-line') {
+            if (!SuikaGame.skins.consumePower(powerId)) return false;
             SuikaGame.physics.hideGameOverLine(7000);
+            SuikaGame.ui.showToast('Linha invisível por 7 segundos');
         }
 
-        if (powerId === 'clear-medium') {
-            this.removeFruits(body => body.fruitIndex >= 2 && body.fruitIndex <= 3);
+        if (powerId === 'cherry-rain') {
+            if (!SuikaGame.skins.consumePower(powerId)) return false;
+            this.rainCherries();
+            SuikaGame.ui.showToast('Chuva de cerejas!');
+        }
+
+        if (powerId === 'side-push') {
+            const fruits = this.getLooseFruits();
+            if (!fruits.length) {
+                SuikaGame.ui.showToast('Não há frutas para empurrar');
+                return false;
+            }
+            if (!SuikaGame.skins.consumePower(powerId)) return false;
+            this.pushFruitsSideways(fruits);
+            SuikaGame.ui.showToast('Empurrão lateral aplicado');
+        }
+
+        if (powerId === 'small-bomb') {
+            const fruits = this.getLooseFruits();
+            if (!fruits.length) {
+                SuikaGame.ui.showToast('Não há frutas para eliminar');
+                return false;
+            }
+            if (!SuikaGame.skins.consumePower(powerId)) return false;
+            this.startBombSelection(Math.min(4, fruits.length));
         }
 
         SuikaGame.ui.updatePowerToolbar();
@@ -148,15 +174,94 @@ SuikaGame.game = {
         });
     },
 
+    rainCherries: function () {
+        const cherry = SuikaGame.fruits.types[0];
+        const count = 6;
+
+        for (let i = 0; i < count; i++) {
+            const x = 34 + (i * ((SuikaGame.config.GAME_WIDTH - 68) / (count - 1)));
+            const y = 46 + (i % 2) * 18;
+            const body = SuikaGame.fruits.createFruitBody(x, y, cherry);
+            body.launchTimestamp = Date.now();
+            Matter.Body.setVelocity(body, { x: (i % 2 === 0 ? -0.6 : 0.6), y: 1.2 });
+            Matter.World.add(SuikaGame.config.engine.world, body);
+        }
+    },
+
+    pushFruitsSideways: function (fruits) {
+        const center = SuikaGame.config.GAME_WIDTH / 2;
+
+        fruits.forEach(body => {
+            const direction = body.position.x < center ? -1 : 1;
+            Matter.Body.applyForce(body, body.position, {
+                x: direction * 0.018 * body.mass,
+                y: -0.002 * body.mass
+            });
+        });
+    },
+
+    startBombSelection: function (count) {
+        SuikaGame.config.bombSelectionRemaining = count;
+        document.getElementById('game-container').classList.add('bomb-selecting');
+        SuikaGame.ui.showToast(`Toque em ${count} frutas para eliminar`);
+    },
+
+    handleBombSelectionPointer: function (event) {
+        if (!SuikaGame.config.bombSelectionRemaining || !event) return false;
+
+        const fruit = this.getFruitAtClientPoint(event);
+        if (!fruit) {
+            SuikaGame.ui.showToast('Toque em uma fruta solta');
+            return true;
+        }
+
+        Matter.World.remove(SuikaGame.config.engine.world, fruit);
+        SuikaGame.particles.createParticles(fruit.position.x, fruit.position.y, fruit.render.fillStyle, 14);
+        SuikaGame.config.bombSelectionRemaining -= 1;
+
+        if (SuikaGame.config.bombSelectionRemaining <= 0 || !this.getLooseFruits().length) {
+            SuikaGame.config.bombSelectionRemaining = 0;
+            document.getElementById('game-container').classList.remove('bomb-selecting');
+            SuikaGame.ui.showToast('Bomba concluída');
+        } else {
+            SuikaGame.ui.showToast(`${SuikaGame.config.bombSelectionRemaining} frutas restantes`);
+        }
+
+        return true;
+    },
+
+    getFruitAtClientPoint: function (event) {
+        const canvas = document.getElementById('game-canvas');
+        const rect = canvas.getBoundingClientRect();
+        const source = event.changedTouches && event.changedTouches[0] ? event.changedTouches[0] : event;
+        const x = (source.clientX - rect.left) * (SuikaGame.config.GAME_WIDTH / rect.width);
+        const y = (source.clientY - rect.top) * (SuikaGame.config.GAME_HEIGHT / rect.height);
+
+        return this.getLooseFruits()
+            .filter(body => {
+                const dx = body.position.x - x;
+                const dy = body.position.y - y;
+                return Math.sqrt(dx * dx + dy * dy) <= body.circleRadius + 10;
+            })
+            .sort((a, b) => {
+                const da = Math.hypot(a.position.x - x, a.position.y - y);
+                const db = Math.hypot(b.position.x - x, b.position.y - y);
+                return da - db;
+            })[0] || null;
+    },
+
     endGame: function () {
         if (SuikaGame.config.gameOver) return;
 
         SuikaGame.config.gameOver = true;
         SuikaGame.config.gameActive = false;
+        SuikaGame.config.bombSelectionRemaining = 0;
+        document.getElementById('game-container').classList.remove('bomb-selecting');
 
         const earnedCoins = SuikaGame.skins.addCoins(SuikaGame.skins.getCoinsForScore(SuikaGame.config.score));
         const isNewHighScore = this.saveHighScore(SuikaGame.config.score);
         const highScore = this.getHighScore();
+        SuikaGame.progress.recordGame(SuikaGame.config.score);
         const medals = SuikaGame.progress.evaluateGame(SuikaGame.config.score);
         const message = isNewHighScore
             ? `Nova pontuação recorde!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`

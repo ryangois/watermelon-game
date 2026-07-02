@@ -15,6 +15,7 @@ SuikaGame.ui = {
         this.createEvolutionDiagram();
         this.renderShop();
         this.renderMedalStrip();
+        this.renderRankingStats();
         SuikaGame.skins.preloadAssets(SuikaGame.fruits.types).then(() => {
             this.createEvolutionDiagram();
             this.renderShop();
@@ -138,6 +139,7 @@ SuikaGame.ui = {
         document.getElementById('login-button').style.display = 'none';
         document.getElementById('how-to-play').style.display = 'none';
         document.getElementById('medal-strip').style.display = 'none';
+        document.getElementById('ranking-stats').style.display = 'none';
         document.getElementById('difficulty-buttons').style.display = 'grid';
     },
 
@@ -159,6 +161,7 @@ SuikaGame.ui = {
         this.updateDifficultyDisplay();
         this.updateAccessibilityControls();
         this.renderMedalStrip();
+        this.renderRankingStats();
 
         document.getElementById('game-title').textContent = 'Suika Game';
         document.getElementById('game-title').style.display = 'block';
@@ -167,6 +170,7 @@ SuikaGame.ui = {
         document.getElementById('login-button').style.display = 'flex';
         document.getElementById('how-to-play').style.display = 'block';
         document.getElementById('medal-strip').style.display = 'flex';
+        document.getElementById('ranking-stats').style.display = 'grid';
         document.getElementById('difficulty-buttons').style.display = 'none';
         document.getElementById('menu-container').style.display = 'flex';
         document.getElementById('shop-container').style.display = 'none';
@@ -212,6 +216,7 @@ SuikaGame.ui = {
 
     renderShop: function () {
         this.renderSkinShop();
+        this.renderThemeShop();
         this.renderMusicShop();
         this.renderPowerShop();
         this.setShopTab(this.activeShopTab);
@@ -226,29 +231,61 @@ SuikaGame.ui = {
         SuikaGame.skins.packs.forEach(pack => {
             const isUnlocked = SuikaGame.skins.isUnlocked(pack.id);
             const isActive = activeId === pack.id;
-            const card = this.createShopCard(pack.name, `${pack.description}. Tema de menu e jogo incluso`, isUnlocked ? 'Desbloqueado' : `${pack.price} moedas`, pack.themeClass);
+            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Desbloqueado' : `${pack.price} moedas`, pack.themeClass);
             const preview = card.querySelector('.shop-preview');
             const action = card.querySelector('.shop-action');
-            const theme = SuikaGame.skins.getThemeForPack(pack);
 
-            preview.classList.add('theme-preview');
-            preview.style.background = theme.preview;
-            SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).slice(0, 5).forEach(fruit => {
-                const icon = document.createElement('div');
-                const view = SuikaGame.skins.getFruitViewForPack(pack, fruit);
-                icon.className = 'skin-preview-fruit';
-                icon.style.backgroundColor = view.color;
-                icon.appendChild(this.createSkinPreviewImage(fruit, view.image));
-                preview.appendChild(icon);
-            });
+            this.decoratePackCard(card, pack, 'fruits');
 
-            action.disabled = !isUnlocked && coins < pack.price;
+            action.disabled = false;
             action.textContent = isActive ? 'Equipada' : isUnlocked ? 'Equipar' : coins >= pack.price ? 'Comprar' : 'Bloqueada';
             action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= pack.price ? 'buy' : 'locked';
-            action.addEventListener('click', () => {
-                if (isUnlocked) SuikaGame.skins.setActive(pack.id);
-                else SuikaGame.skins.buyPack(pack.id);
-                this.afterShopAction();
+            action.addEventListener('click', event => {
+                event.stopPropagation();
+                if (isActive) {
+                    this.showToast('Skin já equipada');
+                } else if (isUnlocked) {
+                    SuikaGame.skins.setActive(pack.id);
+                    this.afterShopAction('Skin equipada');
+                } else if (SuikaGame.skins.buyPack(pack.id)) {
+                    this.afterShopAction('Skin comprada e equipada');
+                } else {
+                    this.showToast('Moedas insuficientes');
+                }
+            });
+            list.appendChild(card);
+        });
+    },
+
+    renderThemeShop: function () {
+        const list = document.getElementById('theme-list');
+        const activeId = SuikaGame.skins.getActiveId();
+        const coins = SuikaGame.skins.getCoins();
+
+        list.innerHTML = '';
+        SuikaGame.skins.packs.forEach(pack => {
+            const isUnlocked = SuikaGame.skins.isUnlocked(pack.id);
+            const isActive = activeId === pack.id;
+            const card = this.createShopCard(pack.name, 'Tema do menu, pote, caixa de evolução e linha final', isUnlocked ? 'Desbloqueado' : `${pack.price} moedas`, pack.themeClass);
+            const action = card.querySelector('.shop-action');
+
+            this.decoratePackCard(card, pack, 'theme');
+
+            action.disabled = false;
+            action.textContent = isActive ? 'Ativo' : isUnlocked ? 'Equipar' : coins >= pack.price ? 'Comprar' : 'Bloqueado';
+            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= pack.price ? 'buy' : 'locked';
+            action.addEventListener('click', event => {
+                event.stopPropagation();
+                if (isActive) {
+                    this.showToast('Tema já ativo');
+                } else if (isUnlocked) {
+                    SuikaGame.skins.setActive(pack.id);
+                    this.afterShopAction('Tema equipado');
+                } else if (SuikaGame.skins.buyPack(pack.id)) {
+                    this.afterShopAction('Tema comprado e equipado');
+                } else {
+                    this.showToast('Moedas insuficientes');
+                }
             });
             list.appendChild(card);
         });
@@ -268,12 +305,20 @@ SuikaGame.ui = {
             const action = card.querySelector('.shop-action');
             preview.textContent = '♪';
             preview.classList.add('music-preview');
-            action.disabled = !isUnlocked && coins < track.price;
+            action.disabled = false;
             action.textContent = isActive ? 'Tocando' : isUnlocked ? 'Equipar' : coins >= track.price ? 'Comprar' : 'Bloqueada';
             action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= track.price ? 'buy' : 'locked';
             action.addEventListener('click', () => {
-                if (isUnlocked) SuikaGame.skins.setActiveTrack(track.id);
-                else SuikaGame.skins.buyTrack(track.id);
+                if (isActive) {
+                    this.showToast('Música já ativa');
+                } else if (isUnlocked) {
+                    SuikaGame.skins.setActiveTrack(track.id);
+                    this.showToast('Música equipada');
+                } else if (SuikaGame.skins.buyTrack(track.id)) {
+                    this.showToast('Música comprada e equipada');
+                } else {
+                    this.showToast('Moedas insuficientes');
+                }
                 SuikaGame.audio.stopBackgroundMusic();
                 this.afterShopAction();
             });
@@ -285,10 +330,10 @@ SuikaGame.ui = {
         const list = document.getElementById('power-list');
         const coins = SuikaGame.skins.getCoins();
         const icons = {
-            'clear-small': 'C',
-            'pop-lowest': 'X',
+            'cherry-rain': 'C',
+            'side-push': '↔',
             'hide-line': 'L',
-            'clear-medium': 'M'
+            'small-bomb': 'B'
         };
 
         list.innerHTML = '';
@@ -299,12 +344,15 @@ SuikaGame.ui = {
             const action = card.querySelector('.shop-action');
             preview.textContent = icons[power.id] || '+';
             preview.classList.add('power-preview');
-            action.disabled = coins < power.price;
+            action.disabled = false;
             action.textContent = coins >= power.price ? 'Comprar' : 'Sem moedas';
             action.dataset.state = coins >= power.price ? 'buy' : 'locked';
             action.addEventListener('click', () => {
-                SuikaGame.skins.buyPower(power.id);
-                this.afterShopAction();
+                if (SuikaGame.skins.buyPower(power.id)) {
+                    this.afterShopAction(`${power.name} comprado`);
+                } else {
+                    this.showToast('Moedas insuficientes');
+                }
             });
             list.appendChild(card);
         });
@@ -327,7 +375,66 @@ SuikaGame.ui = {
         return card;
     },
 
-    afterShopAction: function () {
+    decoratePackCard: function (card, pack, mode) {
+        const preview = card.querySelector('.shop-preview');
+        const theme = SuikaGame.skins.getThemeForPack(pack);
+
+        preview.classList.add('theme-preview');
+        preview.style.background = mode === 'theme' ? theme.preview : theme.vars['--panel-soft'];
+
+        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).slice(0, mode === 'theme' ? 3 : 5).forEach(fruit => {
+            const icon = document.createElement('div');
+            const view = SuikaGame.skins.getFruitViewForPack(pack, fruit);
+            icon.className = 'skin-preview-fruit';
+            icon.style.backgroundColor = view.color;
+            icon.appendChild(this.createSkinPreviewImage(fruit, view.image));
+            preview.appendChild(icon);
+        });
+
+        card.appendChild(this.createPackDetails(pack));
+        card.addEventListener('click', event => {
+            if (event.target.closest('button')) return;
+            card.classList.toggle('expanded');
+        });
+    },
+
+    createPackDetails: function (pack) {
+        const details = document.createElement('div');
+        const theme = SuikaGame.skins.getThemeForPack(pack);
+        const fruitRow = document.createElement('div');
+        const swatches = document.createElement('div');
+
+        details.className = 'pack-details';
+        fruitRow.className = 'pack-fruit-row';
+        swatches.className = 'theme-swatches';
+
+        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).forEach(fruit => {
+            const icon = document.createElement('div');
+            const view = SuikaGame.skins.getFruitViewForPack(pack, fruit);
+            icon.className = 'skin-preview-fruit';
+            icon.style.backgroundColor = view.color;
+            icon.title = fruit.name;
+            icon.appendChild(this.createSkinPreviewImage(fruit, view.image));
+            fruitRow.appendChild(icon);
+        });
+
+        [
+            ['Menu', theme.preview],
+            ['Jogo', theme.vars['--canvas-bg']],
+            ['Linha', theme.vars['--danger-line']]
+        ].forEach(([label, color]) => {
+            const swatch = document.createElement('span');
+            swatch.innerHTML = `<i></i>${label}`;
+            swatch.querySelector('i').style.background = color;
+            swatches.appendChild(swatch);
+        });
+
+        details.appendChild(fruitRow);
+        details.appendChild(swatches);
+        return details;
+    },
+
+    afterShopAction: function (message) {
         SuikaGame.skins.applyActiveTheme();
         SuikaGame.fruits.updateNextFruitPreview();
         this.createEvolutionDiagram();
@@ -335,15 +442,16 @@ SuikaGame.ui = {
         this.renderShop();
         this.renderMedalStrip();
         this.updatePowerToolbar();
+        if (message) this.showToast(message);
     },
 
     updatePowerToolbar: function () {
         const toolbar = document.getElementById('power-toolbar');
         const icons = {
-            'clear-small': 'C',
-            'pop-lowest': 'X',
+            'cherry-rain': 'C',
+            'side-push': '↔',
             'hide-line': 'L',
-            'clear-medium': 'M'
+            'small-bomb': 'B'
         };
 
         toolbar.innerHTML = '';
@@ -373,6 +481,26 @@ SuikaGame.ui = {
         });
     },
 
+    renderRankingStats: function () {
+        const container = document.getElementById('ranking-stats');
+        if (!container) return;
+
+        const stats = SuikaGame.progress.getStats();
+        const bestFruit = typeof stats.bestFruitIndex === 'number' ? SuikaGame.fruits.types[stats.bestFruitIndex] : null;
+        const items = [
+            ['Partidas', stats.gamesPlayed || 0],
+            ['Recorde', SuikaGame.game.getHighScore()],
+            ['Melhor fruta', bestFruit ? bestFruit.name : '-']
+        ];
+
+        container.innerHTML = '';
+        items.forEach(([label, value]) => {
+            const item = document.createElement('span');
+            item.innerHTML = `<strong>${value}</strong><small>${label}</small>`;
+            container.appendChild(item);
+        });
+    },
+
     renderMedals: function (medalIds) {
         const container = document.getElementById('earned-medals');
         container.innerHTML = '';
@@ -395,5 +523,17 @@ SuikaGame.ui = {
             img.src = fruit.image;
         };
         return img;
+    },
+
+    showToast: function (message) {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+
+        clearTimeout(this.toastTimer);
+        toast.textContent = message;
+        toast.classList.add('visible');
+        this.toastTimer = setTimeout(() => {
+            toast.classList.remove('visible');
+        }, 1900);
     }
 };

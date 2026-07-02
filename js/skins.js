@@ -33,10 +33,10 @@ SuikaGame.skins = {
     ],
 
     powers: [
-        { id: 'clear-small', name: 'Limpar pequenas', description: 'Remove cerejas e morangos já soltos', price: 90 },
-        { id: 'pop-lowest', name: 'Estourar menor', description: 'Remove a menor fruta solta do pote', price: 130 },
         { id: 'hide-line', name: 'Linha invisível', description: 'Esconde a linha final por 7 segundos', price: 160 },
-        { id: 'clear-medium', name: 'Limpar médias', description: 'Remove uvas e laranjas já soltas', price: 210 }
+        { id: 'cherry-rain', name: 'Chuva de cerejas', description: 'Derruba cerejas extras para tentar combos', price: 120 },
+        { id: 'side-push', name: 'Empurrão lateral', description: 'Dá um impulso lateral nas frutas soltas', price: 140 },
+        { id: 'small-bomb', name: 'Bomba pequena', description: 'Escolha até 4 frutas soltas para eliminar', price: 240 }
     ],
 
     testCoinGrant: 9999,
@@ -307,6 +307,6 @@ SuikaGame.skins = {
 
     getCoinsForScore: function (score) {
         const difficulty = SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty];
-        return Math.floor((score / 22) * difficulty.coinMultiplier);
+        return Math.floor((score / 38) * difficulty.coinMultiplier);
     }
 };

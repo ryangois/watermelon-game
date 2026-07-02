@@ -316,7 +316,11 @@ SuikaGame.physics = {
         this.moveCurrentFruit(currentX + deltaX);
     },
 
-    dropFruit: function () {
+    dropFruit: function (event) {
+        if (SuikaGame.game.handleBombSelectionPointer(event)) {
+            return;
+        }
+
         const currentFruit = SuikaGame.fruits.currentFruit;
 
         if (!currentFruit || !currentFruit.isStatic || !SuikaGame.config.canDropFruit || SuikaGame.config.gameOver) {

@@ -49,10 +49,16 @@
 
             <section id="how-to-play">
                 <h2>Como jogar</h2>
-                <p>Mova a fruta, solte no pote e junte frutas iguais para evoluir. Se acumular acima da linha por muito tempo, acaba.</p>
+                <ol>
+                    <li>Mova a fruta</li>
+                    <li>Solte no pote</li>
+                    <li>Junte iguais para evoluir</li>
+                </ol>
+                <p>Se acumular acima da linha por muito tempo, acaba.</p>
             </section>
 
             <div id="medal-strip" aria-label="Medalhas"></div>
+            <div id="ranking-stats" aria-label="Estatísticas"></div>
             <footer>Feito por Ryan Gois</footer>
         </section>
 
@@ -67,11 +73,13 @@
 
             <div class="shop-tabs" role="tablist" aria-label="Categorias da loja">
                 <button class="shop-tab active" data-shop-tab="skins">Skins</button>
+                <button class="shop-tab" data-shop-tab="themes">Temas</button>
                 <button class="shop-tab" data-shop-tab="music">Músicas</button>
                 <button class="shop-tab" data-shop-tab="powers">Poderes</button>
             </div>
 
             <div id="skin-list" class="shop-list" data-panel="skins"></div>
+            <div id="theme-list" class="shop-list" data-panel="themes"></div>
             <div id="music-list" class="shop-list" data-panel="music"></div>
             <div id="power-list" class="shop-list" data-panel="powers"></div>
         </section>
@@ -132,17 +140,19 @@
             <button id="restart-button">Reiniciar</button>
             <button id="return-button">Retornar ao menu</button>
         </div>
+
+        <div id="toast" role="status" aria-live="polite"></div>
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/skins.js"></script>
-    <script src="js/progress.js"></script>
-    <script src="js/fruits.js"></script>
-    <script src="js/particles.js"></script>
-    <script src="js/physics.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/game.js"></script>
+    <script src="js/config.js?v=20260702-features"></script>
+    <script src="js/skins.js?v=20260702-features"></script>
+    <script src="js/progress.js?v=20260702-features"></script>
+    <script src="js/fruits.js?v=20260702-features"></script>
+    <script src="js/particles.js?v=20260702-features"></script>
+    <script src="js/physics.js?v=20260702-features"></script>
+    <script src="js/ui.js?v=20260702-features"></script>
+    <script src="js/game.js?v=20260702-features"></script>
 </body>
 
 </html>

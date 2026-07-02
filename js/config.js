@@ -37,6 +37,11 @@ SuikaGame.config = {
     currentDifficulty: 'normal',
     dropPosition: 200,
     canDropFruit: true,
+    lineInvisibleUntil: 0,
+    lineInvisibleTimer: null,
+    bombSelectionRemaining: 0,
+    comboCount: 0,
+    lastMergeAt: 0,
 
     engine: null,
     render: null,
