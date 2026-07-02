@@ -2,6 +2,8 @@ var SuikaGame = SuikaGame || {};
 
 SuikaGame.ui = {
     activeShopTab: 'skins',
+    tutorialIndex: 0,
+    deferredInstallPrompt: null,
 
     initializeUI: function () {
         SuikaGame.skins.ensureTestCoins();
@@ -17,6 +19,8 @@ SuikaGame.ui = {
         this.renderShop();
         this.renderMedalStrip();
         this.renderRankingStats();
+        this.renderDailyPanel();
+        this.setupPwaInstall();
         SuikaGame.skins.preloadAssets(SuikaGame.fruits.types).then(() => {
             this.createEvolutionDiagram();
             this.renderShop();
@@ -34,7 +38,13 @@ SuikaGame.ui = {
         document.getElementById('game-options-button').addEventListener('click', () => this.setGameOptionsOpen(true));
         document.getElementById('game-options-close-button').addEventListener('click', () => this.setGameOptionsOpen(false));
         document.getElementById('fullscreen-button').addEventListener('click', () => this.toggleFullscreen());
+        document.getElementById('pause-button').addEventListener('click', () => SuikaGame.game.togglePause());
         document.getElementById('game-return-menu-button').addEventListener('click', () => this.returnToMenuFromGame());
+        document.getElementById('tutorial-next-button').addEventListener('click', () => this.nextTutorialStep());
+        document.getElementById('tutorial-skip-button').addEventListener('click', () => this.closeTutorial(true));
+        document.getElementById('pwa-install-button').addEventListener('click', () => this.installPwa());
+        document.getElementById('pwa-dismiss-button').addEventListener('click', () => this.dismissPwaBanner());
+        document.getElementById('pack-preview-close').addEventListener('click', () => this.closePackPreview());
         document.addEventListener('fullscreenchange', () => this.updateFullscreenButton());
         document.addEventListener('webkitfullscreenchange', () => this.updateFullscreenButton());
         document.getElementById('easy-button').addEventListener('click', () => this.setDifficulty('easy'));
@@ -72,12 +82,86 @@ SuikaGame.ui = {
         document.querySelectorAll('.shop-tab').forEach(tab => {
             tab.addEventListener('click', () => this.setShopTab(tab.dataset.shopTab));
         });
+
+        window.addEventListener('beforeinstallprompt', event => {
+            event.preventDefault();
+            this.deferredInstallPrompt = event;
+            this.renderPwaBanner();
+        });
     },
 
     registerServiceWorker: function () {
         if (!('serviceWorker' in navigator)) return;
 
         navigator.serviceWorker.register('service-worker.js').catch(function () {});
+    },
+
+    setupPwaInstall: function () {
+        this.renderPwaBanner();
+    },
+
+    renderPwaBanner: function () {
+        const banner = document.getElementById('pwa-install-banner');
+        if (!banner) return;
+
+        const dismissed = localStorage.getItem('suikaPwaBannerDismissed') === 'true';
+        const standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+        banner.classList.toggle('visible', !dismissed && !standalone);
+    },
+
+    installPwa: function () {
+        if (!this.deferredInstallPrompt) {
+            this.showToast('Use o menu do navegador para adicionar à tela inicial');
+            this.dismissPwaBanner();
+            return;
+        }
+
+        this.deferredInstallPrompt.prompt();
+        this.deferredInstallPrompt.userChoice.finally(() => {
+            this.deferredInstallPrompt = null;
+            this.dismissPwaBanner();
+        });
+    },
+
+    dismissPwaBanner: function () {
+        localStorage.setItem('suikaPwaBannerDismissed', 'true');
+        document.getElementById('pwa-install-banner').classList.remove('visible');
+    },
+
+    maybeShowTutorial: function () {
+        if (localStorage.getItem('suikaTutorialDone') === 'true') return;
+        this.tutorialIndex = 0;
+        this.renderTutorial();
+        document.getElementById('tutorial-overlay').classList.add('open');
+    },
+
+    renderTutorial: function () {
+        const steps = [
+            { title: 'Mova', text: 'Arraste no pote ou use os botões para posicionar a fruta.' },
+            { title: 'Solte', text: 'Toque para soltar. Frutas iguais se juntam e evoluem.' },
+            { title: 'Sobreviva', text: 'Não deixe acumular acima da linha. Use poderes com cuidado.' }
+        ];
+        const step = steps[this.tutorialIndex];
+        document.getElementById('tutorial-step').innerHTML = `<h2>${step.title}</h2><p>${step.text}</p><strong>${this.tutorialIndex + 1}/3</strong>`;
+        document.getElementById('tutorial-next-button').textContent = this.tutorialIndex === steps.length - 1 ? 'Jogar' : 'Próximo';
+    },
+
+    nextTutorialStep: function () {
+        this.tutorialIndex += 1;
+        if (this.tutorialIndex >= 3) {
+            this.closeTutorial(true);
+            return;
+        }
+        this.renderTutorial();
+    },
+
+    closeTutorial: function (persist) {
+        document.getElementById('tutorial-overlay').classList.remove('open');
+        if (persist) localStorage.setItem('suikaTutorialDone', 'true');
+    },
+
+    haptic: function (duration) {
+        if (navigator.vibrate) navigator.vibrate(duration);
     },
 
     requestFullscreen: function (silent) {
@@ -158,6 +242,22 @@ SuikaGame.ui = {
         button.setAttribute('aria-label', isFullscreen ? 'Sair da tela cheia' : 'Abrir em tela cheia');
     },
 
+    updatePauseButton: function () {
+        const button = document.getElementById('pause-button');
+        if (!button) return;
+        button.textContent = SuikaGame.config.paused ? 'Continuar' : 'Pausar';
+    },
+
+    showCombo: function (comboCount) {
+        const badge = document.getElementById('combo-badge');
+        if (!badge || comboCount < 2) return;
+
+        clearTimeout(this.comboTimer);
+        badge.textContent = `Combo x${comboCount}`;
+        badge.classList.add('visible');
+        this.comboTimer = setTimeout(() => badge.classList.remove('visible'), 1100);
+    },
+
     updateHighScoreDisplay: function () {
         document.getElementById('high-score').textContent = `Melhor pontuação: ${SuikaGame.game.getHighScore()}`;
     },
@@ -209,6 +309,7 @@ SuikaGame.ui = {
         this.updateMuteButton();
         this.updateAccessibilityControls();
         this.updateFullscreenButton();
+        this.updatePauseButton();
         panel.classList.toggle('open', open);
     },
 
@@ -229,6 +330,7 @@ SuikaGame.ui = {
         document.getElementById('how-to-play').style.display = 'none';
         document.getElementById('medal-strip').style.display = 'none';
         document.getElementById('ranking-stats').style.display = 'none';
+        document.getElementById('daily-panel').style.display = 'none';
         document.getElementById('difficulty-buttons').style.display = 'grid';
     },
 
@@ -251,6 +353,7 @@ SuikaGame.ui = {
         this.updateAccessibilityControls();
         this.renderMedalStrip();
         this.renderRankingStats();
+        this.renderDailyPanel();
 
         document.getElementById('game-title').textContent = 'Suika Game';
         document.getElementById('game-title').style.display = 'block';
@@ -260,6 +363,7 @@ SuikaGame.ui = {
         document.getElementById('how-to-play').style.display = 'block';
         document.getElementById('medal-strip').style.display = 'flex';
         document.getElementById('ranking-stats').style.display = 'grid';
+        document.getElementById('daily-panel').style.display = 'grid';
         document.getElementById('difficulty-buttons').style.display = 'none';
         document.getElementById('menu-container').style.display = 'flex';
         document.getElementById('shop-container').style.display = 'none';
@@ -318,16 +422,18 @@ SuikaGame.ui = {
 
         list.innerHTML = '';
         SuikaGame.skins.packs.forEach(pack => {
-            const isUnlocked = SuikaGame.skins.isUnlocked(pack.id);
+            const isUnlocked = SuikaGame.skins.isSkinUnlocked(pack.id);
             const isActive = activeId === pack.id;
-            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Desbloqueado' : `Compre o pacote ${pack.name} · ${pack.price} moedas`, pack.themeClass);
+            const price = SuikaGame.skins.getSkinPrice(pack);
+            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Skin liberada' : `Frutas: ${price} moedas`, pack.themeClass);
             const action = card.querySelector('.shop-action');
 
-            this.decoratePackCard(card, pack, 'fruits');
+            this.decoratePackCard(card, pack, 'fruits', 'skin');
+            this.addRarityBadge(card, pack);
 
             action.disabled = false;
-            action.textContent = isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= pack.price ? 'Comprar pacote' : 'Compre pacote';
-            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= pack.price ? 'buy' : 'locked';
+            action.textContent = isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= price ? 'Comprar frutas' : 'Sem moedas';
+            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked';
             action.addEventListener('click', event => {
                 event.stopPropagation();
                 if (isActive) {
@@ -335,11 +441,11 @@ SuikaGame.ui = {
                 } else if (isUnlocked) {
                     SuikaGame.skins.setActive(pack.id);
                     this.afterShopAction('Skin equipada');
-                } else if (SuikaGame.skins.buyPack(pack.id)) {
+                } else if (SuikaGame.skins.buySkinPack(pack.id)) {
                     SuikaGame.skins.setActive(pack.id);
-                    this.afterShopAction('Pacote comprado. Skin equipada');
+                    this.afterShopAction('Frutas compradas e equipadas');
                 } else {
-                    this.showToast(`Compre o pacote ${pack.name}`);
+                    this.showToast('Moedas insuficientes');
                 }
             });
             list.appendChild(card);
@@ -353,16 +459,18 @@ SuikaGame.ui = {
 
         list.innerHTML = '';
         SuikaGame.skins.packs.forEach(pack => {
-            const isUnlocked = SuikaGame.skins.isUnlocked(pack.id);
+            const isUnlocked = SuikaGame.skins.isThemeUnlocked(pack.id);
             const isActive = activeId === pack.id;
-            const card = this.createShopCard(pack.name, 'Tema do menu, pote, caixa de evolução e linha final', isUnlocked ? 'Desbloqueado' : `Compre o pacote ${pack.name} · ${pack.price} moedas`, pack.themeClass);
+            const price = SuikaGame.skins.getThemePrice(pack);
+            const card = this.createShopCard(pack.name, 'Tema do menu, pote, caixa de evolução e linha final', isUnlocked ? 'Tema liberado' : `Tema: ${price} moedas`, pack.themeClass);
             const action = card.querySelector('.shop-action');
 
-            this.decoratePackCard(card, pack, 'theme');
+            this.decoratePackCard(card, pack, 'theme', 'theme');
+            this.addRarityBadge(card, pack);
 
             action.disabled = false;
-            action.textContent = isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= pack.price ? 'Comprar pacote' : 'Compre pacote';
-            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= pack.price ? 'buy' : 'locked';
+            action.textContent = isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= price ? 'Comprar tema' : 'Sem moedas';
+            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked';
             action.addEventListener('click', event => {
                 event.stopPropagation();
                 if (isActive) {
@@ -370,11 +478,11 @@ SuikaGame.ui = {
                 } else if (isUnlocked) {
                     SuikaGame.skins.setActiveTheme(pack.id);
                     this.afterShopAction('Tema equipado');
-                } else if (SuikaGame.skins.buyPack(pack.id)) {
+                } else if (SuikaGame.skins.buyThemePack(pack.id)) {
                     SuikaGame.skins.setActiveTheme(pack.id);
-                    this.afterShopAction('Pacote comprado. Tema equipado');
+                    this.afterShopAction('Tema comprado e equipado');
                 } else {
-                    this.showToast(`Compre o pacote ${pack.name}`);
+                    this.showToast('Moedas insuficientes');
                 }
             });
             list.appendChild(card);
@@ -459,7 +567,7 @@ SuikaGame.ui = {
         return card;
     },
 
-    decoratePackCard: function (card, pack, mode) {
+    decoratePackCard: function (card, pack, mode, category) {
         const preview = card.querySelector('.shop-preview');
         const theme = SuikaGame.skins.getThemeForPack(pack);
 
@@ -475,22 +583,24 @@ SuikaGame.ui = {
             preview.appendChild(icon);
         });
 
-        card.appendChild(this.createPackDetails(pack));
+        card.appendChild(this.createPackDetails(pack, category));
         card.addEventListener('click', event => {
             if (event.target.closest('button')) return;
             card.classList.toggle('expanded');
         });
     },
 
-    createPackDetails: function (pack) {
+    createPackDetails: function (pack, category) {
         const details = document.createElement('div');
         const theme = SuikaGame.skins.getThemeForPack(pack);
         const fruitRow = document.createElement('div');
         const swatches = document.createElement('div');
+        const actions = document.createElement('div');
 
         details.className = 'pack-details';
         fruitRow.className = 'pack-fruit-row';
         swatches.className = 'theme-swatches';
+        actions.className = 'pack-extra-actions';
 
         SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).forEach(fruit => {
             const icon = document.createElement('div');
@@ -515,7 +625,90 @@ SuikaGame.ui = {
 
         details.appendChild(fruitRow);
         details.appendChild(swatches);
+        actions.appendChild(this.createPreviewButton(pack));
+        if (pack.id !== 'classic' && (!SuikaGame.skins.isSkinUnlocked(pack.id) || !SuikaGame.skins.isThemeUnlocked(pack.id))) {
+            actions.appendChild(this.createBundleButton(pack, category));
+        }
+        details.appendChild(actions);
         return details;
+    },
+
+    addRarityBadge: function (card, pack) {
+        const badge = document.createElement('span');
+        badge.className = `rarity-badge rarity-${pack.rarity || 'comum'}`;
+        badge.textContent = pack.rarity || 'comum';
+        card.querySelector('.shop-card-body').insertBefore(badge, card.querySelector('.shop-card-body h3').nextSibling);
+    },
+
+    createPreviewButton: function (pack) {
+        const button = document.createElement('button');
+        button.className = 'shop-action preview-action';
+        button.textContent = 'Prévia';
+        button.addEventListener('click', event => {
+            event.stopPropagation();
+            this.openPackPreview(pack);
+        });
+        return button;
+    },
+
+    createBundleButton: function (pack) {
+        const button = document.createElement('button');
+        const price = SuikaGame.skins.getBundlePrice(pack);
+        button.className = 'shop-action bundle-action';
+        button.textContent = `Bundle ${price}`;
+        button.addEventListener('click', event => {
+            event.stopPropagation();
+            if (SuikaGame.skins.buyBundle(pack.id)) {
+                SuikaGame.skins.setActive(pack.id);
+                SuikaGame.skins.setActiveTheme(pack.id);
+                this.afterShopAction('Bundle comprado e equipado');
+            } else {
+                this.showToast('Moedas insuficientes');
+            }
+        });
+        return button;
+    },
+
+    openPackPreview: function (pack) {
+        const modal = document.getElementById('pack-preview-modal');
+        const content = document.getElementById('pack-preview-content');
+        const theme = SuikaGame.skins.getThemeForPack(pack);
+
+        content.innerHTML = `<h2>${pack.name}</h2><p>${pack.description}</p>`;
+        const stage = document.createElement('div');
+        const row = document.createElement('div');
+        const meta = document.createElement('div');
+
+        stage.className = 'pack-preview-stage';
+        stage.style.background = theme.preview;
+        row.className = 'pack-fruit-row';
+        meta.className = 'theme-swatches';
+
+        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).forEach(fruit => {
+            const icon = document.createElement('div');
+            const view = SuikaGame.skins.getFruitViewForPack(pack, fruit);
+            icon.className = 'skin-preview-fruit';
+            icon.style.backgroundColor = view.color;
+            icon.appendChild(this.createSkinPreviewImage(fruit, view.image));
+            row.appendChild(icon);
+        });
+
+        [['Menu', theme.preview], ['Jogo', theme.vars['--canvas-bg']], ['Linha', theme.vars['--danger-line']]]
+            .forEach(([label, color]) => {
+                const item = document.createElement('span');
+                item.innerHTML = `<i></i>${label}`;
+                item.querySelector('i').style.background = color;
+                meta.appendChild(item);
+            });
+
+        stage.appendChild(row);
+        content.appendChild(stage);
+        content.appendChild(meta);
+        modal.classList.add('open');
+    },
+
+    closePackPreview: function () {
+        document.getElementById('pack-preview-modal').classList.remove('open');
     },
 
     afterShopAction: function (message) {
@@ -540,7 +733,7 @@ SuikaGame.ui = {
             button.disabled = count <= 0 || !SuikaGame.config.gameActive;
             button.title = `${power.name} (${count})`;
             button.setAttribute('aria-label', `${power.name}: ${count} disponiveis`);
-            button.innerHTML = `<span>${power.icon || '?'}</span><strong>${count}</strong>`;
+            button.innerHTML = `<span>${power.icon || '?'}</span><strong>${count}</strong><em>${power.name}</em>`;
             button.addEventListener('click', () => SuikaGame.game.usePower(power.id));
             toolbar.appendChild(button);
         });
@@ -575,6 +768,32 @@ SuikaGame.ui = {
         items.forEach(([label, value]) => {
             const item = document.createElement('span');
             item.innerHTML = `<strong>${value}</strong><small>${label}</small>`;
+            container.appendChild(item);
+        });
+    },
+
+    renderDailyPanel: function () {
+        const container = document.getElementById('daily-panel');
+        if (!container) return;
+
+        const rewards = SuikaGame.progress.getDailyRewards();
+        container.innerHTML = '';
+        [
+            ['mission', rewards.mission],
+            ['chest', rewards.chest]
+        ].forEach(([type, reward]) => {
+            const item = document.createElement('button');
+            item.className = 'daily-reward';
+            item.disabled = !reward.ready || reward.claimed;
+            item.innerHTML = `<strong>${reward.title}</strong><span>${reward.description}</span><small>${reward.claimed ? 'Coletado' : reward.ready ? `Coletar ${reward.reward}` : type === 'chest' ? `${Math.min(reward.progress, 3)}/3 partidas` : `+${reward.reward} moedas`}</small>`;
+            item.addEventListener('click', () => {
+                const amount = type === 'mission' ? SuikaGame.progress.claimDailyMission() : SuikaGame.progress.claimDailyChest();
+                if (amount) {
+                    this.updateCoinDisplays();
+                    this.renderDailyPanel();
+                    this.showToast(`+${amount} moedas`);
+                }
+            });
             container.appendChild(item);
         });
     },

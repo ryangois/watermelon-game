@@ -4,6 +4,8 @@ SuikaGame.skins = {
     storageKeys: {
         coins: 'suikaCoins',
         unlocked: 'suikaUnlockedSkins',
+        unlockedSkinPacks: 'suikaUnlockedSkinPacks',
+        unlockedThemePacks: 'suikaUnlockedThemePacks',
         active: 'suikaActiveSkin',
         activeTheme: 'suikaActiveTheme',
         unlockedTracks: 'suikaUnlockedTracks',
@@ -15,15 +17,15 @@ SuikaGame.skins = {
     },
 
     packs: [
-        { id: 'classic', name: 'Clássico', description: 'Frutas originais', price: 0, unlockedByDefault: true, themeClass: 'skin-classic', colorShift: {} },
-        { id: 'halloween', name: 'Halloween', description: 'Abóboras, fantasmas e slasher fruits', price: 120, assetFolder: 'assets/images/Halloween', themeClass: 'skin-halloween', colorShift: { cherry: '#ff6b35', strawberry: '#f72585', grape: '#5a189a', orange: '#fb8500', apple: '#b5179e', pear: '#6a994e', peach: '#ff9f1c', pineapple: '#fca311', melon: '#588157', watermelon: '#386641', jackfruit: '#8d6b25' } },
-        { id: 'christmas', name: 'Natal', description: 'Gorros, neve, luzinhas e frutas festivas', price: 220, assetFolder: 'assets/images/Christmas', themeClass: 'skin-christmas', colorShift: { cherry: '#c1121f', strawberry: '#d90429', grape: '#6a4c93', orange: '#f77f00', apple: '#9d0208', pear: '#52b788', peach: '#ffcad4', pineapple: '#ffd166', melon: '#95d5b2', watermelon: '#2d6a4f', jackfruit: '#b7a57a' } },
-        { id: 'sideral', name: 'Sideral', description: 'Planetas, estrelas e frutas astronautas', price: 360, assetFolder: 'assets/images/Sideral', themeClass: 'skin-sideral', colorShift: { cherry: '#ff4d6d', strawberry: '#ff006e', grape: '#7209b7', orange: '#f48c06', apple: '#3a86ff', pear: '#80ffdb', peach: '#ffafcc', pineapple: '#ffd60a', melon: '#48bfe3', watermelon: '#06d6a0', jackfruit: '#b8c0ff' } },
-        { id: 'mythology', name: 'Mitologia', description: 'Deuses, titãs, ninfas e frutas lendárias', price: 520, assetFolder: 'assets/images/Mythology', themeClass: 'skin-mythology', colorShift: { cherry: '#e63946', strawberry: '#f77f00', grape: '#6d597a', orange: '#f4a261', apple: '#d4af37', pear: '#84a98c', peach: '#e9c46a', pineapple: '#c9a227', melon: '#2a9d8f', watermelon: '#457b9d', jackfruit: '#8d6e63' } },
-        { id: 'ocean', name: 'Oceano', description: 'Piratas, sereias, corais e frutas submersas', price: 680, assetFolder: 'assets/images/Ocean', themeClass: 'skin-ocean', colorShift: { cherry: '#00b4d8', strawberry: '#48cae4', grape: '#5e60ce', orange: '#ffb703', apple: '#0077b6', pear: '#90e0ef', peach: '#ffd6a5', pineapple: '#f9c74f', melon: '#52b788', watermelon: '#0096c7', jackfruit: '#023e8a' } },
-        { id: 'robot', name: 'Robôs', description: 'Frutas cromadas, neon e carinhas digitais', price: 850, assetFolder: 'assets/images/Robot', themeClass: 'skin-robot', colorShift: { cherry: '#ff0054', strawberry: '#ff5400', grape: '#8338ec', orange: '#fb8500', apple: '#00f5d4', pear: '#80ed99', peach: '#f15bb5', pineapple: '#fee440', melon: '#00bbf9', watermelon: '#00f5d4', jackfruit: '#adb5bd' } },
-        { id: 'candy', name: 'Doceria', description: 'Balas, chantilly, chocolate e frutas sobremesa', price: 1100, assetFolder: 'assets/images/Candy', themeClass: 'skin-candy', colorShift: { cherry: '#ff5d8f', strawberry: '#ff8fab', grape: '#c77dff', orange: '#ffb703', apple: '#fb6f92', pear: '#b8f2e6', peach: '#ffc8dd', pineapple: '#fdffb6', melon: '#caffbf', watermelon: '#9bf6ff', jackfruit: '#ffd6a5' } },
-        { id: 'luxury', name: 'Luxo', description: 'Dourado, diamantes, coroas e frutas premium', price: 1500, assetFolder: 'assets/images/Luxury', themeClass: 'skin-luxury', colorShift: { cherry: '#b8860b', strawberry: '#d4af37', grape: '#6f2dbd', orange: '#ffba08', apple: '#f5cb5c', pear: '#c9ada7', peach: '#ffd166', pineapple: '#f4d35e', melon: '#b7e4c7', watermelon: '#95d5b2', jackfruit: '#caa94a' } }
+        { id: 'classic', name: 'Clássico', rarity: 'comum', description: 'Frutas originais', price: 0, unlockedByDefault: true, themeClass: 'skin-classic', colorShift: {} },
+        { id: 'halloween', name: 'Halloween', rarity: 'comum', description: 'Abóboras, fantasmas e slasher fruits', price: 120, assetFolder: 'assets/images/Halloween', themeClass: 'skin-halloween', colorShift: { cherry: '#ff6b35', strawberry: '#f72585', grape: '#5a189a', orange: '#fb8500', apple: '#b5179e', pear: '#6a994e', peach: '#ff9f1c', pineapple: '#fca311', melon: '#588157', watermelon: '#386641', jackfruit: '#8d6b25' } },
+        { id: 'christmas', name: 'Natal', rarity: 'comum', description: 'Gorros, neve, luzinhas e frutas festivas', price: 220, assetFolder: 'assets/images/Christmas', themeClass: 'skin-christmas', colorShift: { cherry: '#c1121f', strawberry: '#d90429', grape: '#6a4c93', orange: '#f77f00', apple: '#9d0208', pear: '#52b788', peach: '#ffcad4', pineapple: '#ffd166', melon: '#95d5b2', watermelon: '#2d6a4f', jackfruit: '#b7a57a' } },
+        { id: 'sideral', name: 'Sideral', rarity: 'raro', description: 'Planetas, estrelas e frutas astronautas', price: 360, assetFolder: 'assets/images/Sideral', themeClass: 'skin-sideral', colorShift: { cherry: '#ff4d6d', strawberry: '#ff006e', grape: '#7209b7', orange: '#f48c06', apple: '#3a86ff', pear: '#80ffdb', peach: '#ffafcc', pineapple: '#ffd60a', melon: '#48bfe3', watermelon: '#06d6a0', jackfruit: '#b8c0ff' } },
+        { id: 'mythology', name: 'Mitologia', rarity: 'raro', description: 'Deuses, titãs, ninfas e frutas lendárias', price: 520, assetFolder: 'assets/images/Mythology', themeClass: 'skin-mythology', colorShift: { cherry: '#e63946', strawberry: '#f77f00', grape: '#6d597a', orange: '#f4a261', apple: '#d4af37', pear: '#84a98c', peach: '#e9c46a', pineapple: '#c9a227', melon: '#2a9d8f', watermelon: '#457b9d', jackfruit: '#8d6e63' } },
+        { id: 'ocean', name: 'Oceano', rarity: 'raro', description: 'Piratas, sereias, corais e frutas submersas', price: 680, assetFolder: 'assets/images/Ocean', themeClass: 'skin-ocean', colorShift: { cherry: '#00b4d8', strawberry: '#48cae4', grape: '#5e60ce', orange: '#ffb703', apple: '#0077b6', pear: '#90e0ef', peach: '#ffd6a5', pineapple: '#f9c74f', melon: '#52b788', watermelon: '#0096c7', jackfruit: '#023e8a' } },
+        { id: 'robot', name: 'Robôs', rarity: 'épico', unlockMedal: 'combo-big', description: 'Frutas cromadas, neon e carinhas digitais', price: 850, assetFolder: 'assets/images/Robot', themeClass: 'skin-robot', colorShift: { cherry: '#ff0054', strawberry: '#ff5400', grape: '#8338ec', orange: '#fb8500', apple: '#00f5d4', pear: '#80ed99', peach: '#f15bb5', pineapple: '#fee440', melon: '#00bbf9', watermelon: '#00f5d4', jackfruit: '#adb5bd' } },
+        { id: 'candy', name: 'Doceria', rarity: 'épico', description: 'Balas, chantilly, chocolate e frutas sobremesa', price: 1100, assetFolder: 'assets/images/Candy', themeClass: 'skin-candy', colorShift: { cherry: '#ff5d8f', strawberry: '#ff8fab', grape: '#c77dff', orange: '#ffb703', apple: '#fb6f92', pear: '#b8f2e6', peach: '#ffc8dd', pineapple: '#fdffb6', melon: '#caffbf', watermelon: '#9bf6ff', jackfruit: '#ffd6a5' } },
+        { id: 'luxury', name: 'Luxo', rarity: 'lendário', unlockMedal: 'hard-watermelon', description: 'Dourado, diamantes, coroas e frutas premium', price: 1500, assetFolder: 'assets/images/Luxury', themeClass: 'skin-luxury', colorShift: { cherry: '#b8860b', strawberry: '#d4af37', grape: '#6f2dbd', orange: '#ffba08', apple: '#f5cb5c', pear: '#c9ada7', peach: '#ffd166', pineapple: '#f4d35e', melon: '#b7e4c7', watermelon: '#95d5b2', jackfruit: '#caa94a' } }
     ],
 
     tracks: [
@@ -129,7 +131,10 @@ SuikaGame.skins = {
     },
 
     getUnlockedIds: function () {
-        return Array.from(new Set(['classic'].concat(this.getJsonList(this.storageKeys.unlocked, ['classic']))));
+        const base = ['classic'].concat(this.getJsonList(this.storageKeys.unlocked, ['classic']));
+        const medals = SuikaGame.progress ? SuikaGame.progress.getUnlocked() : [];
+        const earned = this.packs.filter(pack => pack.unlockMedal && medals.includes(pack.unlockMedal)).map(pack => pack.id);
+        return Array.from(new Set(base.concat(earned)));
     },
 
     saveUnlockedIds: function (ids) {
@@ -140,9 +145,25 @@ SuikaGame.skins = {
         return this.getUnlockedIds().includes(packId);
     },
 
+    getUnlockedSkinIds: function () {
+        return Array.from(new Set(this.getUnlockedIds().concat(this.getJsonList(this.storageKeys.unlockedSkinPacks, ['classic']))));
+    },
+
+    getUnlockedThemeIds: function () {
+        return Array.from(new Set(this.getUnlockedIds().concat(this.getJsonList(this.storageKeys.unlockedThemePacks, ['classic']))));
+    },
+
+    isSkinUnlocked: function (packId) {
+        return this.getUnlockedSkinIds().includes(packId);
+    },
+
+    isThemeUnlocked: function (packId) {
+        return this.getUnlockedThemeIds().includes(packId);
+    },
+
     getActiveId: function () {
         const activeId = localStorage.getItem(this.storageKeys.active) || 'classic';
-        return this.isUnlocked(activeId) ? activeId : 'classic';
+        return this.isSkinUnlocked(activeId) ? activeId : 'classic';
     },
 
     getActivePack: function () {
@@ -151,7 +172,7 @@ SuikaGame.skins = {
 
     getActiveThemeId: function () {
         const activeId = localStorage.getItem(this.storageKeys.activeTheme) || 'classic';
-        return this.isUnlocked(activeId) ? activeId : 'classic';
+        return this.isThemeUnlocked(activeId) ? activeId : 'classic';
     },
 
     getActiveThemePack: function () {
@@ -195,14 +216,57 @@ SuikaGame.skins = {
         return true;
     },
 
+    buySkinPack: function (packId) {
+        const pack = this.getPack(packId);
+        const price = this.getSkinPrice(pack);
+        if (!pack || this.isSkinUnlocked(packId) || this.getCoins() < price) return false;
+        this.setCoins(this.getCoins() - price);
+        localStorage.setItem(this.storageKeys.unlockedSkinPacks, JSON.stringify(this.getUnlockedSkinIds().concat(packId)));
+        SuikaGame.progress.unlock('collector');
+        return true;
+    },
+
+    buyThemePack: function (packId) {
+        const pack = this.getPack(packId);
+        const price = this.getThemePrice(pack);
+        if (!pack || this.isThemeUnlocked(packId) || this.getCoins() < price) return false;
+        this.setCoins(this.getCoins() - price);
+        localStorage.setItem(this.storageKeys.unlockedThemePacks, JSON.stringify(this.getUnlockedThemeIds().concat(packId)));
+        SuikaGame.progress.unlock('collector');
+        return true;
+    },
+
+    buyBundle: function (packId) {
+        const pack = this.getPack(packId);
+        const price = this.getBundlePrice(pack);
+        if (!pack || (this.isSkinUnlocked(packId) && this.isThemeUnlocked(packId)) || this.getCoins() < price) return false;
+        this.setCoins(this.getCoins() - price);
+        localStorage.setItem(this.storageKeys.unlockedSkinPacks, JSON.stringify(this.getUnlockedSkinIds().concat(packId)));
+        localStorage.setItem(this.storageKeys.unlockedThemePacks, JSON.stringify(this.getUnlockedThemeIds().concat(packId)));
+        SuikaGame.progress.unlock('collector');
+        return true;
+    },
+
+    getSkinPrice: function (pack) {
+        return Math.ceil((pack ? pack.price : 0) * 0.62);
+    },
+
+    getThemePrice: function (pack) {
+        return Math.ceil((pack ? pack.price : 0) * 0.48);
+    },
+
+    getBundlePrice: function (pack) {
+        return Math.ceil((pack ? pack.price : 0) * 0.86);
+    },
+
     setActive: function (packId) {
-        if (!this.isUnlocked(packId)) return false;
+        if (!this.isSkinUnlocked(packId)) return false;
         localStorage.setItem(this.storageKeys.active, packId);
         return true;
     },
 
     setActiveTheme: function (packId) {
-        if (!this.isUnlocked(packId)) return false;
+        if (!this.isThemeUnlocked(packId)) return false;
         localStorage.setItem(this.storageKeys.activeTheme, packId);
         return true;
     },

@@ -267,6 +267,48 @@ input:focus-visible {
     gap: 6px;
 }
 
+#daily-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.daily-reward {
+    min-width: 0;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--ink);
+    cursor: pointer;
+    padding: 8px;
+    text-align: left;
+}
+
+.daily-reward strong,
+.daily-reward span,
+.daily-reward small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.daily-reward strong {
+    font-size: 12px;
+}
+
+.daily-reward span,
+.daily-reward small {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.daily-reward:disabled {
+    cursor: default;
+    opacity: 0.72;
+}
+
 #ranking-stats span {
     min-width: 0;
     display: grid;
@@ -502,6 +544,21 @@ footer {
     line-height: 1.08;
 }
 
+.rarity-badge {
+    width: fit-content;
+    border-radius: 999px;
+    padding: 3px 7px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.rarity-comum { background: #6b7280; }
+.rarity-raro { background: #2563eb; }
+.rarity-épico { background: #7c2ec5; }
+.rarity-lendário { background: #b7791f; }
+
 .shop-card p {
     color: var(--muted);
     font-size: 13px;
@@ -568,6 +625,17 @@ footer {
     flex: 0 0 auto;
     border: 1px solid rgba(47, 38, 31, 0.2);
     border-radius: 50%;
+}
+
+.pack-extra-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.preview-action,
+.bundle-action {
+    width: 100%;
 }
 
 .shop-action {
@@ -713,6 +781,28 @@ footer {
     touch-action: none;
 }
 
+#combo-badge {
+    position: absolute;
+    top: 92px;
+    left: 50%;
+    z-index: 6;
+    transform: translate(-50%, -8px) scale(0.96);
+    border-radius: 999px;
+    background: rgba(124, 46, 197, 0.92);
+    color: #fff;
+    padding: 8px 14px;
+    font-size: 18px;
+    font-weight: 900;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 140ms ease, transform 140ms ease;
+}
+
+#combo-badge.visible {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+}
+
 .settings-button {
     background: var(--purple);
     font-size: 19px;
@@ -837,6 +927,33 @@ footer {
     line-height: 1;
 }
 
+.power-button em {
+    position: absolute;
+    right: 46px;
+    top: 50%;
+    z-index: 3;
+    display: none;
+    max-width: 160px;
+    padding: 6px 8px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    color: var(--ink);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 900;
+    line-height: 1.1;
+    white-space: nowrap;
+    transform: translateY(-50%);
+}
+
+.power-button:hover em,
+.power-button:focus-visible em,
+.power-button:active em {
+    display: block;
+}
+
 #fruit-evolution {
     display: none;
     width: clamp(78px, 8vw, 96px);
@@ -938,6 +1055,121 @@ footer {
 #toast.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+#tutorial-overlay,
+#pack-preview-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(47, 38, 31, 0.32);
+    padding: 18px;
+}
+
+#tutorial-overlay.open,
+#pack-preview-modal.open {
+    display: flex;
+}
+
+.tutorial-card,
+.pack-preview-card {
+    width: min(430px, 100%);
+    border: var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    padding: 18px;
+    box-shadow: var(--soft-shadow);
+}
+
+#tutorial-step {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+#tutorial-step h2,
+#pack-preview-content h2 {
+    font-size: 28px;
+    line-height: 1;
+}
+
+#tutorial-step p,
+#pack-preview-content p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.tutorial-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+#pwa-install-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    z-index: 35;
+    width: min(520px, calc(100vw - 24px));
+    display: none;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(47, 38, 31, 0.16);
+    border-radius: var(--radius);
+    background: rgba(255, 250, 240, 0.96);
+    padding: 10px;
+    transform: translateX(-50%);
+    box-shadow: var(--soft-shadow);
+}
+
+#pwa-install-banner.visible {
+    display: grid;
+}
+
+#pwa-install-banner span {
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+#pwa-install-banner button {
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--teal);
+    color: #fff;
+    cursor: pointer;
+    padding: 8px 10px;
+    font-weight: 900;
+}
+
+#pwa-dismiss-button {
+    width: 34px;
+    background: var(--red) !important;
+}
+
+.pack-preview-card {
+    position: relative;
+}
+
+#pack-preview-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#pack-preview-content {
+    display: grid;
+    gap: 12px;
+}
+
+.pack-preview-stage {
+    border-radius: var(--radius);
+    padding: 18px;
 }
 
 @media (max-width: 720px) {
@@ -1212,6 +1444,12 @@ footer {
         min-width: 17px;
         height: 17px;
         font-size: 9px;
+    }
+
+    .power-button em {
+        right: 42px;
+        max-width: 132px;
+        font-size: 11px;
     }
 
     #fruit-evolution {

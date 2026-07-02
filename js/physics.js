@@ -323,13 +323,14 @@ SuikaGame.physics = {
 
         const currentFruit = SuikaGame.fruits.currentFruit;
 
-        if (!currentFruit || !currentFruit.isStatic || !SuikaGame.config.canDropFruit || SuikaGame.config.gameOver) {
+        if (!currentFruit || !currentFruit.isStatic || !SuikaGame.config.canDropFruit || SuikaGame.config.gameOver || SuikaGame.config.paused) {
             return;
         }
 
         SuikaGame.config.canDropFruit = false;
         currentFruit.launchTimestamp = Date.now();
         Matter.Body.setStatic(currentFruit, false);
+        SuikaGame.ui.haptic(18);
 
         setTimeout(function () {
             if (!SuikaGame.config.gameOver && SuikaGame.config.gameActive) {

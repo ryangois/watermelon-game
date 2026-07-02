@@ -12,7 +12,12 @@ SuikaGame.game = {
         SuikaGame.skins.applyActiveTheme();
         SuikaGame.physics.applyTheme();
         this.resetGame();
+        if (SuikaGame.config.runner && SuikaGame.config.runner.enabled === false) {
+            Matter.Runner.run(SuikaGame.config.runner, SuikaGame.config.engine);
+        }
         SuikaGame.config.gameActive = true;
+        SuikaGame.config.paused = false;
+        SuikaGame.config.usedPowersThisGame = false;
         SuikaGame.ui.setGameOptionsOpen(false);
 
         document.getElementById('menu-container').style.display = 'none';
@@ -24,11 +29,15 @@ SuikaGame.game = {
         SuikaGame.fruits.createNewFruit();
         SuikaGame.audio.playBackgroundMusic();
         SuikaGame.ui.updatePowerToolbar();
+        SuikaGame.ui.updatePauseButton();
+        SuikaGame.ui.maybeShowTutorial();
     },
 
     resetGame: function () {
         SuikaGame.config.score = 0;
         SuikaGame.config.gameOver = false;
+        SuikaGame.config.paused = false;
+        SuikaGame.config.usedPowersThisGame = false;
         SuikaGame.config.canDropFruit = true;
         SuikaGame.config.dropPosition = SuikaGame.config.GAME_WIDTH / 2;
         SuikaGame.config.lineInvisibleUntil = 0;
@@ -86,6 +95,8 @@ SuikaGame.game = {
         SuikaGame.config.lastMergeAt = now;
         if (SuikaGame.config.comboCount >= 4) SuikaGame.progress.unlock('combo-big');
         SuikaGame.progress.noteFruit(newFruitData.id, newFruitIndex);
+        SuikaGame.ui.showCombo(SuikaGame.config.comboCount);
+        SuikaGame.ui.haptic(35);
 
         SuikaGame.particles.createParticles(midX, midY, SuikaGame.fruits.getColorForFruit(currentFruitData), 25);
         SuikaGame.config.score += Math.round(newFruitData.score * scoreMultiplier);
@@ -131,18 +142,21 @@ SuikaGame.game = {
                 return false;
             }
             if (!SuikaGame.skins.consumePower(powerId)) return false;
+            SuikaGame.config.usedPowersThisGame = true;
             targets.forEach(body => Matter.World.remove(SuikaGame.config.engine.world, body));
             SuikaGame.ui.showToast('Cerejas e morangos removidos');
         }
 
         if (powerId === 'hide-line') {
             if (!SuikaGame.skins.consumePower(powerId)) return false;
+            SuikaGame.config.usedPowersThisGame = true;
             SuikaGame.physics.hideGameOverLine(7000);
             SuikaGame.ui.showToast('Linha invisível por 7 segundos');
         }
 
         if (powerId === 'cherry-rain') {
             if (!SuikaGame.skins.consumePower(powerId)) return false;
+            SuikaGame.config.usedPowersThisGame = true;
             this.rainCherries();
             SuikaGame.ui.showToast('Chuva de cerejas!');
         }
@@ -154,6 +168,7 @@ SuikaGame.game = {
                 return false;
             }
             if (!SuikaGame.skins.consumePower(powerId)) return false;
+            SuikaGame.config.usedPowersThisGame = true;
             this.shakeFruits(fruits);
             SuikaGame.ui.showToast('Chacoalhão aplicado');
         }
@@ -165,12 +180,33 @@ SuikaGame.game = {
                 return false;
             }
             if (!SuikaGame.skins.consumePower(powerId)) return false;
+            SuikaGame.config.usedPowersThisGame = true;
             this.startBombSelection(Math.min(4, fruits.length));
         }
 
         SuikaGame.ui.updatePowerToolbar();
         SuikaGame.ui.updateCoinDisplays();
         return true;
+    },
+
+    setPaused: function (paused) {
+        if (!SuikaGame.config.gameActive || SuikaGame.config.gameOver) return;
+
+        SuikaGame.config.paused = paused;
+        if (paused) {
+            Matter.Runner.stop(SuikaGame.config.runner);
+            if (SuikaGame.audio.backgroundMusic) SuikaGame.audio.backgroundMusic.pause();
+        } else {
+            Matter.Runner.run(SuikaGame.config.runner, SuikaGame.config.engine);
+            SuikaGame.audio.playBackgroundMusic();
+        }
+
+        SuikaGame.ui.updatePauseButton();
+        SuikaGame.ui.showToast(paused ? 'Jogo pausado' : 'Jogo retomado');
+    },
+
+    togglePause: function () {
+        this.setPaused(!SuikaGame.config.paused);
     },
 
     getLooseFruits: function () {
@@ -285,6 +321,8 @@ SuikaGame.game = {
             : `Fim de jogo!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`;
 
         SuikaGame.ui.updateCoinDisplays();
+        SuikaGame.ui.renderDailyPanel();
+        SuikaGame.ui.renderRankingStats();
         SuikaGame.ui.renderMedals(medals);
         document.getElementById('game-over-message').textContent = message;
         document.getElementById('game-over-card').style.display = 'block';

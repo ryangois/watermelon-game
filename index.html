@@ -66,6 +66,7 @@
 
             <div id="medal-strip" aria-label="Medalhas"></div>
             <div id="ranking-stats" aria-label="Estatísticas"></div>
+            <div id="daily-panel" aria-label="Missões diárias"></div>
             <footer>Feito por Ryan Gois</footer>
         </section>
 
@@ -107,6 +108,7 @@
                     </div>
                 </div>
                 <canvas id="game-canvas" width="400" height="700"></canvas>
+                <div id="combo-badge" aria-live="polite"></div>
                 <div id="game-controls" aria-label="Controles do jogo">
                     <button id="move-left-button" class="control-action" aria-label="Mover para esquerda">←</button>
                     <button id="drop-button" class="control-action primary" aria-label="Soltar fruta">Soltar</button>
@@ -132,6 +134,7 @@
                             <span>Mostrar raio das frutas</span>
                         </label>
                         <button id="fullscreen-button" class="menu-button accent">Tela cheia</button>
+                        <button id="pause-button" class="menu-button">Pausar</button>
                         <button id="game-return-menu-button" class="menu-button secondary">Voltar ao menu</button>
                     </div>
                 </div>
@@ -150,17 +153,37 @@
         </div>
 
         <div id="toast" role="status" aria-live="polite"></div>
+        <div id="tutorial-overlay" aria-modal="true" role="dialog">
+            <div class="tutorial-card">
+                <div id="tutorial-step"></div>
+                <div class="tutorial-actions">
+                    <button id="tutorial-skip-button" class="menu-button secondary">Pular</button>
+                    <button id="tutorial-next-button" class="menu-button">Próximo</button>
+                </div>
+            </div>
+        </div>
+        <div id="pwa-install-banner">
+            <span>Instale o jogo para abrir sem barra do navegador.</span>
+            <button id="pwa-install-button">Adicionar</button>
+            <button id="pwa-dismiss-button" aria-label="Fechar">×</button>
+        </div>
+        <div id="pack-preview-modal" aria-modal="true" role="dialog">
+            <div class="pack-preview-card">
+                <button id="pack-preview-close" class="icon-button" aria-label="Fechar prévia">×</button>
+                <div id="pack-preview-content"></div>
+            </div>
+        </div>
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js?v=20260702-fullscreen-toggle"></script>
-    <script src="js/skins.js?v=20260702-fullscreen-toggle"></script>
-    <script src="js/progress.js?v=20260702-fullscreen-toggle"></script>
-    <script src="js/fruits.js?v=20260702-fullscreen-toggle"></script>
-    <script src="js/particles.js?v=20260702-fullscreen-toggle"></script>
-    <script src="js/physics.js?v=20260702-fullscreen-toggle"></script>
-    <script src="js/ui.js?v=20260702-fullscreen-toggle"></script>
-    <script src="js/game.js?v=20260702-fullscreen-toggle"></script>
+    <script src="js/config.js?v=20260702-progression-ux"></script>
+    <script src="js/skins.js?v=20260702-progression-ux"></script>
+    <script src="js/progress.js?v=20260702-progression-ux"></script>
+    <script src="js/fruits.js?v=20260702-progression-ux"></script>
+    <script src="js/particles.js?v=20260702-progression-ux"></script>
+    <script src="js/physics.js?v=20260702-progression-ux"></script>
+    <script src="js/ui.js?v=20260702-progression-ux"></script>
+    <script src="js/game.js?v=20260702-progression-ux"></script>
 </body>
 
 </html>
