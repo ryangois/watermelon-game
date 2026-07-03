@@ -106,24 +106,75 @@ input:focus-visible {
 }
 
 .login-button {
-    min-height: 44px;
+    min-height: 48px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 10px;
     border: 1px solid rgba(47, 38, 31, 0.2);
     border-radius: var(--radius);
     background: #fff;
     color: var(--ink);
     cursor: default;
     font-weight: 800;
+    padding: 7px 12px;
     box-shadow: 0 5px 14px rgba(63, 52, 37, 0.06);
-    transition: border-color 160ms ease, filter 160ms ease, transform 160ms ease;
+    transition: border-color 160ms ease, box-shadow 160ms ease, filter 160ms ease, transform 160ms ease;
 }
 
-.login-button span {
+.login-copy {
+    min-width: 0;
+    display: grid;
+    gap: 1px;
+    text-align: left;
+}
+
+.login-copy strong,
+.login-copy small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.login-copy strong {
+    font-size: 14px;
+    line-height: 1.12;
+}
+
+.login-copy small {
     color: #805100;
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.google-mark,
+.login-avatar {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+}
+
+.google-mark {
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(47, 38, 31, 0.12);
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        conic-gradient(from -45deg, #4285f4 0 25%, #34a853 0 50%, #fbbc05 0 75%, #ea4335 0 100%) border-box;
+    color: #4285f4;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.login-avatar {
+    object-fit: cover;
+    border: 2px solid rgba(34, 153, 141, 0.28);
+    background: #fff;
 }
 
 .login-button:not(:disabled) {
@@ -131,7 +182,8 @@ input:focus-visible {
 }
 
 .login-button:not(:disabled):hover {
-    border-color: rgba(124, 46, 197, 0.42);
+    border-color: rgba(66, 133, 244, 0.42);
+    box-shadow: 0 8px 18px rgba(66, 133, 244, 0.12);
     filter: brightness(1.02);
     transform: translateY(-1px);
 }
@@ -146,7 +198,7 @@ input:focus-visible {
     background: rgba(255, 255, 255, 0.86);
 }
 
-.login-button.signed-in span {
+.login-button.signed-in .login-copy small {
     color: var(--teal);
 }
 

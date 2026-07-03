@@ -136,27 +136,55 @@ SuikaGame.ui = {
         button.disabled = status === 'loading' || status === 'signing-in' || status === 'signing-out';
 
         if (status === 'loading') {
-            button.innerHTML = 'Google <span>carregando</span>';
+            this.renderLoginButton(button, 'Google', 'carregando', null);
             return;
         }
 
         if (status === 'signing-in') {
-            button.innerHTML = 'Entrando <span>Google</span>';
+            this.renderLoginButton(button, 'Entrando', 'Google', null);
             return;
         }
 
         if (status === 'signing-out') {
-            button.innerHTML = 'Saindo <span>aguarde</span>';
+            this.renderLoginButton(button, 'Saindo', 'aguarde', user);
             return;
         }
 
         if (user) {
             const firstName = (user.name || 'Jogador').split(' ')[0];
-            button.innerHTML = `${firstName} <span>Sair</span>`;
+            this.renderLoginButton(button, firstName, 'Sair da conta', user);
             return;
         }
 
-        button.innerHTML = 'Entrar com Google <span>online</span>';
+        this.renderLoginButton(button, 'Entrar com Google', 'salvar progresso', null);
+    },
+
+    renderLoginButton: function (button, title, meta, user) {
+        const copy = document.createElement('span');
+        const titleNode = document.createElement('strong');
+        const metaNode = document.createElement('small');
+        let visual;
+
+        copy.className = 'login-copy';
+        titleNode.textContent = title;
+        metaNode.textContent = meta;
+        copy.appendChild(titleNode);
+        copy.appendChild(metaNode);
+
+        if (user && user.photoURL) {
+            visual = document.createElement('img');
+            visual.className = 'login-avatar';
+            visual.src = user.photoURL;
+            visual.alt = '';
+            visual.referrerPolicy = 'no-referrer';
+        } else {
+            visual = document.createElement('span');
+            visual.className = 'google-mark';
+            visual.setAttribute('aria-hidden', 'true');
+            visual.textContent = 'G';
+        }
+
+        button.replaceChildren(visual, copy);
     },
 
     getAuthErrorMessage: function (error) {
