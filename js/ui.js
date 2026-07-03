@@ -9,6 +9,7 @@ SuikaGame.ui = {
         SuikaGame.skins.applyActiveTheme();
         this.registerServiceWorker();
         this.setupEventListeners();
+        this.initializeAuthUI();
         this.updateHighScoreDisplay();
         this.updateCoinDisplays();
         this.updateDifficultyDisplay();
@@ -33,6 +34,7 @@ SuikaGame.ui = {
         document.getElementById('options-button').addEventListener('click', () => this.showOptions());
         document.getElementById('shop-button').addEventListener('click', () => this.showShop());
         document.getElementById('shop-close-button').addEventListener('click', () => this.showMainMenu());
+        document.getElementById('login-button').addEventListener('click', () => this.handleLoginClick());
         document.getElementById('mute-button').addEventListener('click', () => SuikaGame.audio.toggleMute());
         document.getElementById('game-options-button').addEventListener('click', () => this.setGameOptionsOpen(true));
         document.getElementById('game-options-close-button').addEventListener('click', () => this.setGameOptionsOpen(false));
@@ -87,6 +89,92 @@ SuikaGame.ui = {
             this.deferredInstallPrompt = event;
             this.renderPwaBanner();
         });
+    },
+
+    initializeAuthUI: function () {
+        const bindAuth = () => {
+            if (!window.SuikaAuth || this.authBound) return;
+
+            this.authBound = true;
+            window.SuikaAuth.listen(({ user, status, error }) => {
+                this.updateLoginButton(user, status);
+                if (error) this.showToast(this.getAuthErrorMessage(error));
+            });
+        };
+
+        bindAuth();
+        window.addEventListener('suika-auth-ready', bindAuth);
+        setTimeout(bindAuth, 1200);
+        setTimeout(() => {
+            if (!window.SuikaAuth && !this.authBound) {
+                this.updateLoginButton(null, 'signed-out');
+            }
+        }, 2600);
+    },
+
+    handleLoginClick: function () {
+        const auth = window.SuikaAuth;
+
+        if (!auth) {
+            this.showToast('Login indisponível. Verifique conexão e domínio autorizado');
+            return;
+        }
+
+        const user = auth.getUser();
+        const action = user ? auth.logout() : auth.login();
+
+        Promise.resolve(action).catch(error => {
+            this.showToast(this.getAuthErrorMessage(error));
+        });
+    },
+
+    updateLoginButton: function (user, status) {
+        const button = document.getElementById('login-button');
+        if (!button) return;
+
+        button.classList.toggle('signed-in', Boolean(user));
+        button.disabled = status === 'loading' || status === 'signing-in' || status === 'signing-out';
+
+        if (status === 'loading') {
+            button.innerHTML = 'Google <span>carregando</span>';
+            return;
+        }
+
+        if (status === 'signing-in') {
+            button.innerHTML = 'Entrando <span>Google</span>';
+            return;
+        }
+
+        if (status === 'signing-out') {
+            button.innerHTML = 'Saindo <span>aguarde</span>';
+            return;
+        }
+
+        if (user) {
+            const firstName = (user.name || 'Jogador').split(' ')[0];
+            button.innerHTML = `${firstName} <span>Sair</span>`;
+            return;
+        }
+
+        button.innerHTML = 'Entrar com Google <span>online</span>';
+    },
+
+    getAuthErrorMessage: function (error) {
+        const code = error && error.code ? error.code : '';
+
+        if (code.includes('unauthorized-domain')) {
+            return 'Autorize este domínio no Firebase Auth';
+        }
+
+        if (code.includes('popup-closed-by-user') || code.includes('cancelled-popup-request')) {
+            return 'Login cancelado';
+        }
+
+        if (code.includes('network-request-failed')) {
+            return 'Falha de rede no login';
+        }
+
+        return 'Não foi possível entrar com Google';
     },
 
     registerServiceWorker: function () {

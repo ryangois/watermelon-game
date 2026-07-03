@@ -118,11 +118,36 @@ input:focus-visible {
     cursor: default;
     font-weight: 800;
     box-shadow: 0 5px 14px rgba(63, 52, 37, 0.06);
+    transition: border-color 160ms ease, filter 160ms ease, transform 160ms ease;
 }
 
 .login-button span {
     color: #805100;
     font-size: 12px;
+}
+
+.login-button:not(:disabled) {
+    cursor: pointer;
+}
+
+.login-button:not(:disabled):hover {
+    border-color: rgba(124, 46, 197, 0.42);
+    filter: brightness(1.02);
+    transform: translateY(-1px);
+}
+
+.login-button:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.login-button.signed-in {
+    border-color: rgba(34, 153, 141, 0.34);
+    background: rgba(255, 255, 255, 0.86);
+}
+
+.login-button.signed-in span {
+    color: var(--teal);
 }
 
 .menu-stats {
