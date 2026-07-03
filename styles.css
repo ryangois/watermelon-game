@@ -475,7 +475,21 @@ footer {
     overflow: hidden;
     box-shadow: 0 8px 18px rgba(63, 52, 37, 0.07);
     cursor: pointer;
+    position: relative;
 }
+
+.shop-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: rgba(52, 41, 31, 0.12);
+}
+
+.shop-card[data-shop-status="equipped"]::before { background: var(--teal); }
+.shop-card[data-shop-status="owned"]::before { background: var(--purple); }
+.shop-card[data-shop-status="buy"]::before { background: var(--gold); }
+.shop-card[data-shop-status="locked"]::before { background: rgba(52, 41, 31, 0.28); }
 
 .shop-preview {
     min-height: 82px;
@@ -570,6 +584,41 @@ footer {
     font-weight: 800;
 }
 
+.shop-meta {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.shop-status {
+    width: fit-content;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(52, 41, 31, 0.08);
+    color: var(--muted);
+    padding: 3px 7px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.shop-card[data-shop-status="equipped"] .shop-status {
+    background: rgba(34, 153, 141, 0.16);
+    color: #14675f;
+}
+
+.shop-card[data-shop-status="owned"] .shop-status {
+    background: rgba(124, 46, 197, 0.14);
+    color: #5f2097;
+}
+
+.shop-card[data-shop-status="buy"] .shop-status {
+    background: rgba(242, 184, 75, 0.24);
+    color: #7a4d00;
+}
+
 .shop-card-footer {
     display: flex;
     align-items: center;
@@ -658,6 +707,14 @@ footer {
 
 .shop-action[data-state="available"] {
     background: var(--purple);
+}
+
+.shop-action[data-state="preview"] {
+    background: #4f5d75;
+}
+
+.shop-action[data-state="bundle"] {
+    background: linear-gradient(135deg, var(--purple), var(--teal));
 }
 
 .shop-action[data-state="locked"] {
@@ -822,7 +879,9 @@ footer {
     display: grid;
     grid-template-columns: 48px minmax(92px, 1fr) 48px;
     gap: 8px;
-    background: transparent;
+    border-radius: 999px;
+    background: rgba(255, 250, 240, 0.22);
+    backdrop-filter: blur(4px);
 }
 
 .control-action {
@@ -935,10 +994,10 @@ footer {
     display: none;
     max-width: 160px;
     padding: 6px 8px;
-    border: 2px solid var(--border);
+    border: 1px solid var(--border-soft);
     border-radius: 8px;
     background: var(--panel);
-    box-shadow: var(--shadow);
+    box-shadow: var(--soft-shadow);
     color: var(--ink);
     font-size: 12px;
     font-style: normal;
@@ -1065,7 +1124,7 @@ footer {
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(47, 38, 31, 0.32);
+    background: rgba(47, 38, 31, 0.22);
     padding: 18px;
 }
 
@@ -1084,10 +1143,105 @@ footer {
     box-shadow: var(--soft-shadow);
 }
 
+#tutorial-overlay .tutorial-card {
+    position: absolute;
+    width: min(360px, calc(100vw - 28px));
+    padding: 14px;
+}
+
+#tutorial-overlay::before,
+#tutorial-overlay::after {
+    content: "";
+    position: absolute;
+    border: 2px solid rgba(255, 255, 255, 0.92);
+    border-radius: 999px;
+    box-shadow: 0 0 0 999px rgba(47, 38, 31, 0.2), 0 0 24px rgba(255, 255, 255, 0.36);
+    pointer-events: none;
+}
+
+#power-toolbar:empty {
+    display: none;
+}
+
+#tutorial-overlay::after {
+    width: 12px;
+    height: 12px;
+    border: 0;
+    background: #fff;
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+#tutorial-overlay[data-target="drop"]::before {
+    left: 50%;
+    top: 22%;
+    width: min(280px, 64vw);
+    height: min(260px, 38vh);
+    transform: translateX(-50%);
+}
+
+#tutorial-overlay[data-target="drop"]::after {
+    left: calc(50% - 6px);
+    top: calc(22% + 24px);
+}
+
+#tutorial-overlay[data-target="drop"] .tutorial-card {
+    left: 50%;
+    bottom: max(22px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+}
+
+#tutorial-overlay[data-target="controls"]::before {
+    left: 50%;
+    bottom: 32px;
+    width: min(360px, 82vw);
+    height: 76px;
+    transform: translateX(-50%);
+}
+
+#tutorial-overlay[data-target="controls"]::after {
+    left: calc(50% - 6px);
+    bottom: 64px;
+}
+
+#tutorial-overlay[data-target="controls"] .tutorial-card {
+    left: 50%;
+    top: 86px;
+    transform: translateX(-50%);
+}
+
+#tutorial-overlay[data-target="hud"]::before {
+    right: max(10px, calc((100vw - var(--game-width)) / 2));
+    top: 76px;
+    width: min(170px, 42vw);
+    height: 190px;
+}
+
+#tutorial-overlay[data-target="hud"]::after {
+    right: max(34px, calc((100vw - var(--game-width)) / 2 + 24px));
+    top: 126px;
+}
+
+#tutorial-overlay[data-target="hud"] .tutorial-card {
+    left: 50%;
+    bottom: max(22px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+}
+
 #tutorial-step {
     display: grid;
     gap: 8px;
     margin-bottom: 14px;
+}
+
+#tutorial-step span {
+    width: fit-content;
+    border-radius: 999px;
+    background: rgba(124, 46, 197, 0.14);
+    color: var(--purple);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
 }
 
 #tutorial-step h2,
@@ -1416,10 +1570,11 @@ footer {
 
     #game-controls.enabled {
         right: 8px;
-        bottom: 8px;
+        bottom: max(8px, env(safe-area-inset-bottom));
         left: 8px;
         grid-template-columns: 44px minmax(84px, 1fr) 44px;
         gap: 7px;
+        padding: 5px;
     }
 
     .control-action {
@@ -1428,16 +1583,20 @@ footer {
     }
 
     #power-toolbar {
-        top: 74px;
+        top: 72px;
         right: 6px;
-        gap: 6px;
+        gap: 5px;
+        padding: 4px;
+        border-radius: 999px;
+        background: rgba(255, 250, 240, 0.28);
+        backdrop-filter: blur(4px);
     }
 
     .power-button {
-        width: 38px;
-        height: 38px;
-        min-height: 38px;
-        font-size: 15px;
+        width: 34px;
+        height: 34px;
+        min-height: 34px;
+        font-size: 14px;
     }
 
     .power-button strong {
@@ -1456,7 +1615,7 @@ footer {
         width: var(--game-width);
         max-width: none;
         max-height: none;
-        padding: 8px;
+        padding: 6px;
         overflow: hidden;
     }
 
@@ -1471,7 +1630,7 @@ footer {
     .fruit-icon {
         flex: 1 1 0;
         width: auto;
-        max-width: 46px;
+        max-width: 40px;
         height: auto;
         aspect-ratio: 1;
     }

@@ -6,7 +6,6 @@ SuikaGame.ui = {
     deferredInstallPrompt: null,
 
     initializeUI: function () {
-        SuikaGame.skins.ensureTestCoins();
         SuikaGame.skins.applyActiveTheme();
         this.registerServiceWorker();
         this.setupEventListeners();
@@ -137,12 +136,13 @@ SuikaGame.ui = {
 
     renderTutorial: function () {
         const steps = [
-            { title: 'Mova', text: 'Arraste no pote ou use os botões para posicionar a fruta.' },
-            { title: 'Solte', text: 'Toque para soltar. Frutas iguais se juntam e evoluem.' },
-            { title: 'Sobreviva', text: 'Não deixe acumular acima da linha. Use poderes com cuidado.' }
+            { title: 'Mova a fruta', text: 'Arraste dentro do pote ou use os botões para posicionar a fruta antes de soltar.', hint: 'Arraste aqui', target: 'drop' },
+            { title: 'Solte com intenção', text: 'Toque no pote ou no botão Soltar. Frutas iguais se juntam e viram frutas maiores.', hint: 'Solte aqui', target: 'controls' },
+            { title: 'Olhe os atalhos', text: 'A próxima fruta fica no topo, os poderes ficam na lateral e a evolução aparece abaixo no celular.', hint: 'HUD e poderes', target: 'hud' }
         ];
         const step = steps[this.tutorialIndex];
-        document.getElementById('tutorial-step').innerHTML = `<h2>${step.title}</h2><p>${step.text}</p><strong>${this.tutorialIndex + 1}/3</strong>`;
+        document.getElementById('tutorial-overlay').dataset.target = step.target;
+        document.getElementById('tutorial-step').innerHTML = `<span>${step.hint}</span><h2>${step.title}</h2><p>${step.text}</p><strong>${this.tutorialIndex + 1}/3</strong>`;
         document.getElementById('tutorial-next-button').textContent = this.tutorialIndex === steps.length - 1 ? 'Jogar' : 'Próximo';
     },
 
@@ -425,15 +425,14 @@ SuikaGame.ui = {
             const isUnlocked = SuikaGame.skins.isSkinUnlocked(pack.id);
             const isActive = activeId === pack.id;
             const price = SuikaGame.skins.getSkinPrice(pack);
-            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Skin liberada' : `Frutas: ${price} moedas`, pack.themeClass);
+            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Skin liberada' : `Skin: ${price} moedas`, pack.themeClass);
             const action = card.querySelector('.shop-action');
 
             this.decoratePackCard(card, pack, 'fruits', 'skin');
             this.addRarityBadge(card, pack);
 
-            action.disabled = false;
-            action.textContent = isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= price ? 'Comprar frutas' : 'Sem moedas';
-            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked';
+            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Comprada' : coins >= price ? 'Disponível' : `Faltam ${price - coins}`);
+            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= price ? 'Comprar skin' : 'Sem moedas');
             action.addEventListener('click', event => {
                 event.stopPropagation();
                 if (isActive) {
@@ -468,9 +467,8 @@ SuikaGame.ui = {
             this.decoratePackCard(card, pack, 'theme', 'theme');
             this.addRarityBadge(card, pack);
 
-            action.disabled = false;
-            action.textContent = isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= price ? 'Comprar tema' : 'Sem moedas';
-            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked';
+            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy' : 'locked', isActive ? 'Ativo' : isUnlocked ? 'Comprado' : coins >= price ? 'Disponível' : `Faltam ${price - coins}`);
+            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked', isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= price ? 'Comprar tema' : 'Sem moedas');
             action.addEventListener('click', event => {
                 event.stopPropagation();
                 if (isActive) {
@@ -503,9 +501,8 @@ SuikaGame.ui = {
             const action = card.querySelector('.shop-action');
             preview.textContent = track.icon || '♪';
             preview.classList.add('music-preview');
-            action.disabled = false;
-            action.textContent = isActive ? 'Tocando' : isUnlocked ? 'Equipar' : coins >= track.price ? 'Comprar' : 'Bloqueada';
-            action.dataset.state = isActive ? 'active' : isUnlocked ? 'available' : coins >= track.price ? 'buy' : 'locked';
+            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= track.price ? 'buy' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Comprada' : coins >= track.price ? 'Disponível' : `Faltam ${track.price - coins}`);
+            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'available' : coins >= track.price ? 'buy' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Equipar' : coins >= track.price ? 'Comprar' : 'Sem moedas');
             action.addEventListener('click', () => {
                 if (isActive) {
                     this.showToast('Música já ativa');
@@ -536,9 +533,8 @@ SuikaGame.ui = {
             const action = card.querySelector('.shop-action');
             preview.textContent = power.icon || '+';
             preview.classList.add('power-preview');
-            action.disabled = false;
-            action.textContent = coins >= power.price ? 'Comprar' : 'Sem moedas';
-            action.dataset.state = coins >= power.price ? 'buy' : 'locked';
+            this.setShopCardState(card, coins >= power.price ? 'buy' : 'locked', coins >= power.price ? `Você tem ${count}` : `Faltam ${power.price - coins}`);
+            this.setShopActionState(action, coins >= power.price ? 'buy' : 'locked', coins >= power.price ? 'Comprar' : 'Sem moedas');
             action.addEventListener('click', () => {
                 if (SuikaGame.skins.buyPower(power.id)) {
                     this.afterShopAction(`${power.name} comprado`);
@@ -559,12 +555,27 @@ SuikaGame.ui = {
                 <h3>${title}</h3>
                 <p>${description}</p>
                 <div class="shop-card-footer">
-                    <span class="shop-price">${price}</span>
+                    <div class="shop-meta">
+                        <span class="shop-price">${price}</span>
+                        <small class="shop-status"></small>
+                    </div>
                     <button class="shop-action"></button>
                 </div>
             </div>
         `;
         return card;
+    },
+
+    setShopCardState: function (card, state, status) {
+        card.dataset.shopStatus = state;
+        const label = card.querySelector('.shop-status');
+        if (label) label.textContent = status;
+    },
+
+    setShopActionState: function (action, state, label) {
+        action.disabled = state === 'locked' || state === 'active';
+        action.dataset.state = state;
+        action.textContent = label;
     },
 
     decoratePackCard: function (card, pack, mode, category) {
@@ -643,6 +654,7 @@ SuikaGame.ui = {
     createPreviewButton: function (pack) {
         const button = document.createElement('button');
         button.className = 'shop-action preview-action';
+        button.dataset.state = 'preview';
         button.textContent = 'Prévia';
         button.addEventListener('click', event => {
             event.stopPropagation();
@@ -654,8 +666,11 @@ SuikaGame.ui = {
     createBundleButton: function (pack) {
         const button = document.createElement('button');
         const price = SuikaGame.skins.getBundlePrice(pack);
+        const coins = SuikaGame.skins.getCoins();
         button.className = 'shop-action bundle-action';
-        button.textContent = `Bundle ${price}`;
+        button.dataset.state = coins >= price ? 'bundle' : 'locked';
+        button.disabled = coins < price;
+        button.textContent = coins >= price ? `Bundle ${price}` : `Faltam ${price - coins}`;
         button.addEventListener('click', event => {
             event.stopPropagation();
             if (SuikaGame.skins.buyBundle(pack.id)) {

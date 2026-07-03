@@ -18,37 +18,37 @@ SuikaGame.skins = {
 
     packs: [
         { id: 'classic', name: 'Clássico', rarity: 'comum', description: 'Frutas originais', price: 0, unlockedByDefault: true, themeClass: 'skin-classic', colorShift: {} },
-        { id: 'halloween', name: 'Halloween', rarity: 'comum', description: 'Abóboras, fantasmas e slasher fruits', price: 120, assetFolder: 'assets/images/Halloween', themeClass: 'skin-halloween', colorShift: { cherry: '#ff6b35', strawberry: '#f72585', grape: '#5a189a', orange: '#fb8500', apple: '#b5179e', pear: '#6a994e', peach: '#ff9f1c', pineapple: '#fca311', melon: '#588157', watermelon: '#386641', jackfruit: '#8d6b25' } },
-        { id: 'christmas', name: 'Natal', rarity: 'comum', description: 'Gorros, neve, luzinhas e frutas festivas', price: 220, assetFolder: 'assets/images/Christmas', themeClass: 'skin-christmas', colorShift: { cherry: '#c1121f', strawberry: '#d90429', grape: '#6a4c93', orange: '#f77f00', apple: '#9d0208', pear: '#52b788', peach: '#ffcad4', pineapple: '#ffd166', melon: '#95d5b2', watermelon: '#2d6a4f', jackfruit: '#b7a57a' } },
-        { id: 'sideral', name: 'Sideral', rarity: 'raro', description: 'Planetas, estrelas e frutas astronautas', price: 360, assetFolder: 'assets/images/Sideral', themeClass: 'skin-sideral', colorShift: { cherry: '#ff4d6d', strawberry: '#ff006e', grape: '#7209b7', orange: '#f48c06', apple: '#3a86ff', pear: '#80ffdb', peach: '#ffafcc', pineapple: '#ffd60a', melon: '#48bfe3', watermelon: '#06d6a0', jackfruit: '#b8c0ff' } },
-        { id: 'mythology', name: 'Mitologia', rarity: 'raro', description: 'Deuses, titãs, ninfas e frutas lendárias', price: 520, assetFolder: 'assets/images/Mythology', themeClass: 'skin-mythology', colorShift: { cherry: '#e63946', strawberry: '#f77f00', grape: '#6d597a', orange: '#f4a261', apple: '#d4af37', pear: '#84a98c', peach: '#e9c46a', pineapple: '#c9a227', melon: '#2a9d8f', watermelon: '#457b9d', jackfruit: '#8d6e63' } },
-        { id: 'ocean', name: 'Oceano', rarity: 'raro', description: 'Piratas, sereias, corais e frutas submersas', price: 680, assetFolder: 'assets/images/Ocean', themeClass: 'skin-ocean', colorShift: { cherry: '#00b4d8', strawberry: '#48cae4', grape: '#5e60ce', orange: '#ffb703', apple: '#0077b6', pear: '#90e0ef', peach: '#ffd6a5', pineapple: '#f9c74f', melon: '#52b788', watermelon: '#0096c7', jackfruit: '#023e8a' } },
-        { id: 'robot', name: 'Robôs', rarity: 'épico', unlockMedal: 'combo-big', description: 'Frutas cromadas, neon e carinhas digitais', price: 850, assetFolder: 'assets/images/Robot', themeClass: 'skin-robot', colorShift: { cherry: '#ff0054', strawberry: '#ff5400', grape: '#8338ec', orange: '#fb8500', apple: '#00f5d4', pear: '#80ed99', peach: '#f15bb5', pineapple: '#fee440', melon: '#00bbf9', watermelon: '#00f5d4', jackfruit: '#adb5bd' } },
-        { id: 'candy', name: 'Doceria', rarity: 'épico', description: 'Balas, chantilly, chocolate e frutas sobremesa', price: 1100, assetFolder: 'assets/images/Candy', themeClass: 'skin-candy', colorShift: { cherry: '#ff5d8f', strawberry: '#ff8fab', grape: '#c77dff', orange: '#ffb703', apple: '#fb6f92', pear: '#b8f2e6', peach: '#ffc8dd', pineapple: '#fdffb6', melon: '#caffbf', watermelon: '#9bf6ff', jackfruit: '#ffd6a5' } },
-        { id: 'luxury', name: 'Luxo', rarity: 'lendário', unlockMedal: 'hard-watermelon', description: 'Dourado, diamantes, coroas e frutas premium', price: 1500, assetFolder: 'assets/images/Luxury', themeClass: 'skin-luxury', colorShift: { cherry: '#b8860b', strawberry: '#d4af37', grape: '#6f2dbd', orange: '#ffba08', apple: '#f5cb5c', pear: '#c9ada7', peach: '#ffd166', pineapple: '#f4d35e', melon: '#b7e4c7', watermelon: '#95d5b2', jackfruit: '#caa94a' } }
+        { id: 'halloween', name: 'Halloween', rarity: 'comum', description: 'Abóboras, fantasmas e slasher fruits', price: 110, assetFolder: 'assets/images/Halloween', themeClass: 'skin-halloween', colorShift: { cherry: '#ff6b35', strawberry: '#f72585', grape: '#5a189a', orange: '#fb8500', apple: '#b5179e', pear: '#6a994e', peach: '#ff9f1c', pineapple: '#fca311', melon: '#588157', watermelon: '#386641', jackfruit: '#8d6b25' } },
+        { id: 'christmas', name: 'Natal', rarity: 'comum', description: 'Gorros, neve, luzinhas e frutas festivas', price: 190, assetFolder: 'assets/images/Christmas', themeClass: 'skin-christmas', colorShift: { cherry: '#c1121f', strawberry: '#d90429', grape: '#6a4c93', orange: '#f77f00', apple: '#9d0208', pear: '#52b788', peach: '#ffcad4', pineapple: '#ffd166', melon: '#95d5b2', watermelon: '#2d6a4f', jackfruit: '#b7a57a' } },
+        { id: 'sideral', name: 'Sideral', rarity: 'raro', description: 'Planetas, estrelas e frutas astronautas', price: 320, assetFolder: 'assets/images/Sideral', themeClass: 'skin-sideral', colorShift: { cherry: '#ff4d6d', strawberry: '#ff006e', grape: '#7209b7', orange: '#f48c06', apple: '#3a86ff', pear: '#80ffdb', peach: '#ffafcc', pineapple: '#ffd60a', melon: '#48bfe3', watermelon: '#06d6a0', jackfruit: '#b8c0ff' } },
+        { id: 'mythology', name: 'Mitologia', rarity: 'raro', description: 'Deuses, titãs, ninfas e frutas lendárias', price: 460, assetFolder: 'assets/images/Mythology', themeClass: 'skin-mythology', colorShift: { cherry: '#e63946', strawberry: '#f77f00', grape: '#6d597a', orange: '#f4a261', apple: '#d4af37', pear: '#84a98c', peach: '#e9c46a', pineapple: '#c9a227', melon: '#2a9d8f', watermelon: '#457b9d', jackfruit: '#8d6e63' } },
+        { id: 'ocean', name: 'Oceano', rarity: 'raro', description: 'Piratas, sereias, corais e frutas submersas', price: 600, assetFolder: 'assets/images/Ocean', themeClass: 'skin-ocean', colorShift: { cherry: '#00b4d8', strawberry: '#48cae4', grape: '#5e60ce', orange: '#ffb703', apple: '#0077b6', pear: '#90e0ef', peach: '#ffd6a5', pineapple: '#f9c74f', melon: '#52b788', watermelon: '#0096c7', jackfruit: '#023e8a' } },
+        { id: 'robot', name: 'Robôs', rarity: 'épico', unlockMedal: 'combo-big', description: 'Frutas cromadas, neon e carinhas digitais', price: 760, assetFolder: 'assets/images/Robot', themeClass: 'skin-robot', colorShift: { cherry: '#ff0054', strawberry: '#ff5400', grape: '#8338ec', orange: '#fb8500', apple: '#00f5d4', pear: '#80ed99', peach: '#f15bb5', pineapple: '#fee440', melon: '#00bbf9', watermelon: '#00f5d4', jackfruit: '#adb5bd' } },
+        { id: 'candy', name: 'Doceria', rarity: 'épico', description: 'Balas, chantilly, chocolate e frutas sobremesa', price: 940, assetFolder: 'assets/images/Candy', themeClass: 'skin-candy', colorShift: { cherry: '#ff5d8f', strawberry: '#ff8fab', grape: '#c77dff', orange: '#ffb703', apple: '#fb6f92', pear: '#b8f2e6', peach: '#ffc8dd', pineapple: '#fdffb6', melon: '#caffbf', watermelon: '#9bf6ff', jackfruit: '#ffd6a5' } },
+        { id: 'luxury', name: 'Luxo', rarity: 'lendário', unlockMedal: 'hard-watermelon', description: 'Dourado, diamantes, coroas e frutas premium', price: 1250, assetFolder: 'assets/images/Luxury', themeClass: 'skin-luxury', colorShift: { cherry: '#b8860b', strawberry: '#d4af37', grape: '#6f2dbd', orange: '#ffba08', apple: '#f5cb5c', pear: '#c9ada7', peach: '#ffd166', pineapple: '#f4d35e', melon: '#b7e4c7', watermelon: '#95d5b2', jackfruit: '#caa94a' } }
     ],
 
     tracks: [
         { id: 'fruit-groove', name: 'Fruit Groove', icon: '♪', description: 'Trilha original animada', price: 0, src: 'assets/music/music-fruits.mp3' },
-        { id: 'calm-harvest', name: 'Calm Harvest', icon: '~', description: 'Vibe mais calma para jogar focado', price: 180, src: 'assets/music/music-fruits.mp3' },
-        { id: 'arcade-pop', name: 'Arcade Pop', icon: '⚡', description: 'Energia de fliperama para combos', price: 320, src: 'assets/music/music-fruits.mp3' },
-        { id: 'boss-fruit', name: 'Boss Fruit', icon: '!', description: 'Trilha intensa para pontuações altas', price: 520, src: 'assets/music/music-fruits.mp3' },
-        { id: 'halloween-hop', name: 'Halloween Hop', icon: '☾', description: 'Beat travesso para pacotes assustadores', price: 260, src: 'assets/music/music-fruits.mp3' },
-        { id: 'snowy-sleigh', name: 'Snowy Sleigh', icon: '*', description: 'Natal leve com sinos e brilho arcade', price: 300, src: 'assets/music/music-fruits.mp3' },
-        { id: 'cosmic-bounce', name: 'Cosmic Bounce', icon: '✦', description: 'Synth espacial para skins siderais', price: 380, src: 'assets/music/music-fruits.mp3' },
-        { id: 'olympus-pop', name: 'Olympus Pop', icon: 'Ω', description: 'Mitologia pop com percussão heroica', price: 440, src: 'assets/music/music-fruits.mp3' },
-        { id: 'tidal-combo', name: 'Tidal Combo', icon: '≈', description: 'Groove oceânico relaxado para partidas longas', price: 500, src: 'assets/music/music-fruits.mp3' },
-        { id: 'neon-circuit', name: 'Neon Circuit', icon: '#', description: 'Eletrônica robótica com pulso neon', price: 560, src: 'assets/music/music-fruits.mp3' },
-        { id: 'candy-rush', name: 'Candy Rush', icon: '+', description: 'Pop doce, colorido e acelerado', price: 620, src: 'assets/music/music-fruits.mp3' },
-        { id: 'golden-fever', name: 'Golden Fever', icon: '$', description: 'Funk luxuoso para pontuações altas', price: 760, src: 'assets/music/music-fruits.mp3' }
+        { id: 'calm-harvest', name: 'Calm Harvest', icon: '~', description: 'Vibe mais calma para jogar focado', price: 120, src: 'assets/music/music-fruits.mp3' },
+        { id: 'arcade-pop', name: 'Arcade Pop', icon: '⚡', description: 'Energia de fliperama para combos', price: 180, src: 'assets/music/music-fruits.mp3' },
+        { id: 'boss-fruit', name: 'Boss Fruit', icon: '!', description: 'Trilha intensa para pontuações altas', price: 300, src: 'assets/music/music-fruits.mp3' },
+        { id: 'halloween-hop', name: 'Halloween Hop', icon: '☾', description: 'Beat travesso para pacotes assustadores', price: 150, src: 'assets/music/music-fruits.mp3' },
+        { id: 'snowy-sleigh', name: 'Snowy Sleigh', icon: '*', description: 'Natal leve com sinos e brilho arcade', price: 170, src: 'assets/music/music-fruits.mp3' },
+        { id: 'cosmic-bounce', name: 'Cosmic Bounce', icon: '✦', description: 'Synth espacial para skins siderais', price: 220, src: 'assets/music/music-fruits.mp3' },
+        { id: 'olympus-pop', name: 'Olympus Pop', icon: 'Ω', description: 'Mitologia pop com percussão heroica', price: 260, src: 'assets/music/music-fruits.mp3' },
+        { id: 'tidal-combo', name: 'Tidal Combo', icon: '≈', description: 'Groove oceânico relaxado para partidas longas', price: 290, src: 'assets/music/music-fruits.mp3' },
+        { id: 'neon-circuit', name: 'Neon Circuit', icon: '#', description: 'Eletrônica robótica com pulso neon', price: 330, src: 'assets/music/music-fruits.mp3' },
+        { id: 'candy-rush', name: 'Candy Rush', icon: '+', description: 'Pop doce, colorido e acelerado', price: 360, src: 'assets/music/music-fruits.mp3' },
+        { id: 'golden-fever', name: 'Golden Fever', icon: '$', description: 'Funk luxuoso para pontuações altas', price: 440, src: 'assets/music/music-fruits.mp3' }
     ],
 
     powers: [
-        { id: 'clear-small', name: 'Limpeza de menores', icon: '🧹', description: 'Remove cerejas e morangos já soltos', price: 90 },
-        { id: 'hide-line', name: 'Linha invisível', icon: '👁', description: 'Esconde a linha final por 7 segundos', price: 160 },
-        { id: 'cherry-rain', name: 'Chuva de cerejas', icon: '🍒', description: 'Derruba cerejas extras para tentar combos', price: 120 },
-        { id: 'side-push', name: 'Chacoalhão', icon: '🌀', description: 'Chacoalha todas as frutas soltas no pote', price: 140 },
-        { id: 'small-bomb', name: 'Bomba pequena', icon: '💣', description: 'Escolha até 4 frutas soltas para eliminar', price: 240 }
+        { id: 'clear-small', name: 'Limpeza de menores', icon: '🧹', description: 'Remove cerejas e morangos já soltos', price: 55 },
+        { id: 'hide-line', name: 'Linha invisível', icon: '👁', description: 'Esconde a linha final por 7 segundos', price: 90 },
+        { id: 'cherry-rain', name: 'Chuva de cerejas', icon: '🍒', description: 'Derruba cerejas extras para tentar combos', price: 70 },
+        { id: 'side-push', name: 'Chacoalhão', icon: '🌀', description: 'Chacoalha todas as frutas soltas no pote', price: 80 },
+        { id: 'small-bomb', name: 'Bomba pequena', icon: '💣', description: 'Escolha até 4 frutas soltas para eliminar', price: 130 }
     ],
 
     testCoinGrant: 9999,
@@ -339,7 +339,9 @@ SuikaGame.skins = {
     },
 
     areAccessibilityControlsEnabled: function () {
-        return localStorage.getItem(this.storageKeys.accessibilityControls) === 'true';
+        const saved = localStorage.getItem(this.storageKeys.accessibilityControls);
+        if (saved !== null) return saved === 'true';
+        return window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
     },
 
     setAccessibilityControlsEnabled: function (enabled) {
@@ -395,6 +397,6 @@ SuikaGame.skins = {
 
     getCoinsForScore: function (score) {
         const difficulty = SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty];
-        return Math.floor((score / 38) * difficulty.coinMultiplier);
+        return Math.floor((score / 24) * difficulty.coinMultiplier);
     }
 };
