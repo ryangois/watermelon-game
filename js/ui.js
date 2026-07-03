@@ -547,8 +547,8 @@ SuikaGame.ui = {
             this.decoratePackCard(card, pack, 'fruits', 'skin');
             this.addRarityBadge(card, pack);
 
-            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Comprada' : coins >= price ? 'Disponível' : `Faltam ${price - coins}`);
-            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= price ? 'Comprar skin' : 'Sem moedas');
+            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy-skin' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Skin comprada' : coins >= price ? 'Comprar skin' : `Faltam ${price - coins}`, 'Skin');
+            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'equip-skin' : coins >= price ? 'buy-skin' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= price ? 'Comprar skin' : 'Sem moedas');
             action.addEventListener('click', event => {
                 event.stopPropagation();
                 if (isActive) {
@@ -583,8 +583,8 @@ SuikaGame.ui = {
             this.decoratePackCard(card, pack, 'theme', 'theme');
             this.addRarityBadge(card, pack);
 
-            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy' : 'locked', isActive ? 'Ativo' : isUnlocked ? 'Comprado' : coins >= price ? 'Disponível' : `Faltam ${price - coins}`);
-            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'available' : coins >= price ? 'buy' : 'locked', isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= price ? 'Comprar tema' : 'Sem moedas');
+            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy-theme' : 'locked', isActive ? 'Tema ativo' : isUnlocked ? 'Tema comprado' : coins >= price ? 'Comprar tema' : `Faltam ${price - coins}`, 'Tema');
+            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'equip-theme' : coins >= price ? 'buy-theme' : 'locked', isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= price ? 'Comprar tema' : 'Sem moedas');
             action.addEventListener('click', event => {
                 event.stopPropagation();
                 if (isActive) {
@@ -617,8 +617,8 @@ SuikaGame.ui = {
             const action = card.querySelector('.shop-action');
             preview.textContent = track.icon || '♪';
             preview.classList.add('music-preview');
-            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= track.price ? 'buy' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Comprada' : coins >= track.price ? 'Disponível' : `Faltam ${track.price - coins}`);
-            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'available' : coins >= track.price ? 'buy' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Equipar' : coins >= track.price ? 'Comprar' : 'Sem moedas');
+            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= track.price ? 'buy-music' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Música comprada' : coins >= track.price ? 'Comprar música' : `Faltam ${track.price - coins}`, 'Música');
+            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'equip-music' : coins >= track.price ? 'buy-music' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Equipar música' : coins >= track.price ? 'Comprar música' : 'Sem moedas');
             action.addEventListener('click', () => {
                 if (isActive) {
                     this.showToast('Música já ativa');
@@ -649,8 +649,8 @@ SuikaGame.ui = {
             const action = card.querySelector('.shop-action');
             preview.textContent = power.icon || '+';
             preview.classList.add('power-preview');
-            this.setShopCardState(card, coins >= power.price ? 'buy' : 'locked', coins >= power.price ? `Você tem ${count}` : `Faltam ${power.price - coins}`);
-            this.setShopActionState(action, coins >= power.price ? 'buy' : 'locked', coins >= power.price ? 'Comprar' : 'Sem moedas');
+            this.setShopCardState(card, coins >= power.price ? 'buy-power' : 'locked', coins >= power.price ? `Estoque: ${count}` : `Faltam ${power.price - coins}`, 'Poder');
+            this.setShopActionState(action, coins >= power.price ? 'buy-power' : 'locked', coins >= power.price ? 'Comprar poder' : 'Sem moedas');
             action.addEventListener('click', () => {
                 if (SuikaGame.skins.buyPower(power.id)) {
                     this.afterShopAction(`${power.name} comprado`);
@@ -668,6 +668,7 @@ SuikaGame.ui = {
         card.innerHTML = `
             <div class="shop-preview"></div>
             <div class="shop-card-body">
+                <span class="shop-kind"></span>
                 <h3>${title}</h3>
                 <p>${description}</p>
                 <div class="shop-card-footer">
@@ -682,10 +683,13 @@ SuikaGame.ui = {
         return card;
     },
 
-    setShopCardState: function (card, state, status) {
+    setShopCardState: function (card, state, status, kind) {
         card.dataset.shopStatus = state;
+        if (kind) card.dataset.shopKind = kind.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         const label = card.querySelector('.shop-status');
+        const kindLabel = card.querySelector('.shop-kind');
         if (label) label.textContent = status;
+        if (kindLabel) kindLabel.textContent = kind || '';
     },
 
     setShopActionState: function (action, state, label) {
@@ -786,7 +790,7 @@ SuikaGame.ui = {
         button.className = 'shop-action bundle-action';
         button.dataset.state = coins >= price ? 'bundle' : 'locked';
         button.disabled = coins < price;
-        button.textContent = coins >= price ? `Bundle ${price}` : `Faltam ${price - coins}`;
+        button.textContent = coins >= price ? `Comprar bundle (${price})` : `Faltam ${price - coins}`;
         button.addEventListener('click', event => {
             event.stopPropagation();
             if (SuikaGame.skins.buyBundle(pack.id)) {

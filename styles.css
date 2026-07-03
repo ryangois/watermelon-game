@@ -565,7 +565,10 @@ footer {
 
 .shop-card[data-shop-status="equipped"]::before { background: var(--teal); }
 .shop-card[data-shop-status="owned"]::before { background: var(--purple); }
-.shop-card[data-shop-status="buy"]::before { background: var(--gold); }
+.shop-card[data-shop-status="buy-skin"]::before { background: var(--purple); }
+.shop-card[data-shop-status="buy-theme"]::before { background: #2f80ed; }
+.shop-card[data-shop-status="buy-music"]::before { background: #4f5d75; }
+.shop-card[data-shop-status="buy-power"]::before { background: var(--gold); }
 .shop-card[data-shop-status="locked"]::before { background: rgba(52, 41, 31, 0.28); }
 
 .shop-preview {
@@ -627,6 +630,38 @@ footer {
     flex-direction: column;
     justify-content: center;
     gap: 6px;
+}
+
+.shop-kind {
+    width: fit-content;
+    border-radius: 999px;
+    background: rgba(52, 41, 31, 0.08);
+    color: var(--muted);
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.shop-card[data-shop-kind="skin"] .shop-kind {
+    background: rgba(124, 46, 197, 0.14);
+    color: #5f2097;
+}
+
+.shop-card[data-shop-kind="tema"] .shop-kind {
+    background: rgba(47, 128, 237, 0.14);
+    color: #1e579f;
+}
+
+.shop-card[data-shop-kind="musica"] .shop-kind {
+    background: rgba(79, 93, 117, 0.14);
+    color: #344054;
+}
+
+.shop-card[data-shop-kind="poder"] .shop-kind {
+    background: rgba(242, 184, 75, 0.24);
+    color: #7a4d00;
 }
 
 .shop-card h3 {
@@ -691,15 +726,23 @@ footer {
     color: #5f2097;
 }
 
-.shop-card[data-shop-status="buy"] .shop-status {
+.shop-card[data-shop-status="buy-skin"] .shop-status,
+.shop-card[data-shop-status="buy-theme"] .shop-status,
+.shop-card[data-shop-status="buy-music"] .shop-status,
+.shop-card[data-shop-status="buy-power"] .shop-status {
     background: rgba(242, 184, 75, 0.24);
     color: #7a4d00;
 }
 
+.shop-card[data-shop-status="locked"] .shop-status {
+    background: rgba(52, 41, 31, 0.1);
+    color: #6b6259;
+}
+
 .shop-card-footer {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
     gap: 10px;
 }
 
@@ -782,8 +825,26 @@ footer {
     background: #268a7e;
 }
 
-.shop-action[data-state="available"] {
+.shop-action[data-state="equip-skin"],
+.shop-action[data-state="equip-theme"],
+.shop-action[data-state="equip-music"] {
     background: var(--purple);
+}
+
+.shop-action[data-state="buy-skin"] {
+    background: #7c2ec5;
+}
+
+.shop-action[data-state="buy-theme"] {
+    background: #2f80ed;
+}
+
+.shop-action[data-state="buy-music"] {
+    background: #4f5d75;
+}
+
+.shop-action[data-state="buy-power"] {
+    background: var(--teal);
 }
 
 .shop-action[data-state="preview"] {
@@ -791,7 +852,10 @@ footer {
 }
 
 .shop-action[data-state="bundle"] {
-    background: linear-gradient(135deg, var(--purple), var(--teal));
+    width: 100%;
+    min-width: 0;
+    background: linear-gradient(135deg, #7c2ec5, #f2b84b);
+    color: #fff;
 }
 
 .shop-action[data-state="locked"] {
@@ -1594,6 +1658,12 @@ footer {
 
     .shop-price {
         font-size: 13px;
+    }
+
+    .shop-card-footer {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        gap: 6px;
     }
 
     .shop-action {

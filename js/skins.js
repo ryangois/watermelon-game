@@ -397,6 +397,8 @@ SuikaGame.skins = {
 
     getCoinsForScore: function (score) {
         const difficulty = SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty];
-        return Math.floor((score / 24) * difficulty.coinMultiplier);
+        const baseCoins = Math.floor((score / 28) * difficulty.coinMultiplier);
+        const milestoneBonus = score >= 1000 ? 12 : score >= 650 ? 7 : score >= 350 ? 3 : 0;
+        return Math.max(0, baseCoins + milestoneBonus);
     }
 };

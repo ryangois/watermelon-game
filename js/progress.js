@@ -126,14 +126,14 @@ SuikaGame.progress = {
                 description: 'Faça 650 pontos em uma partida',
                 ready: daily.bestScore >= 650,
                 claimed: daily.claimedMission,
-                reward: 65
+                reward: 60
             },
             chest: {
                 title: 'Cofre diário',
                 description: 'Jogue 3 partidas hoje',
                 ready: daily.games >= 3,
                 claimed: daily.claimedChest,
-                reward: 95,
+                reward: 85,
                 progress: daily.games
             }
         };
