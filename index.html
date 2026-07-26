@@ -12,7 +12,7 @@
     <title>Suika Game</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/images/watermelon_emoji.png">
-    <link rel="stylesheet" href="styles.css?v=20260703-shop-economy">
+    <link rel="stylesheet" href="styles.css?v=20260726-achievements-menu">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -57,6 +57,7 @@
             <div class="menu-actions">
                 <button id="start-button" class="menu-button">Iniciar jogo</button>
                 <button id="shop-button" class="menu-button accent">Loja</button>
+                <button id="achievements-button" class="menu-button trophy">Conquistas</button>
                 <button id="options-button" class="menu-button secondary">Opções</button>
             </div>
 
@@ -179,18 +180,30 @@
                 <div id="pack-preview-content"></div>
             </div>
         </div>
+        <div id="achievements-modal" aria-modal="true" role="dialog" aria-labelledby="achievements-title">
+            <div class="achievements-card">
+                <div class="achievements-header">
+                    <div>
+                        <h2 id="achievements-title">Conquistas</h2>
+                        <p id="achievements-progress">0/0 desbloqueadas</p>
+                    </div>
+                    <button id="achievements-close" class="icon-button" aria-label="Fechar conquistas">×</button>
+                </div>
+                <div id="achievements-list"></div>
+            </div>
+        </div>
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js?v=20260703-shop-economy"></script>
-    <script src="js/skins.js?v=20260703-shop-economy"></script>
-    <script src="js/progress.js?v=20260703-shop-economy"></script>
-    <script src="js/fruits.js?v=20260703-shop-economy"></script>
-    <script src="js/particles.js?v=20260703-shop-economy"></script>
-    <script src="js/physics.js?v=20260703-shop-economy"></script>
-    <script src="js/ui.js?v=20260703-shop-economy"></script>
-    <script src="js/game.js?v=20260703-shop-economy"></script>
-    <script type="module" async src="js/auth.js?v=20260703-shop-economy"></script>
+    <script src="js/config.js?v=20260726-achievements-menu"></script>
+    <script src="js/skins.js?v=20260726-achievements-menu"></script>
+    <script src="js/progress.js?v=20260726-achievements-menu"></script>
+    <script src="js/fruits.js?v=20260726-achievements-menu"></script>
+    <script src="js/particles.js?v=20260726-achievements-menu"></script>
+    <script src="js/physics.js?v=20260726-achievements-menu"></script>
+    <script src="js/ui.js?v=20260726-achievements-menu"></script>
+    <script src="js/game.js?v=20260726-achievements-menu"></script>
+    <script type="module" async src="js/auth.js?v=20260726-achievements-menu"></script>
 </body>
 
 </html>

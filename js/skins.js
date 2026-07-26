@@ -119,6 +119,9 @@ SuikaGame.skins = {
     addCoins: function (amount) {
         const earned = Math.max(0, Math.floor(amount));
         this.setCoins(this.getCoins() + earned);
+        if (SuikaGame.progress && this.getCoins() >= 500) {
+            SuikaGame.progress.unlock('coin-bank');
+        }
         return earned;
     },
 
@@ -213,6 +216,7 @@ SuikaGame.skins = {
         this.setCoins(this.getCoins() - pack.price);
         this.saveUnlockedIds(this.getUnlockedIds().concat(packId));
         SuikaGame.progress.unlock('collector');
+        SuikaGame.progress.unlock('theme-stylist');
         return true;
     },
 
@@ -233,6 +237,7 @@ SuikaGame.skins = {
         this.setCoins(this.getCoins() - price);
         localStorage.setItem(this.storageKeys.unlockedThemePacks, JSON.stringify(this.getUnlockedThemeIds().concat(packId)));
         SuikaGame.progress.unlock('collector');
+        SuikaGame.progress.unlock('theme-stylist');
         return true;
     },
 
@@ -244,6 +249,7 @@ SuikaGame.skins = {
         localStorage.setItem(this.storageKeys.unlockedSkinPacks, JSON.stringify(this.getUnlockedSkinIds().concat(packId)));
         localStorage.setItem(this.storageKeys.unlockedThemePacks, JSON.stringify(this.getUnlockedThemeIds().concat(packId)));
         SuikaGame.progress.unlock('collector');
+        SuikaGame.progress.unlock('theme-stylist');
         return true;
     },
 
@@ -294,6 +300,7 @@ SuikaGame.skins = {
         this.setCoins(this.getCoins() - track.price);
         localStorage.setItem(this.storageKeys.unlockedTracks, JSON.stringify(this.getUnlockedTracks().concat(trackId)));
         this.setActiveTrack(trackId);
+        SuikaGame.progress.unlock('music-fan');
         return true;
     },
 
@@ -318,6 +325,7 @@ SuikaGame.skins = {
         this.setCoins(this.getCoins() - power.price);
         counts[powerId] = (counts[powerId] || 0) + 1;
         localStorage.setItem(this.storageKeys.powers, JSON.stringify(counts));
+        SuikaGame.progress.unlock('first-power');
         return true;
     },
 

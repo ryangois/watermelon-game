@@ -29,6 +29,10 @@ let currentUser = null;
 let currentStatus = 'loading';
 let currentError = null;
 
+provider.setCustomParameters({
+    prompt: 'select_account'
+});
+
 isAnalyticsSupported()
     .then(supported => {
         if (supported) getAnalytics(app);
@@ -69,7 +73,21 @@ function shouldUseRedirect() {
     return isCoarsePointer || isStandalone;
 }
 
+function getLocalAuthUrl() {
+    if (window.location.hostname !== '127.0.0.1') return '';
+    const url = new URL(window.location.href);
+    url.hostname = 'localhost';
+    return url.toString();
+}
+
 async function login() {
+    const localAuthUrl = getLocalAuthUrl();
+
+    if (localAuthUrl) {
+        window.location.assign(localAuthUrl);
+        return null;
+    }
+
     setState('signing-in', currentUser, null);
 
     try {
@@ -108,6 +126,7 @@ window.SuikaAuth = {
     login,
     logout,
     listen,
+    getLocalAuthUrl,
     getUser: () => currentUser,
     getStatus: () => currentStatus
 };
