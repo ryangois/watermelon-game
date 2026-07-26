@@ -211,6 +211,62 @@ input:focus-visible {
     color: var(--red);
 }
 
+.auth-status {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.auth-status-dot {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: #a39a91;
+    box-shadow: 0 0 0 3px rgba(52, 41, 31, 0.07);
+}
+
+#auth-status-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.auth-status[data-state="signed-in"] {
+    color: #14786f;
+}
+
+.auth-status[data-state="signed-in"] .auth-status-dot {
+    background: var(--teal);
+    box-shadow: 0 0 0 3px rgba(34, 153, 141, 0.14);
+}
+
+.auth-status[data-state="error"] {
+    color: var(--red);
+}
+
+.auth-status[data-state="error"] .auth-status-dot {
+    background: var(--red);
+    box-shadow: 0 0 0 3px rgba(224, 49, 49, 0.12);
+}
+
+.auth-status[data-state="loading"] .auth-status-dot {
+    animation: auth-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes auth-pulse {
+    50% {
+        opacity: 0.35;
+        transform: scale(0.78);
+    }
+}
+
 .menu-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;

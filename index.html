@@ -12,7 +12,7 @@
     <title>Suika Game</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/images/watermelon_emoji.png">
-    <link rel="stylesheet" href="styles.css?v=20260726-achievements-menu">
+    <link rel="stylesheet" href="styles.css?v=20260726-auth-status-v2">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -31,6 +31,10 @@
                     <small>carregando</small>
                 </span>
             </button>
+            <div id="auth-status" class="auth-status" data-state="loading" role="status" aria-live="polite">
+                <span class="auth-status-dot" aria-hidden="true"></span>
+                <span id="auth-status-text">Verificando login...</span>
+            </div>
 
             <div class="menu-stats">
                 <div id="high-score">Melhor pontuação: 0</div>
@@ -195,15 +199,15 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js?v=20260726-achievements-menu"></script>
-    <script src="js/skins.js?v=20260726-achievements-menu"></script>
-    <script src="js/progress.js?v=20260726-achievements-menu"></script>
-    <script src="js/fruits.js?v=20260726-achievements-menu"></script>
-    <script src="js/particles.js?v=20260726-achievements-menu"></script>
-    <script src="js/physics.js?v=20260726-achievements-menu"></script>
-    <script src="js/ui.js?v=20260726-achievements-menu"></script>
-    <script src="js/game.js?v=20260726-achievements-menu"></script>
-    <script type="module" async src="js/auth.js?v=20260726-achievements-menu"></script>
+    <script src="js/config.js?v=20260726-auth-status-v2"></script>
+    <script src="js/skins.js?v=20260726-auth-status-v2"></script>
+    <script src="js/progress.js?v=20260726-auth-status-v2"></script>
+    <script src="js/fruits.js?v=20260726-auth-status-v2"></script>
+    <script src="js/particles.js?v=20260726-auth-status-v2"></script>
+    <script src="js/physics.js?v=20260726-auth-status-v2"></script>
+    <script src="js/ui.js?v=20260726-auth-status-v2"></script>
+    <script src="js/game.js?v=20260726-auth-status-v2"></script>
+    <script type="module" async src="js/auth.js?v=20260726-auth-status-v2"></script>
 </body>
 
 </html>

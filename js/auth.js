@@ -77,7 +77,24 @@ function getLocalAuthUrl() {
     if (window.location.hostname !== '127.0.0.1') return '';
     const url = new URL(window.location.href);
     url.hostname = 'localhost';
+    url.searchParams.set('login', 'google');
     return url.toString();
+}
+
+function consumeRequestedLogin() {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('login') !== 'google') return false;
+
+    url.searchParams.delete('login');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    return true;
+}
+
+function shouldFallbackToRedirect(error) {
+    const code = error && error.code ? error.code : '';
+    return code.includes('popup-blocked')
+        || code.includes('operation-not-supported-in-this-environment')
+        || code.includes('web-storage-unsupported');
 }
 
 async function login() {
@@ -96,8 +113,14 @@ async function login() {
             return null;
         }
 
-        const result = await signInWithPopup(auth, provider);
-        return getPublicUser(result.user);
+        try {
+            const result = await signInWithPopup(auth, provider);
+            return getPublicUser(result.user);
+        } catch (error) {
+            if (!shouldFallbackToRedirect(error)) throw error;
+            await signInWithRedirect(auth, provider);
+            return null;
+        }
     } catch (error) {
         setState(currentUser ? 'signed-in' : 'signed-out', currentUser, error);
         throw error;
@@ -133,10 +156,16 @@ window.SuikaAuth = {
 
 window.dispatchEvent(new CustomEvent('suika-auth-ready'));
 
+let requestedLogin = consumeRequestedLogin();
+
 getRedirectResult(auth).catch(error => {
     setState('signed-out', null, error);
 });
 
 onAuthStateChanged(auth, user => {
     setState(user ? 'signed-in' : 'signed-out', getPublicUser(user), null);
+    if (!user && requestedLogin) {
+        requestedLogin = false;
+        login().catch(() => {});
+    }
 });

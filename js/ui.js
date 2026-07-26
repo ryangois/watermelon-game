@@ -106,6 +106,7 @@ SuikaGame.ui = {
             this.authBound = true;
             window.SuikaAuth.listen(({ user, status, error }) => {
                 this.updateLoginButton(user, status);
+                this.updateAuthStatus(user, status, error);
                 if (error) this.showToast(this.getAuthErrorMessage(error));
             });
         };
@@ -116,6 +117,7 @@ SuikaGame.ui = {
         setTimeout(() => {
             if (!window.SuikaAuth && !this.authBound) {
                 this.updateLoginButton(null, 'signed-out');
+                this.updateAuthStatus(null, 'unavailable', null);
             }
         }, 2600);
     },
@@ -179,6 +181,51 @@ SuikaGame.ui = {
         }
 
         this.renderLoginButton(button, 'Entrar com Google', 'salvar progresso', null);
+    },
+
+    updateAuthStatus: function (user, status, error) {
+        const container = document.getElementById('auth-status');
+        const text = document.getElementById('auth-status-text');
+        if (!container || !text) return;
+
+        if (error) {
+            container.dataset.state = 'error';
+            text.textContent = this.getAuthErrorMessage(error);
+            return;
+        }
+
+        if (status === 'loading') {
+            container.dataset.state = 'loading';
+            text.textContent = 'Verificando login...';
+            return;
+        }
+
+        if (status === 'signing-in') {
+            container.dataset.state = 'loading';
+            text.textContent = 'Conectando com o Google...';
+            return;
+        }
+
+        if (status === 'signing-out') {
+            container.dataset.state = 'loading';
+            text.textContent = 'Desconectando...';
+            return;
+        }
+
+        if (status === 'unavailable') {
+            container.dataset.state = 'error';
+            text.textContent = 'Login indisponível neste navegador';
+            return;
+        }
+
+        if (user) {
+            container.dataset.state = 'signed-in';
+            text.textContent = `Conectado como ${user.email || user.name}`;
+            return;
+        }
+
+        container.dataset.state = 'signed-out';
+        text.textContent = 'Você não está conectado';
     },
 
     renderLoginButton: function (button, title, meta, user) {
