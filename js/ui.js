@@ -48,12 +48,7 @@ SuikaGame.ui = {
         document.getElementById('pwa-dismiss-button').addEventListener('click', () => this.dismissPwaBanner());
         document.getElementById('pack-preview-close').addEventListener('click', () => this.closePackPreview());
         document.getElementById('achievements-close').addEventListener('click', () => this.closeAchievements());
-        document.getElementById('achievements-modal').addEventListener('click', event => {
-            if (event.target.id === 'achievements-modal') this.closeAchievements();
-        });
-        document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') this.closeAchievements();
-        });
+        this.bindModalDismissal();
         document.addEventListener('fullscreenchange', () => this.updateFullscreenButton());
         document.addEventListener('webkitfullscreenchange', () => this.updateFullscreenButton());
         document.getElementById('easy-button').addEventListener('click', () => this.setDifficulty('easy'));
@@ -99,6 +94,45 @@ SuikaGame.ui = {
         });
     },
 
+    dismissibleModals: ['pack-preview-modal', 'achievements-modal'],
+
+    openModal: function (id, focusId) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.add('open');
+        const focusTarget = focusId && document.getElementById(focusId);
+        if (focusTarget) focusTarget.focus();
+    },
+
+    closeModal: function (id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.remove('open');
+    },
+
+    bindModalDismissal: function () {
+        this.dismissibleModals.forEach(id => {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.addEventListener('click', event => {
+                if (event.target.id === id) this.closeModal(id);
+            });
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            this.dismissibleModals.forEach(id => this.closeModal(id));
+        });
+    },
+
+    ensureAuthLoaded: function () {
+        if (!this.authLoadPromise) {
+            this.authLoadPromise = import('./auth.js?v=20260824-cloud-sync')
+                .then(() => true)
+                .catch(() => false);
+        }
+        return this.authLoadPromise;
+    },
+
     initializeAuthUI: function () {
         const bindAuth = () => {
             if (!window.SuikaAuth || this.authBound) return;
@@ -111,24 +145,55 @@ SuikaGame.ui = {
             });
         };
 
-        bindAuth();
         window.addEventListener('suika-auth-ready', bindAuth);
-        setTimeout(bindAuth, 1200);
-        setTimeout(() => {
-            if (!window.SuikaAuth && !this.authBound) {
-                this.updateLoginButton(null, 'signed-out');
-                this.updateAuthStatus(null, 'unavailable', null);
-            }
-        }, 2600);
+
+        const triggerLoad = () => {
+            this.ensureAuthLoaded().then(loaded => {
+                if (loaded) {
+                    bindAuth();
+                } else if (!this.authBound) {
+                    this.updateLoginButton(null, 'signed-out');
+                    this.updateAuthStatus(null, 'unavailable', null);
+                }
+            });
+        };
+
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(triggerLoad, { timeout: 2500 });
+        } else {
+            setTimeout(triggerLoad, 1500);
+        }
+
+        window.addEventListener('suika-sync-complete', () => {
+            this.updateHighScoreDisplay();
+            this.updateCoinDisplays();
+            this.renderMedalStrip();
+            this.renderAchievements();
+            this.renderRankingStats();
+            this.renderShop();
+            this.showToast('Progresso sincronizado com a nuvem');
+        });
     },
 
     handleLoginClick: function () {
-        const auth = window.SuikaAuth;
-
-        if (!auth) {
-            this.showToast('Login indisponível. Verifique conexão e domínio autorizado');
+        if (!window.SuikaAuth) {
+            this.updateLoginButton(null, 'loading');
+            this.ensureAuthLoaded().then(loaded => {
+                if (loaded && window.SuikaAuth) {
+                    this.performLogin();
+                } else {
+                    this.showToast('Login indisponível. Verifique conexão e domínio autorizado');
+                    this.updateLoginButton(null, 'signed-out');
+                }
+            });
             return;
         }
+
+        this.performLogin();
+    },
+
+    performLogin: function () {
+        const auth = window.SuikaAuth;
 
         if (!auth.getUser() && auth.getLocalAuthUrl && auth.getLocalAuthUrl()) {
             this.showToast('Abrindo via localhost para o Google funcionar');
@@ -146,10 +211,8 @@ SuikaGame.ui = {
         const button = document.getElementById('login-button');
         if (!button) return;
 
-        const needsLocalhost = !user
-            && window.SuikaAuth
-            && window.SuikaAuth.getLocalAuthUrl
-            && Boolean(window.SuikaAuth.getLocalAuthUrl());
+        const localAuthUrl = window.SuikaAuth && window.SuikaAuth.getLocalAuthUrl && window.SuikaAuth.getLocalAuthUrl();
+        const needsLocalhost = !user && Boolean(localAuthUrl);
         button.classList.toggle('signed-in', Boolean(user));
         button.classList.toggle('auth-warning', needsLocalhost);
         button.disabled = status === 'loading' || status === 'signing-in' || status === 'signing-out';
@@ -175,7 +238,7 @@ SuikaGame.ui = {
             return;
         }
 
-        if (window.SuikaAuth && window.SuikaAuth.getLocalAuthUrl && window.SuikaAuth.getLocalAuthUrl()) {
+        if (localAuthUrl) {
             this.renderLoginButton(button, 'Entrar com Google', 'usar localhost', null);
             return;
         }
@@ -320,7 +383,7 @@ SuikaGame.ui = {
         if (localStorage.getItem('suikaTutorialDone') === 'true') return;
         this.tutorialIndex = 0;
         this.renderTutorial();
-        document.getElementById('tutorial-overlay').classList.add('open');
+        this.openModal('tutorial-overlay');
     },
 
     renderTutorial: function () {
@@ -345,7 +408,7 @@ SuikaGame.ui = {
     },
 
     closeTutorial: function (persist) {
-        document.getElementById('tutorial-overlay').classList.remove('open');
+        this.closeModal('tutorial-overlay');
         if (persist) localStorage.setItem('suikaTutorialDone', 'true');
     },
 
@@ -516,6 +579,7 @@ SuikaGame.ui = {
         document.querySelector('.menu-stats').style.display = 'none';
         document.querySelector('.menu-actions').style.display = 'none';
         document.getElementById('login-button').style.display = 'none';
+        document.getElementById('auth-status').style.display = 'none';
         document.getElementById('how-to-play').style.display = 'none';
         document.getElementById('medal-strip').style.display = 'none';
         document.getElementById('ranking-stats').style.display = 'none';
@@ -551,6 +615,7 @@ SuikaGame.ui = {
         document.querySelector('.menu-stats').style.display = 'grid';
         document.querySelector('.menu-actions').style.display = 'grid';
         document.getElementById('login-button').style.display = 'flex';
+        document.getElementById('auth-status').style.display = 'flex';
         document.getElementById('how-to-play').style.display = 'block';
         document.getElementById('medal-strip').style.display = 'grid';
         document.getElementById('ranking-stats').style.display = 'grid';
@@ -599,143 +664,162 @@ SuikaGame.ui = {
         document.querySelectorAll('.shop-list').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === tabName));
     },
 
-    renderShop: function () {
-        this.renderSkinShop();
-        this.renderThemeShop();
-        this.renderMusicShop();
-        this.renderPowerShop();
-        this.setShopTab(this.activeShopTab);
-    },
+    shopCategories: {
+        skin: {
+            listId: 'skin-list',
+            kind: 'Skin',
+            getItems: () => SuikaGame.skins.packs,
+            getActiveId: () => SuikaGame.skins.getActiveId(),
+            getPrice: pack => SuikaGame.skins.getSkinPrice(pack),
+            isUnlocked: pack => SuikaGame.skins.isSkinUnlocked(pack.id),
+            buildCard: (pack, price, isUnlocked) => {
+                const card = SuikaGame.ui.createShopCard(pack.name, pack.description, isUnlocked ? 'Skin liberada' : `Skin: ${price} moedas`, pack.themeClass);
+                SuikaGame.ui.decoratePackCard(card, pack, 'fruits', 'skin');
+                SuikaGame.ui.addRarityBadge(card, pack);
+                return card;
+            },
+            cardLabels: { equipped: 'Equipada', owned: 'Skin comprada', buy: 'Comprar skin' },
+            actionLabels: { active: 'Equipada', equip: 'Equipar skin', buy: 'Comprar skin' },
+            stateNames: { buy: 'buy-skin', equip: 'equip-skin' },
+            onEquip: pack => SuikaGame.skins.setActive(pack.id),
+            onBuy: pack => {
+                if (!SuikaGame.skins.buySkinPack(pack.id)) return false;
+                SuikaGame.skins.setActive(pack.id);
+                return true;
+            },
+            toasts: { active: 'Skin já equipada', equipped: 'Skin equipada', bought: 'Frutas compradas e equipadas' }
+        },
 
-    renderSkinShop: function () {
-        const list = document.getElementById('skin-list');
-        const activeId = SuikaGame.skins.getActiveId();
-        const coins = SuikaGame.skins.getCoins();
+        theme: {
+            listId: 'theme-list',
+            kind: 'Tema',
+            getItems: () => SuikaGame.skins.packs,
+            getActiveId: () => SuikaGame.skins.getActiveThemeId(),
+            getPrice: pack => SuikaGame.skins.getThemePrice(pack),
+            isUnlocked: pack => SuikaGame.skins.isThemeUnlocked(pack.id),
+            buildCard: (pack, price, isUnlocked) => {
+                const card = SuikaGame.ui.createShopCard(pack.name, 'Tema do menu, pote, caixa de evolução e linha final', isUnlocked ? 'Tema liberado' : `Tema: ${price} moedas`, pack.themeClass);
+                SuikaGame.ui.decoratePackCard(card, pack, 'theme', 'theme');
+                SuikaGame.ui.addRarityBadge(card, pack);
+                return card;
+            },
+            cardLabels: { equipped: 'Tema ativo', owned: 'Tema comprado', buy: 'Comprar tema' },
+            actionLabels: { active: 'Ativo', equip: 'Equipar tema', buy: 'Comprar tema' },
+            stateNames: { buy: 'buy-theme', equip: 'equip-theme' },
+            onEquip: pack => SuikaGame.skins.setActiveTheme(pack.id),
+            onBuy: pack => {
+                if (!SuikaGame.skins.buyThemePack(pack.id)) return false;
+                SuikaGame.skins.setActiveTheme(pack.id);
+                return true;
+            },
+            toasts: { active: 'Tema já ativo', equipped: 'Tema equipado', bought: 'Tema comprado e equipado' }
+        },
 
-        list.innerHTML = '';
-        SuikaGame.skins.packs.forEach(pack => {
-            const isUnlocked = SuikaGame.skins.isSkinUnlocked(pack.id);
-            const isActive = activeId === pack.id;
-            const price = SuikaGame.skins.getSkinPrice(pack);
-            const card = this.createShopCard(pack.name, pack.description, isUnlocked ? 'Skin liberada' : `Skin: ${price} moedas`, pack.themeClass);
-            const action = card.querySelector('.shop-action');
-
-            this.decoratePackCard(card, pack, 'fruits', 'skin');
-            this.addRarityBadge(card, pack);
-
-            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy-skin' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Skin comprada' : coins >= price ? 'Comprar skin' : `Faltam ${price - coins}`, 'Skin');
-            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'equip-skin' : coins >= price ? 'buy-skin' : 'locked', isActive ? 'Equipada' : isUnlocked ? 'Equipar skin' : coins >= price ? 'Comprar skin' : 'Sem moedas');
-            action.addEventListener('click', event => {
-                event.stopPropagation();
-                if (isActive) {
-                    this.showToast('Skin já equipada');
-                } else if (isUnlocked) {
-                    SuikaGame.skins.setActive(pack.id);
-                    this.afterShopAction('Skin equipada');
-                } else if (SuikaGame.skins.buySkinPack(pack.id)) {
-                    SuikaGame.skins.setActive(pack.id);
-                    this.afterShopAction('Frutas compradas e equipadas');
-                } else {
-                    this.showToast('Moedas insuficientes');
-                }
-            });
-            list.appendChild(card);
-        });
-    },
-
-    renderThemeShop: function () {
-        const list = document.getElementById('theme-list');
-        const activeId = SuikaGame.skins.getActiveThemeId();
-        const coins = SuikaGame.skins.getCoins();
-
-        list.innerHTML = '';
-        SuikaGame.skins.packs.forEach(pack => {
-            const isUnlocked = SuikaGame.skins.isThemeUnlocked(pack.id);
-            const isActive = activeId === pack.id;
-            const price = SuikaGame.skins.getThemePrice(pack);
-            const card = this.createShopCard(pack.name, 'Tema do menu, pote, caixa de evolução e linha final', isUnlocked ? 'Tema liberado' : `Tema: ${price} moedas`, pack.themeClass);
-            const action = card.querySelector('.shop-action');
-
-            this.decoratePackCard(card, pack, 'theme', 'theme');
-            this.addRarityBadge(card, pack);
-
-            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= price ? 'buy-theme' : 'locked', isActive ? 'Tema ativo' : isUnlocked ? 'Tema comprado' : coins >= price ? 'Comprar tema' : `Faltam ${price - coins}`, 'Tema');
-            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'equip-theme' : coins >= price ? 'buy-theme' : 'locked', isActive ? 'Ativo' : isUnlocked ? 'Equipar tema' : coins >= price ? 'Comprar tema' : 'Sem moedas');
-            action.addEventListener('click', event => {
-                event.stopPropagation();
-                if (isActive) {
-                    this.showToast('Tema já ativo');
-                } else if (isUnlocked) {
-                    SuikaGame.skins.setActiveTheme(pack.id);
-                    this.afterShopAction('Tema equipado');
-                } else if (SuikaGame.skins.buyThemePack(pack.id)) {
-                    SuikaGame.skins.setActiveTheme(pack.id);
-                    this.afterShopAction('Tema comprado e equipado');
-                } else {
-                    this.showToast('Moedas insuficientes');
-                }
-            });
-            list.appendChild(card);
-        });
-    },
-
-    renderMusicShop: function () {
-        const list = document.getElementById('music-list');
-        const activeId = SuikaGame.skins.getActiveTrackId();
-        const coins = SuikaGame.skins.getCoins();
-
-        list.innerHTML = '';
-        SuikaGame.skins.tracks.forEach(track => {
-            const isUnlocked = SuikaGame.skins.isTrackUnlocked(track.id);
-            const isActive = activeId === track.id;
-            const card = this.createShopCard(track.name, track.description, isUnlocked ? 'Desbloqueada' : `${track.price} moedas`, 'music-card');
-            const preview = card.querySelector('.shop-preview');
-            const action = card.querySelector('.shop-action');
-            preview.textContent = track.icon || '♪';
-            preview.classList.add('music-preview');
-            this.setShopCardState(card, isActive ? 'equipped' : isUnlocked ? 'owned' : coins >= track.price ? 'buy-music' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Música comprada' : coins >= track.price ? 'Comprar música' : `Faltam ${track.price - coins}`, 'Música');
-            this.setShopActionState(action, isActive ? 'active' : isUnlocked ? 'equip-music' : coins >= track.price ? 'buy-music' : 'locked', isActive ? 'Tocando' : isUnlocked ? 'Equipar música' : coins >= track.price ? 'Comprar música' : 'Sem moedas');
-            action.addEventListener('click', () => {
-                if (isActive) {
-                    this.showToast('Música já ativa');
-                } else if (isUnlocked) {
-                    SuikaGame.skins.setActiveTrack(track.id);
-                    this.showToast('Música equipada');
-                } else if (SuikaGame.skins.buyTrack(track.id)) {
-                    this.showToast('Música comprada e equipada');
-                } else {
-                    this.showToast('Moedas insuficientes');
-                }
+        music: {
+            listId: 'music-list',
+            kind: 'Música',
+            getItems: () => SuikaGame.skins.tracks,
+            getActiveId: () => SuikaGame.skins.getActiveTrackId(),
+            getPrice: track => track.price,
+            isUnlocked: track => SuikaGame.skins.isTrackUnlocked(track.id),
+            buildCard: (track, price, isUnlocked) => {
+                const card = SuikaGame.ui.createShopCard(track.name, track.description, isUnlocked ? 'Desbloqueada' : `${price} moedas`, 'music-card');
+                const preview = card.querySelector('.shop-preview');
+                preview.textContent = track.icon || '♪';
+                preview.classList.add('music-preview');
+                return card;
+            },
+            cardLabels: { equipped: 'Tocando', owned: 'Música comprada', buy: 'Comprar música' },
+            actionLabels: { active: 'Tocando', equip: 'Equipar música', buy: 'Comprar música' },
+            stateNames: { buy: 'buy-music', equip: 'equip-music' },
+            onEquip: track => {
+                SuikaGame.skins.setActiveTrack(track.id);
                 SuikaGame.audio.stopBackgroundMusic();
-                this.afterShopAction();
-            });
-            list.appendChild(card);
-        });
+            },
+            onBuy: track => {
+                if (!SuikaGame.skins.buyTrack(track.id)) return false;
+                SuikaGame.audio.stopBackgroundMusic();
+                return true;
+            },
+            toasts: { active: 'Música já ativa', equipped: 'Música equipada', bought: 'Música comprada e equipada' }
+        },
+
+        power: {
+            listId: 'power-list',
+            kind: 'Poder',
+            getItems: () => SuikaGame.skins.powers,
+            getPrice: power => power.price,
+            isUnlocked: () => false,
+            buildCard: (power, price) => {
+                const card = SuikaGame.ui.createShopCard(power.name, power.description, `${price} moedas · Você tem ${SuikaGame.skins.getPowerCount(power.id)}`, 'power-card');
+                const preview = card.querySelector('.shop-preview');
+                preview.textContent = power.icon || '+';
+                preview.classList.add('power-preview');
+                return card;
+            },
+            cardLabels: { buy: power => `Estoque: ${SuikaGame.skins.getPowerCount(power.id)}` },
+            actionLabels: { buy: 'Comprar poder' },
+            stateNames: { buy: 'buy-power' },
+            onBuy: power => SuikaGame.skins.buyPower(power.id),
+            toasts: { bought: power => `${power.name} comprado` }
+        }
     },
 
-    renderPowerShop: function () {
-        const list = document.getElementById('power-list');
+    resolveLabel: function (value, item) {
+        return typeof value === 'function' ? value(item) : value;
+    },
+
+    renderShopCategory: function (config) {
+        const list = document.getElementById(config.listId);
         const coins = SuikaGame.skins.getCoins();
+        const activeId = config.getActiveId ? config.getActiveId() : null;
 
         list.innerHTML = '';
-        SuikaGame.skins.powers.forEach(power => {
-            const count = SuikaGame.skins.getPowerCount(power.id);
-            const card = this.createShopCard(power.name, power.description, `${power.price} moedas · Você tem ${count}`, 'power-card');
-            const preview = card.querySelector('.shop-preview');
+        config.getItems().forEach(item => {
+            const price = config.getPrice(item);
+            const isUnlocked = config.isUnlocked(item);
+            const isActive = config.getActiveId ? activeId === item.id : false;
+            const canAfford = coins >= price;
+            const card = config.buildCard(item, price, isUnlocked);
             const action = card.querySelector('.shop-action');
-            preview.textContent = power.icon || '+';
-            preview.classList.add('power-preview');
-            this.setShopCardState(card, coins >= power.price ? 'buy-power' : 'locked', coins >= power.price ? `Estoque: ${count}` : `Faltam ${power.price - coins}`, 'Poder');
-            this.setShopActionState(action, coins >= power.price ? 'buy-power' : 'locked', coins >= power.price ? 'Comprar poder' : 'Sem moedas');
-            action.addEventListener('click', () => {
-                if (SuikaGame.skins.buyPower(power.id)) {
-                    this.afterShopAction(`${power.name} comprado`);
+
+            const cardState = isActive ? 'equipped' : isUnlocked ? 'owned' : canAfford ? config.stateNames.buy : 'locked';
+            const cardStatus = isActive ? this.resolveLabel(config.cardLabels.equipped, item)
+                : isUnlocked ? this.resolveLabel(config.cardLabels.owned, item)
+                : canAfford ? this.resolveLabel(config.cardLabels.buy, item)
+                : `Faltam ${price - coins}`;
+            const actionState = isActive ? 'active' : isUnlocked ? config.stateNames.equip : canAfford ? config.stateNames.buy : 'locked';
+            const actionLabel = isActive ? this.resolveLabel(config.actionLabels.active, item)
+                : isUnlocked ? this.resolveLabel(config.actionLabels.equip, item)
+                : canAfford ? this.resolveLabel(config.actionLabels.buy, item)
+                : 'Sem moedas';
+
+            this.setShopCardState(card, cardState, cardStatus, config.kind);
+            this.setShopActionState(action, actionState, actionLabel);
+
+            action.addEventListener('click', event => {
+                event.stopPropagation();
+                if (isActive) {
+                    this.showToast(this.resolveLabel(config.toasts.active, item));
+                } else if (isUnlocked) {
+                    config.onEquip(item);
+                    this.afterShopAction(this.resolveLabel(config.toasts.equipped, item));
+                } else if (config.onBuy(item)) {
+                    this.afterShopAction(this.resolveLabel(config.toasts.bought, item));
                 } else {
                     this.showToast('Moedas insuficientes');
                 }
             });
             list.appendChild(card);
         });
+    },
+
+    renderShop: function () {
+        this.renderShopCategory(this.shopCategories.skin);
+        this.renderShopCategory(this.shopCategories.theme);
+        this.renderShopCategory(this.shopCategories.music);
+        this.renderShopCategory(this.shopCategories.power);
+        this.setShopTab(this.activeShopTab);
     },
 
     createShopCard: function (title, description, price, className) {
@@ -769,7 +853,6 @@ SuikaGame.ui = {
     },
 
     setShopActionState: function (action, state, label) {
-        action.disabled = state === 'locked' || state === 'active';
         action.dataset.state = state;
         action.textContent = label;
     },
@@ -881,7 +964,6 @@ SuikaGame.ui = {
     },
 
     openPackPreview: function (pack) {
-        const modal = document.getElementById('pack-preview-modal');
         const content = document.getElementById('pack-preview-content');
         const theme = SuikaGame.skins.getThemeForPack(pack);
 
@@ -915,11 +997,11 @@ SuikaGame.ui = {
         stage.appendChild(row);
         content.appendChild(stage);
         content.appendChild(meta);
-        modal.classList.add('open');
+        this.openModal('pack-preview-modal');
     },
 
     closePackPreview: function () {
-        document.getElementById('pack-preview-modal').classList.remove('open');
+        this.closeModal('pack-preview-modal');
     },
 
     afterShopAction: function (message) {
@@ -954,17 +1036,17 @@ SuikaGame.ui = {
         const strip = document.getElementById('medal-strip');
         const unlocked = SuikaGame.progress.getUnlocked();
         const total = SuikaGame.progress.medals.length;
-        const unlockedMedals = SuikaGame.progress.medals.filter(medal => unlocked.includes(medal.id));
+        const unlockedCount = SuikaGame.progress.medals.filter(medal => unlocked.includes(medal.id)).length;
         strip.innerHTML = '';
 
         const summary = document.createElement('button');
         summary.className = 'medal-summary';
         summary.type = 'button';
-        summary.innerHTML = `<strong>${unlockedMedals.length}/${total}</strong><span>Conquistas</span>`;
+        summary.innerHTML = `<strong>${unlockedCount}/${total}</strong><span>Conquistas</span>`;
         summary.addEventListener('click', () => this.openAchievements());
         strip.appendChild(summary);
 
-        unlockedMedals.slice(-5).forEach(medal => {
+        unlocked.slice(-5).map(medalId => SuikaGame.progress.getMedal(medalId)).filter(Boolean).forEach(medal => {
             const badge = document.createElement('span');
             badge.className = 'medal unlocked';
             badge.title = medal.description;
@@ -1003,15 +1085,11 @@ SuikaGame.ui = {
 
     openAchievements: function () {
         this.renderAchievements();
-        const modal = document.getElementById('achievements-modal');
-        if (!modal) return;
-        modal.classList.add('open');
-        document.getElementById('achievements-close').focus();
+        this.openModal('achievements-modal', 'achievements-close');
     },
 
     closeAchievements: function () {
-        const modal = document.getElementById('achievements-modal');
-        if (modal) modal.classList.remove('open');
+        this.closeModal('achievements-modal');
     },
 
     renderRankingStats: function () {

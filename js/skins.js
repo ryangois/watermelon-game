@@ -118,8 +118,9 @@ SuikaGame.skins = {
 
     addCoins: function (amount) {
         const earned = Math.max(0, Math.floor(amount));
-        this.setCoins(this.getCoins() + earned);
-        if (SuikaGame.progress && this.getCoins() >= 500) {
+        const newTotal = this.getCoins() + earned;
+        this.setCoins(newTotal);
+        if (SuikaGame.progress && newTotal >= 500) {
             SuikaGame.progress.unlock('coin-bank');
         }
         return earned;
