@@ -202,8 +202,12 @@ function consumeRequestedLogin() {
     return true;
 }
 
+function getErrorCode(error) {
+    return error && error.code ? error.code : '';
+}
+
 function shouldFallbackToRedirect(error) {
-    const code = error && error.code ? error.code : '';
+    const code = getErrorCode(error);
     return code.includes('popup-blocked')
         || code.includes('operation-not-supported-in-this-environment')
         || code.includes('web-storage-unsupported');
@@ -268,6 +272,7 @@ window.SuikaAuth = {
     logout,
     listen,
     getLocalAuthUrl,
+    getErrorCode,
     getUser: () => currentUser,
     getStatus: () => currentStatus
 };

@@ -677,10 +677,7 @@ footer {
 
 .shop-card[data-shop-status="equipped"]::before { background: var(--teal); }
 .shop-card[data-shop-status="owned"]::before { background: var(--purple); }
-.shop-card[data-shop-status="buy-skin"]::before { background: var(--purple); }
-.shop-card[data-shop-status="buy-theme"]::before { background: #2f80ed; }
-.shop-card[data-shop-status="buy-music"]::before { background: #4f5d75; }
-.shop-card[data-shop-status="buy-power"]::before { background: var(--gold); }
+.shop-card[data-shop-status^="buy-"]::before { background: var(--shop-accent, var(--purple)); }
 .shop-card[data-shop-status="locked"]::before { background: rgba(52, 41, 31, 0.28); }
 
 .shop-preview {
@@ -943,20 +940,8 @@ footer {
     background: var(--purple);
 }
 
-.shop-action[data-state="buy-skin"] {
-    background: #7c2ec5;
-}
-
-.shop-action[data-state="buy-theme"] {
-    background: #2f80ed;
-}
-
-.shop-action[data-state="buy-music"] {
-    background: #4f5d75;
-}
-
-.shop-action[data-state="buy-power"] {
-    background: var(--teal);
+.shop-action[data-state^="buy-"] {
+    background: var(--shop-accent, var(--purple));
 }
 
 .shop-action[data-state="preview"] {

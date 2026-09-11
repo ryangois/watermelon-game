@@ -36,6 +36,12 @@ SuikaGame.progress = {
         }
     },
 
+    getUnlockedMedals: function () {
+        const ids = this.getUnlocked();
+        const set = new Set(ids);
+        return { ids, set, list: this.medals.filter(medal => set.has(medal.id)) };
+    },
+
     getStats: function () {
         try {
             return JSON.parse(localStorage.getItem(this.statsKey) || '{}');

@@ -126,7 +126,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20260824-cloud-sync')
+            this.authLoadPromise = import('./auth.js?v=20260911-shop-cleanup')
                 .then(() => true)
                 .catch(() => false);
         }
@@ -320,7 +320,7 @@ SuikaGame.ui = {
     },
 
     getAuthErrorMessage: function (error) {
-        const code = error && error.code ? error.code : '';
+        const code = window.SuikaAuth && window.SuikaAuth.getErrorCode ? window.SuikaAuth.getErrorCode(error) : (error && error.code ? error.code : '');
 
         if (code.includes('unauthorized-domain')) {
             if (window.location.hostname === '127.0.0.1') {
@@ -668,6 +668,7 @@ SuikaGame.ui = {
         skin: {
             listId: 'skin-list',
             kind: 'Skin',
+            accentColor: 'var(--purple)',
             getItems: () => SuikaGame.skins.packs,
             getActiveId: () => SuikaGame.skins.getActiveId(),
             getPrice: pack => SuikaGame.skins.getSkinPrice(pack),
@@ -693,6 +694,7 @@ SuikaGame.ui = {
         theme: {
             listId: 'theme-list',
             kind: 'Tema',
+            accentColor: '#2f80ed',
             getItems: () => SuikaGame.skins.packs,
             getActiveId: () => SuikaGame.skins.getActiveThemeId(),
             getPrice: pack => SuikaGame.skins.getThemePrice(pack),
@@ -718,6 +720,7 @@ SuikaGame.ui = {
         music: {
             listId: 'music-list',
             kind: 'Música',
+            accentColor: '#4f5d75',
             getItems: () => SuikaGame.skins.tracks,
             getActiveId: () => SuikaGame.skins.getActiveTrackId(),
             getPrice: track => track.price,
@@ -747,6 +750,7 @@ SuikaGame.ui = {
         power: {
             listId: 'power-list',
             kind: 'Poder',
+            accentColor: 'var(--teal)',
             getItems: () => SuikaGame.skins.powers,
             getPrice: power => power.price,
             isUnlocked: () => false,
@@ -782,6 +786,7 @@ SuikaGame.ui = {
             const canAfford = coins >= price;
             const card = config.buildCard(item, price, isUnlocked);
             const action = card.querySelector('.shop-action');
+            if (config.accentColor) card.style.setProperty('--shop-accent', config.accentColor);
 
             const cardState = isActive ? 'equipped' : isUnlocked ? 'owned' : canAfford ? config.stateNames.buy : 'locked';
             const cardStatus = isActive ? this.resolveLabel(config.cardLabels.equipped, item)
@@ -1034,19 +1039,18 @@ SuikaGame.ui = {
 
     renderMedalStrip: function () {
         const strip = document.getElementById('medal-strip');
-        const unlocked = SuikaGame.progress.getUnlocked();
+        const { ids, list } = SuikaGame.progress.getUnlockedMedals();
         const total = SuikaGame.progress.medals.length;
-        const unlockedCount = SuikaGame.progress.medals.filter(medal => unlocked.includes(medal.id)).length;
         strip.innerHTML = '';
 
         const summary = document.createElement('button');
         summary.className = 'medal-summary';
         summary.type = 'button';
-        summary.innerHTML = `<strong>${unlockedCount}/${total}</strong><span>Conquistas</span>`;
+        summary.innerHTML = `<strong>${list.length}/${total}</strong><span>Conquistas</span>`;
         summary.addEventListener('click', () => this.openAchievements());
         strip.appendChild(summary);
 
-        unlocked.slice(-5).map(medalId => SuikaGame.progress.getMedal(medalId)).filter(Boolean).forEach(medal => {
+        ids.slice(-5).map(medalId => SuikaGame.progress.getMedal(medalId)).filter(Boolean).forEach(medal => {
             const badge = document.createElement('span');
             badge.className = 'medal unlocked';
             badge.title = medal.description;
@@ -1057,17 +1061,16 @@ SuikaGame.ui = {
 
     renderAchievements: function () {
         const list = document.getElementById('achievements-list');
-        const progress = document.getElementById('achievements-progress');
-        if (!list || !progress) return;
+        const progressEl = document.getElementById('achievements-progress');
+        if (!list || !progressEl) return;
 
-        const unlocked = SuikaGame.progress.getUnlocked();
+        const { set: unlockedSet, list: unlockedMedals } = SuikaGame.progress.getUnlockedMedals();
         const medals = SuikaGame.progress.medals;
-        const unlockedCount = medals.filter(medal => unlocked.includes(medal.id)).length;
-        progress.textContent = `${unlockedCount}/${medals.length} desbloqueadas`;
+        progressEl.textContent = `${unlockedMedals.length}/${medals.length} desbloqueadas`;
         list.innerHTML = '';
 
         medals.forEach(medal => {
-            const isUnlocked = unlocked.includes(medal.id);
+            const isUnlocked = unlockedSet.has(medal.id);
             const item = document.createElement('article');
             const visibleName = medal.secret && !isUnlocked ? 'Conquista secreta' : medal.name;
             item.className = isUnlocked ? 'achievement unlocked' : 'achievement';

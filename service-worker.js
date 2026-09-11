@@ -1,17 +1,23 @@
-const CACHE_NAME = 'suika-game-v20260824-cloud-sync';
+const CACHE_VERSION = '20260911-shop-cleanup';
+const CACHE_NAME = `suika-game-v${CACHE_VERSION}`;
+
+const VERSIONED_FILES = [
+  '/styles.css',
+  '/js/config.js',
+  '/js/skins.js',
+  '/js/progress.js',
+  '/js/fruits.js',
+  '/js/particles.js',
+  '/js/physics.js',
+  '/js/ui.js',
+  '/js/game.js'
+];
+
 const APP_SHELL = [
   '/',
   '/index.html',
-  '/styles.css?v=20260824-cloud-sync',
   '/manifest.json',
-  '/js/config.js?v=20260824-cloud-sync',
-  '/js/skins.js?v=20260824-cloud-sync',
-  '/js/progress.js?v=20260824-cloud-sync',
-  '/js/fruits.js?v=20260824-cloud-sync',
-  '/js/particles.js?v=20260824-cloud-sync',
-  '/js/physics.js?v=20260824-cloud-sync',
-  '/js/ui.js?v=20260824-cloud-sync',
-  '/js/game.js?v=20260824-cloud-sync',
+  ...VERSIONED_FILES.map(path => `${path}?v=${CACHE_VERSION}`),
   '/assets/images/apple_emoji.png',
   '/assets/images/cherries_emoji.png',
   '/assets/images/grapes_emoji.png',
@@ -41,6 +47,16 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+
+      return fetch(event.request).then(response => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+        }
+        return response;
+      }).catch(() => cached);
+    })
   );
 });
