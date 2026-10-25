@@ -1,8 +1,9 @@
-const CACHE_VERSION = '20261025-glass-ux';
+const CACHE_VERSION = '20261025-home';
 const CACHE_NAME = `suika-game-v${CACHE_VERSION}`;
 
 const VERSIONED_FILES = [
   '/styles.css',
+  '/home.css',
   '/js/config.js',
   '/js/skins.js',
   '/js/sprite-metrics.js',

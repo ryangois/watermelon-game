@@ -1,0 +1,115 @@
+/* Home screen: a clear play area and a quieter progress column. */
+#menu-container[data-screen="home"] {
+    width: min(900px, calc(100vw - 32px));
+    padding: 28px;
+    gap: 22px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(255,255,255,.65), transparent 55%), var(--paper);
+}
+
+.home-brand { min-width: 0; }
+.home-kicker {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--teal);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+#menu-container #game-title {
+    max-width: none;
+    font-size: clamp(36px, 5vw, 52px);
+    line-height: 1;
+    letter-spacing: -2px;
+}
+.home-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 28px;
+}
+.home-play, .home-aside { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.home-intro {
+    position: relative;
+    overflow: hidden;
+    padding: 8px 14px 20px;
+    border: 1px solid rgba(34,153,141,.12);
+    border-radius: 22px;
+    background: radial-gradient(ellipse at 50% 20%, #e1f3cf, #f3f7dc 60%, #fff8e7);
+    text-align: center;
+}
+.home-fruits { position: relative; width: min(100%, 310px); height: 175px; margin: auto; }
+.home-fruit { position: absolute; object-fit: contain; filter: drop-shadow(0 9px 3px rgba(75,100,40,.12)); }
+.home-fruit.watermelon { width: 178px; height: 178px; left: calc(50% - 89px); top: -4px; transform: rotate(-8deg); z-index: 2; }
+.home-fruit.cherry { width: 96px; height: 96px; left: 0; bottom: 9px; transform: rotate(-14deg); z-index: 3; }
+.home-fruit.orange { width: 110px; height: 110px; right: 0; bottom: 1px; transform: rotate(12deg); z-index: 3; }
+.home-fruit-shadow { position: absolute; width: 78%; height: 20px; bottom: 6px; left: 11%; border-radius: 50%; background: rgba(81,123,58,.12); filter: blur(7px); }
+.home-spark { position: absolute; color: #d9a12b; font-size: 23px; }
+.spark-one { left: 27px; top: 18px; transform: rotate(15deg); }
+.spark-two { right: 25px; top: 29px; font-size: 30px; }
+.home-intro h2 { font-size: 21px; letter-spacing: -.6px; line-height: 1.3; margin-bottom: 5px; }
+.home-intro p { max-width: 29ch; margin: auto; font-size: 12px; color: #596445; line-height: 1.55; }
+.home-play .menu-stats { gap: 8px; }
+.home-play #high-score, .home-play #coin-balance {
+    min-height: 44px;
+    padding: 9px;
+    font-size: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.7);
+}
+.home-play #coin-balance { color: #805100; background: #fff2c7; border-color: #eddca3; }
+.home-play #difficulty-status { min-height: 24px; padding: 0; border: 0; background: none; color: var(--muted); font-size: 11px; }
+.home-play .menu-actions { gap: 10px; padding: 0; }
+.home-play #start-button { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; min-height: 58px; }
+.home-play #start-button span { font-size: 25px; }
+.home-play #shop-button, .home-play #achievements-button { min-height: 46px; font-size: 13px; }
+.home-play #options-button { font-size: 12px; min-height: 36px; border: 0; box-shadow: none; background: transparent; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+.home-account { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border-soft); }
+.home-account .login-button { width: 100%; min-height: 44px; justify-content: center; border-radius: 12px; box-shadow: none; }
+.home-account .auth-status { justify-content: center; font-size: 10px; }
+.home-aside { gap: 18px; justify-content: center; }
+.home-aside #how-to-play, .home-progress, .home-missions {
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    padding: 18px;
+    background: rgba(255,255,255,.55);
+}
+.home-aside #how-to-play h2 { font-size: 18px; letter-spacing: -.4px; }
+.home-aside #how-to-play ol { margin: 14px 0; gap: 8px; }
+.home-aside #how-to-play li { background: none; padding: 0; font-size: 11px; line-height: 1.5; }
+.home-aside #how-to-play li::before { width: 28px; height: 28px; margin-bottom: 8px; box-shadow: 0 3px 0 rgba(26,103,87,.15); }
+.home-aside #how-to-play p { border-top: 1px solid var(--border-soft); padding-top: 12px; font-size: 11px; line-height: 1.6; }
+.home-section-title { font-size: 13px; margin-bottom: 12px; line-height: 1.5; }
+.home-progress #medal-strip { grid-template-columns: minmax(0,1fr) repeat(2,auto); margin-bottom: 12px; }
+.home-progress #medal-strip .medal:nth-of-type(n+3) { display: none; }
+.home-progress .medal-summary { justify-content: flex-start; padding: 7px; }
+.home-progress #ranking-stats span { background: rgba(34,153,141,.06); padding: 11px 4px; }
+.home-progress #ranking-stats strong { font-size: 19px; margin-bottom: 4px; }
+.home-missions #daily-panel { grid-template-columns: 1fr; gap: 8px; }
+.home-missions .daily-reward { padding: 12px; background: #fff9e9; border-color: #eddfbb; }
+.home-missions .daily-reward span, .home-missions .daily-reward small { white-space: normal; line-height: 1.6; }
+.home-missions .daily-reward small { color: #81651e; margin-top: 5px; }
+.home-missions .daily-reward:disabled { opacity: 1; }
+.home-missions .daily-reward span { color: #68604f; font-size: 11px; font-weight: 600; }
+.home-missions .daily-reward strong { color: var(--ink); }
+#menu-container footer { font-size: 10px; opacity: .75; }
+#menu-container[data-screen="options"] .home-layout { grid-template-columns: 1fr; }
+#menu-container[data-screen="options"] .home-intro,
+#menu-container[data-screen="options"] .home-aside,
+#menu-container[data-screen="options"] .home-account,
+#menu-container[data-screen="options"] .home-kicker { display: none; }
+
+@media (max-width: 720px) {
+    #menu-container[data-screen="home"] { width: min(480px, calc(100vw - 20px)); min-height: 0; margin: 6px 0; padding: 18px; gap: 18px; border-radius: 24px; justify-content: flex-start; }
+    .home-kicker { font-size: 8px; letter-spacing: 1.3px; margin-bottom: 7px; }
+    #menu-container #game-title { font-size: clamp(32px, 9vw, 42px); }
+    .home-layout { grid-template-columns: 1fr; gap: 24px; }
+    .home-fruits { height: 143px; max-width: 270px; }
+    .home-fruit.watermelon { width: 150px; height: 150px; left: calc(50% - 75px); top: -7px; }
+    .home-fruit.cherry { width: 85px; height: 85px; }
+    .home-fruit.orange { width: 96px; height: 96px; }
+    .home-intro { padding-bottom: 16px; }
+    .home-intro h2 { font-size: 20px; }
+    .home-aside { gap: 14px; }
+    .home-aside #how-to-play, .home-progress, .home-missions { padding: 16px; }
+    .home-missions #daily-panel { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}

@@ -126,7 +126,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20261025-glass-ux')
+            this.authLoadPromise = import('./auth.js?v=20261025-home')
                 .then(() => true)
                 .catch(() => false);
         }
@@ -577,6 +577,7 @@ SuikaGame.ui = {
     },
 
     showOptions: function () {
+        document.getElementById('menu-container').dataset.screen = 'options';
         document.getElementById('game-title').textContent = 'Opções';
         document.getElementById('game-title').style.display = 'block';
         document.querySelector('.menu-stats').style.display = 'none';
@@ -603,6 +604,7 @@ SuikaGame.ui = {
     },
 
     showMainMenu: function () {
+        document.getElementById('menu-container').dataset.screen = 'home';
         SuikaGame.skins.applyActiveTheme();
         this.updateHighScoreDisplay();
         this.updateCoinDisplays();

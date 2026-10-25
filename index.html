@@ -12,18 +12,47 @@
     <title>Suika Game</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/images/watermelon_emoji.png">
-    <link rel="stylesheet" href="styles.css?v=20261025-glass-ux">
+    <link rel="stylesheet" href="styles.css?v=20261025-home">
+    <link rel="stylesheet" href="home.css?v=20261025-home">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <main id="app">
-        <section id="menu-container" class="panel">
+        <section id="menu-container" class="panel" data-screen="home" aria-label="Página principal">
             <div class="menu-top">
-                <h1 id="game-title">Suika Game</h1>
+                <div class="home-brand">
+                    <span class="home-kicker">UM POTE. MUITAS POSSIBILIDADES.</span>
+                    <h1 id="game-title">Suika Game</h1>
+                </div>
                 <button id="mute-button" class="icon-button small" aria-label="Mutar música">♪</button>
             </div>
-
+            <div class="home-layout">
+            <div class="home-play">
+            <div class="home-intro">
+                <div class="home-fruits" aria-hidden="true">
+                    <span class="home-fruit-shadow"></span>
+                    <img class="home-fruit cherry" src="assets/images/cherries_emoji.png" alt="">
+                    <img class="home-fruit watermelon" src="assets/images/watermelon_emoji.png" alt="">
+                    <img class="home-fruit orange" src="assets/images/orange_emoji.png" alt="">
+                    <span class="home-spark spark-one">✦</span>
+                    <span class="home-spark spark-two">✧</span>
+                </div>
+                <h2>Uma fruta puxa a outra.</h2>
+                <p>Junte iguais, crie combos e chegue à melancia.</p>
+            </div>
+            <div class="menu-stats">
+                <div id="high-score">Melhor pontuação: 0</div>
+                <div id="coin-balance">Moedas: 0</div>
+            </div>
+            <div id="difficulty-status">Dificuldade: Normal</div>
+            <div class="menu-actions">
+                <button id="start-button" class="menu-button">Jogar agora <span aria-hidden="true">→</span></button>
+                <button id="shop-button" class="menu-button accent">Loja de frutas</button>
+                <button id="achievements-button" class="menu-button trophy">Conquistas</button>
+                <button id="options-button" class="menu-button secondary">Ajustar dificuldade e controles</button>
+            </div>
+            <div class="home-account">
             <button id="login-button" class="login-button">
                 <span class="google-mark" aria-hidden="true">G</span>
                 <span class="login-copy">
@@ -35,14 +64,7 @@
                 <span class="auth-status-dot" aria-hidden="true"></span>
                 <span id="auth-status-text">Verificando login...</span>
             </div>
-
-            <div class="menu-stats">
-                <div id="high-score">Melhor pontuação: 0</div>
-                <div id="coin-balance">Moedas: 0</div>
             </div>
-
-            <div id="difficulty-status">Dificuldade: Normal</div>
-
             <div id="difficulty-buttons">
                 <button id="easy-button" class="menu-button difficulty-button" data-level="easy">Fácil</button>
                 <button id="normal-button" class="menu-button difficulty-button" data-level="normal">Normal</button>
@@ -58,13 +80,8 @@
                 <button id="back-button" class="menu-button secondary">Voltar</button>
             </div>
 
-            <div class="menu-actions">
-                <button id="start-button" class="menu-button">Iniciar jogo</button>
-                <button id="shop-button" class="menu-button accent">Loja</button>
-                <button id="achievements-button" class="menu-button trophy">Conquistas</button>
-                <button id="options-button" class="menu-button secondary">Opções</button>
             </div>
-
+            <aside class="home-aside" aria-label="Como jogar e seu progresso">
             <section id="how-to-play">
                 <h2>Como jogar</h2>
                 <ol>
@@ -72,12 +89,19 @@
                     <li>Solte no pote</li>
                     <li>Junte iguais para evoluir</li>
                 </ol>
-                <p>Se acumular acima da linha por muito tempo, acaba.</p>
+                <p>Fique de olho na linha: o pote não pode transbordar!</p>
             </section>
-
+            <div class="home-progress">
+            <h2 class="home-section-title">Seu progresso</h2>
             <div id="medal-strip" aria-label="Medalhas"></div>
             <div id="ranking-stats" aria-label="Estatísticas"></div>
+            </div>
+            <section class="home-missions" aria-label="Desafios do dia">
+            <h2 class="home-section-title">Desafios do dia</h2>
             <div id="daily-panel" aria-label="Missões diárias"></div>
+            </section>
+            </aside>
+            </div>
             <footer>Feito por Ryan Gois</footer>
         </section>
 
@@ -201,15 +225,15 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js?v=20261025-glass-ux"></script>
-    <script src="js/sprite-metrics.js?v=20261025-glass-ux"></script>
-    <script src="js/skins.js?v=20261025-glass-ux"></script>
-    <script src="js/progress.js?v=20261025-glass-ux"></script>
-    <script src="js/fruits.js?v=20261025-glass-ux"></script>
-    <script src="js/particles.js?v=20261025-glass-ux"></script>
-    <script src="js/physics.js?v=20261025-glass-ux"></script>
-    <script src="js/ui.js?v=20261025-glass-ux"></script>
-    <script src="js/game.js?v=20261025-glass-ux"></script>
+    <script src="js/config.js?v=20261025-home"></script>
+    <script src="js/sprite-metrics.js?v=20261025-home"></script>
+    <script src="js/skins.js?v=20261025-home"></script>
+    <script src="js/progress.js?v=20261025-home"></script>
+    <script src="js/fruits.js?v=20261025-home"></script>
+    <script src="js/particles.js?v=20261025-home"></script>
+    <script src="js/physics.js?v=20261025-home"></script>
+    <script src="js/ui.js?v=20261025-home"></script>
+    <script src="js/game.js?v=20261025-home"></script>
 </body>
 
 </html>
