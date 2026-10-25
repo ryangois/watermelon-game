@@ -126,7 +126,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20260911-shop-cleanup')
+            this.authLoadPromise = import('./auth.js?v=20261025-sync-safety')
                 .then(() => true)
                 .catch(() => false);
         }
@@ -164,14 +164,17 @@ SuikaGame.ui = {
             setTimeout(triggerLoad, 1500);
         }
 
-        window.addEventListener('suika-sync-complete', () => {
+        window.addEventListener('suika-sync-complete', event => {
+            const replaced = event.detail && event.detail.mode === 'replace';
+            SuikaGame.skins.applyActiveTheme();
+            this.createEvolutionDiagram();
             this.updateHighScoreDisplay();
             this.updateCoinDisplays();
             this.renderMedalStrip();
             this.renderAchievements();
             this.renderRankingStats();
             this.renderShop();
-            this.showToast('Progresso sincronizado com a nuvem');
+            this.showToast(replaced ? 'Progresso desta conta carregado' : 'Progresso sincronizado com a nuvem');
         });
     },
 

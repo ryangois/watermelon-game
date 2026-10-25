@@ -27,15 +27,17 @@ const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 const listeners = new Set();
 
-const SYNC_NUMERIC_MAX_KEYS = ['suikaCoins', 'suikaHighScore'];
-const SYNC_UNION_LIST_KEYS = ['suikaUnlockedSkins', 'suikaUnlockedSkinPacks', 'suikaUnlockedThemePacks', 'suikaUnlockedTracks', 'suikaMedals'];
-const SYNC_ACTIVE_SELECTION_KEYS = ['suikaActiveSkin', 'suikaActiveTheme', 'suikaActiveTrack'];
-const SYNCED_KEYS = SYNC_NUMERIC_MAX_KEYS.concat(SYNC_UNION_LIST_KEYS, SYNC_ACTIVE_SELECTION_KEYS, ['suikaPowers', 'suikaStats']);
+// Reuses this module's ?v= query so the cache-busting version lives in one fewer place.
+const { SYNCED_KEYS, planSync } = await import(new URL(`./sync-merge.js${new URL(import.meta.url).search}`, import.meta.url));
+
+const LAST_SYNCED_UID_KEY = 'suikaLastSyncedUid';
+const LOGOUT_FLUSH_TIMEOUT_MS = 3000;
 
 let currentUser = null;
 let currentStatus = 'loading';
 let currentError = null;
 let syncedUid = null;
+let cloudReadyUid = null;
 let applyingRemoteState = false;
 let pushTimer = null;
 
@@ -49,14 +51,6 @@ isAnalyticsSupported()
     })
     .catch(() => {});
 
-function parseJsonSafe(value, fallback) {
-    try {
-        return JSON.parse(value);
-    } catch (error) {
-        return fallback;
-    }
-}
-
 function snapshotLocalState() {
     const snapshot = {};
     SYNCED_KEYS.forEach(key => {
@@ -66,84 +60,72 @@ function snapshotLocalState() {
     return snapshot;
 }
 
-function writeLocalState(snapshot) {
+function writeLocalState(snapshot, replace) {
     applyingRemoteState = true;
     try {
-        Object.keys(snapshot).forEach(key => localStorage.setItem(key, snapshot[key]));
+        SYNCED_KEYS.forEach(key => {
+            if (snapshot[key] !== undefined) localStorage.setItem(key, snapshot[key]);
+            else if (replace) localStorage.removeItem(key);
+        });
     } finally {
         applyingRemoteState = false;
     }
 }
 
-function mergeSnapshots(local, remote) {
-    const merged = {};
-
-    SYNC_NUMERIC_MAX_KEYS.forEach(key => {
-        merged[key] = String(Math.max(parseInt(local[key] || '0', 10), parseInt(remote[key] || '0', 10)));
-    });
-
-    SYNC_UNION_LIST_KEYS.forEach(key => {
-        const localList = parseJsonSafe(local[key], []);
-        const remoteList = parseJsonSafe(remote[key], []);
-        merged[key] = JSON.stringify(Array.from(new Set(localList.concat(remoteList))));
-    });
-
-    SYNC_ACTIVE_SELECTION_KEYS.forEach(key => {
-        if (local[key] !== undefined) merged[key] = local[key];
-        else if (remote[key] !== undefined) merged[key] = remote[key];
-    });
-
-    if (local.suikaPowers !== undefined || remote.suikaPowers !== undefined) {
-        const localPowers = parseJsonSafe(local.suikaPowers, {});
-        const remotePowers = parseJsonSafe(remote.suikaPowers, {});
-        const mergedPowers = {};
-        Array.from(new Set(Object.keys(localPowers).concat(Object.keys(remotePowers)))).forEach(id => {
-            mergedPowers[id] = Math.max(localPowers[id] || 0, remotePowers[id] || 0);
-        });
-        merged.suikaPowers = JSON.stringify(mergedPowers);
-    }
-
-    if (local.suikaStats !== undefined || remote.suikaStats !== undefined) {
-        const localStats = parseJsonSafe(local.suikaStats, {});
-        const remoteStats = parseJsonSafe(remote.suikaStats, {});
-        const localBestFruitIndex = typeof localStats.bestFruitIndex === 'number' ? localStats.bestFruitIndex : -1;
-        const remoteBestFruitIndex = typeof remoteStats.bestFruitIndex === 'number' ? remoteStats.bestFruitIndex : -1;
-        merged.suikaStats = JSON.stringify({
-            gamesPlayed: Math.max(localStats.gamesPlayed || 0, remoteStats.gamesPlayed || 0),
-            bestScore: Math.max(localStats.bestScore || 0, remoteStats.bestScore || 0),
-            bestFruitIndex: Math.max(localBestFruitIndex, remoteBestFruitIndex),
-            bestFruitId: remoteBestFruitIndex > localBestFruitIndex ? remoteStats.bestFruitId : localStats.bestFruitId
-        });
-    }
-
-    return merged;
+// Pushing before the first pull for this account finishes would overwrite cloud data with unmerged local data.
+function canPush() {
+    return Boolean(currentUser) && cloudReadyUid === currentUser.uid;
 }
 
 function pushCloudState(uid) {
-    setDoc(doc(db, 'users', uid), snapshotLocalState(), { merge: true }).catch(error => {
+    return setDoc(doc(db, 'users', uid), snapshotLocalState(), { merge: true }).catch(error => {
         console.warn('Suika sync: falha ao enviar progresso', error);
     });
 }
 
 function schedulePush() {
-    if (!currentUser) return;
+    if (!canPush()) return;
     clearTimeout(pushTimer);
-    pushTimer = setTimeout(() => pushCloudState(currentUser.uid), 1500);
+    pushTimer = setTimeout(() => {
+        pushTimer = null;
+        if (canPush()) pushCloudState(currentUser.uid);
+    }, 1500);
+}
+
+function flushPush() {
+    if (!pushTimer) return Promise.resolve();
+    clearTimeout(pushTimer);
+    pushTimer = null;
+    return canPush() ? pushCloudState(currentUser.uid) : Promise.resolve();
 }
 
 async function pullAndMergeCloudState(uid) {
     try {
         const snapshotRef = doc(db, 'users', uid);
         const remoteDoc = await getDoc(snapshotRef);
-        const merged = mergeSnapshots(snapshotLocalState(), remoteDoc.exists() ? remoteDoc.data() : {});
+        if (!currentUser || currentUser.uid !== uid) return;
 
-        writeLocalState(merged);
-        await setDoc(snapshotRef, merged, { merge: true });
-        window.dispatchEvent(new CustomEvent('suika-sync-complete'));
+        const { mode, snapshot } = planSync({
+            local: snapshotLocalState(),
+            remote: remoteDoc.exists() ? remoteDoc.data() : {},
+            uid,
+            lastUid: localStorage.getItem(LAST_SYNCED_UID_KEY)
+        });
+
+        writeLocalState(snapshot, mode === 'replace');
+        localStorage.setItem(LAST_SYNCED_UID_KEY, uid);
+        cloudReadyUid = uid;
+        window.dispatchEvent(new CustomEvent('suika-sync-complete', { detail: { mode } }));
+        await setDoc(snapshotRef, snapshot, { merge: true });
     } catch (error) {
         console.warn('Suika sync: falha ao sincronizar progresso', error);
     }
 }
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushPush();
+});
+window.addEventListener('pagehide', () => flushPush());
 
 const nativeSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function (key, value) {
@@ -247,6 +229,7 @@ async function logout() {
     setState('signing-out', currentUser, null);
 
     try {
+        await Promise.race([flushPush(), new Promise(resolve => setTimeout(resolve, LOGOUT_FLUSH_TIMEOUT_MS))]);
         await signOut(auth);
     } catch (error) {
         setState('signed-in', currentUser, error);
@@ -296,5 +279,8 @@ onAuthStateChanged(auth, user => {
         pullAndMergeCloudState(user.uid);
     } else if (!user) {
         syncedUid = null;
+        cloudReadyUid = null;
+        clearTimeout(pushTimer);
+        pushTimer = null;
     }
 });

@@ -1,4 +1,4 @@
-const CACHE_VERSION = '20260911-shop-cleanup';
+const CACHE_VERSION = '20261025-sync-safety';
 const CACHE_NAME = `suika-game-v${CACHE_VERSION}`;
 
 const VERSIONED_FILES = [
