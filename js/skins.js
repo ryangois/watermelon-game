@@ -53,6 +53,11 @@ SuikaGame.skins = {
 
     testCoinGrant: 9999,
     assetAvailability: {},
+    previewImages: {},
+
+    getPreviewImage: function (path) {
+        return this.previewImages[path] || path;
+    },
 
     themes: {
         classic: {
@@ -389,13 +394,27 @@ SuikaGame.skins = {
         if (typeof Image === 'undefined') return Promise.resolve();
         const checks = [];
         this.packs.forEach(pack => {
-            if (!pack.assetFolder) return;
             fruits.forEach(fruit => {
                 const fileName = fruit.image.split('/').pop();
-                const path = `${pack.assetFolder}/${fileName}`;
+                const path = pack.assetFolder ? `${pack.assetFolder}/${fileName}` : fruit.image;
                 checks.push(new Promise(resolve => {
                     const img = new Image();
-                    img.onload = () => { this.assetAvailability[path] = true; resolve(); };
+                    img.onload = () => {
+                        this.assetAvailability[path] = true;
+                        const geometry = (SuikaGame.spriteMetrics || {})[path];
+                        if (geometry) {
+                            const [left, top, right, bottom] = geometry.bounds;
+                            const canvas = document.createElement('canvas');
+                            canvas.width = canvas.height = 128;
+                            const scale = 120 / Math.max(right - left, bottom - top);
+                            const width = (right - left) * scale;
+                            const height = (bottom - top) * scale;
+                            canvas.getContext('2d').drawImage(img, left, top, right - left, bottom - top,
+                                (128 - width) / 2, (128 - height) / 2, width, height);
+                            this.previewImages[path] = canvas.toDataURL();
+                        }
+                        resolve();
+                    };
                     img.onerror = () => { this.assetAvailability[path] = false; resolve(); };
                     img.src = path;
                 }));

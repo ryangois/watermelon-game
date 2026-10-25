@@ -15,7 +15,7 @@ SuikaGame.physics = {
         });
 
         SuikaGame.config.render = Render.create({
-            element: document.getElementById('game-container'),
+            element: document.querySelector('.fruit-vessel'),
             engine: SuikaGame.config.engine,
             canvas: document.getElementById('game-canvas'),
             options: {

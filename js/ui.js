@@ -126,7 +126,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20261025-sync-safety')
+            this.authLoadPromise = import('./auth.js?v=20261025-glass-ux')
                 .then(() => true)
                 .catch(() => false);
         }
@@ -663,8 +663,34 @@ SuikaGame.ui = {
 
     setShopTab: function (tabName) {
         this.activeShopTab = tabName;
-        document.querySelectorAll('.shop-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.shopTab === tabName));
-        document.querySelectorAll('.shop-list').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === tabName));
+        document.querySelectorAll('.shop-tab').forEach(tab => {
+            const active = tab.dataset.shopTab === tabName;
+            tab.classList.toggle('active', active);
+            tab.setAttribute('role', 'tab');
+            tab.setAttribute('aria-selected', String(active));
+            tab.setAttribute('aria-controls', `${tab.dataset.shopTab === 'skins' ? 'skin' : tab.dataset.shopTab === 'themes' ? 'theme' : tab.dataset.shopTab === 'powers' ? 'power' : 'music'}-list`);
+            tab.id = `shop-tab-${tab.dataset.shopTab}`;
+            tab.tabIndex = active ? 0 : -1;
+            tab.onkeydown = event => {
+                const tabs = Array.from(document.querySelectorAll('.shop-tab'));
+                const index = tabs.indexOf(tab);
+                let next;
+                if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+                if (event.key === 'Home') next = 0;
+                if (event.key === 'End') next = tabs.length - 1;
+                if (next === undefined) return;
+                event.preventDefault();
+                this.setShopTab(tabs[next].dataset.shopTab);
+                tabs[next].focus();
+            };
+        });
+        document.querySelectorAll('.shop-list').forEach(panel => {
+            const active = panel.dataset.panel === tabName;
+            panel.classList.toggle('active', active);
+            panel.setAttribute('role', 'tabpanel');
+            panel.setAttribute('aria-labelledby', `shop-tab-${panel.dataset.panel}`);
+        });
     },
 
     shopCategories: {
@@ -1161,7 +1187,7 @@ SuikaGame.ui = {
 
     createSkinPreviewImage: function (fruit, image) {
         const img = document.createElement('img');
-        img.src = image;
+        img.src = SuikaGame.skins.getPreviewImage(image);
         img.alt = fruit.name;
         img.onerror = function () {
             img.src = fruit.image;

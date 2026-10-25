@@ -2,7 +2,7 @@ var SuikaGame = SuikaGame || {};
 
 SuikaGame.fruits = {
     imageSize: 1024,
-    spriteFillScale: 1.2,
+    spriteFillScale: 1.02,
     spawnableCount: 5,
 
     types: [
@@ -24,9 +24,10 @@ SuikaGame.fruits = {
 
     createFruitBody: function (x, y, fruitData) {
         const view = SuikaGame.skins.getFruitView(fruitData);
-        const scale = this.getSpriteScale(fruitData);
+        const scale = this.getSpriteScale(fruitData, view.image);
+        const geometry = (SuikaGame.spriteMetrics || {})[view.image];
 
-        return Matter.Bodies.circle(x, y, fruitData.radius, {
+        const body = Matter.Bodies.circle(x, y, fruitData.radius, {
             restitution: 0.25,
             friction: 0.08,
             frictionAir: 0.002,
@@ -43,10 +44,18 @@ SuikaGame.fruits = {
                 }
             }
         });
+        // Matter adds its own half-width offset during body creation.
+        // Apply the measured alpha center afterwards to avoid double offsets.
+        body.render.sprite.xOffset = geometry ? geometry.xOffset : 0.5;
+        body.render.sprite.yOffset = geometry ? geometry.yOffset : 0.5;
+        return body;
     },
 
-    getSpriteScale: function (fruitData) {
-        return ((fruitData.radius * 2) / this.imageSize) * this.spriteFillScale;
+    getSpriteScale: function (fruitData, image) {
+        const geometry = (SuikaGame.spriteMetrics || {})[image || SuikaGame.skins.getFruitView(fruitData).image];
+        return geometry
+            ? (fruitData.radius / geometry.radius) * this.spriteFillScale
+            : ((fruitData.radius * 2) / this.imageSize) * 1.2;
     },
 
     getColorForFruit: function (fruitData) {
@@ -57,7 +66,7 @@ SuikaGame.fruits = {
         const view = SuikaGame.skins.getFruitView(fruitData);
         const img = document.createElement('img');
 
-        img.src = view.image;
+        img.src = SuikaGame.skins.getPreviewImage(view.image);
         img.alt = fruitData.name;
         img.width = size;
         img.height = size;

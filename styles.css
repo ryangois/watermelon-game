@@ -16,7 +16,7 @@
     --shop-width: 560px;
     --game-width: clamp(300px, min(74vw, calc((100dvh - 150px) * 0.571)), 500px);
     --line: 1px solid var(--border-soft);
-    --radius: 8px;
+    --radius: 16px;
     --soft-shadow: 0 18px 44px rgba(63, 52, 37, 0.16);
 }
 
@@ -299,6 +299,72 @@ input:focus-visible {
 #difficulty-buttons {
     display: grid;
     gap: 10px;
+}
+
+.menu-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-block: 4px;
+}
+
+#start-button,
+#options-button {
+    grid-column: 1 / -1;
+}
+
+#start-button {
+    min-height: 60px;
+    font-size: 21px;
+    background: linear-gradient(#f45c48, var(--red));
+    box-shadow: 0 5px 0 #9e2822, 0 10px 16px rgba(175, 48, 36, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+    margin-bottom: 5px;
+}
+
+#start-button:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #9e2822;
+}
+
+#options-button {
+    min-height: 44px;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--border-soft);
+    box-shadow: inset 0 1px 0 #fff;
+    font-size: 14px;
+}
+
+#menu-container,
+#shop-container {
+    border-color: rgba(139, 107, 65, 0.22);
+    box-shadow: 0 6px 0 rgba(156, 132, 85, 0.16), 0 22px 50px rgba(61, 71, 40, 0.16), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+#game-title {
+    color: var(--red);
+    letter-spacing: -2px;
+    text-shadow: 0 3px 0 #fff, 0 5px 0 rgba(117, 54, 28, 0.12);
+}
+
+#how-to-play ol {
+    counter-reset: play-step;
+}
+
+#how-to-play li::before {
+    counter-increment: play-step;
+    content: counter(play-step);
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    margin-bottom: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #fff;
+}
+
+.daily-reward:not(:disabled):hover {
+    border-color: var(--teal);
+    background: var(--panel);
 }
 
 #difficulty-buttons {
@@ -625,7 +691,7 @@ footer {
 
 .shop-tab {
     flex: 1 1 0;
-    min-height: 40px;
+    min-height: 44px;
     border: 0;
     border-radius: var(--radius);
     background: rgba(52, 41, 31, 0.12);
@@ -676,6 +742,10 @@ footer {
 }
 
 .shop-card[data-shop-status="equipped"]::before { background: var(--teal); }
+.shop-card[data-shop-status="equipped"] {
+    border-color: var(--teal);
+    box-shadow: inset 0 0 0 1px var(--teal), 0 5px 14px rgba(34, 153, 141, 0.08);
+}
 .shop-card[data-shop-status="owned"]::before { background: var(--purple); }
 .shop-card[data-shop-status^="buy-"]::before { background: var(--shop-accent, var(--purple)); }
 .shop-card[data-shop-status="locked"]::before { background: rgba(52, 41, 31, 0.28); }
@@ -991,6 +1061,52 @@ footer {
     overflow: hidden;
     background: var(--paper);
     transition: background 220ms ease;
+}
+
+/* Layered glass stays decorative; the canvas retains its original coordinates. */
+.fruit-vessel {
+    position: relative;
+    isolation: isolate;
+    margin: 12px 10px 18px;
+    border: 5px solid rgba(146, 182, 177, 0.72);
+    border-top: 0;
+    border-radius: 7px 7px 30px 30px;
+    background: var(--canvas-bg);
+    box-shadow: 0 7px 0 #8ca9a1, 0 10px 0 #63877f,
+        0 17px 18px -8px rgba(38, 65, 56, 0.4);
+}
+
+.fruit-vessel #game-canvas {
+    border-radius: 3px 3px 24px 24px;
+}
+
+.fruit-vessel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(39, 88, 83, 0.16), transparent 9%, transparent 90%, rgba(39, 88, 83, 0.2)),
+        linear-gradient(90deg, transparent 3%, rgba(255, 255, 255, 0.65) 4%, rgba(255, 255, 255, 0.1) 6%, transparent 8%),
+        linear-gradient(0deg, rgba(81, 139, 124, 0.22), transparent 7%);
+    box-shadow: inset 0 -7px 0 rgba(255, 255, 255, 0.45), inset 2px 0 0 rgba(255, 255, 255, 0.8);
+}
+
+.fruit-vessel::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    top: -8px;
+    left: -9px;
+    right: -9px;
+    height: 15px;
+    pointer-events: none;
+    border: 2px solid #7d9c93;
+    border-radius: 50% / 35%;
+    background: linear-gradient(#f4fffa 0%, #cce3d9 42%, #8bac9f 52%, #deeee5 85%);
+    box-shadow: 0 3px 4px rgba(37, 68, 58, 0.18), inset 0 2px 0 #fff;
 }
 
 #game-container.bomb-selecting #game-canvas {
@@ -1748,7 +1864,7 @@ footer {
     }
 
     #how-to-play ol {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 5px;
     }
 
