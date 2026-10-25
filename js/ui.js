@@ -126,7 +126,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20261025-home')
+            this.authLoadPromise = import('./auth.js?v=20261025-retina-skins')
                 .then(() => true)
                 .catch(() => false);
         }

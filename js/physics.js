@@ -26,6 +26,8 @@ SuikaGame.physics = {
             }
         });
 
+        this.updateRenderResolution();
+        window.addEventListener('resize', () => this.updateRenderResolution());
         Render.run(SuikaGame.config.render);
 
         SuikaGame.config.runner = Runner.create();
@@ -44,6 +46,21 @@ SuikaGame.physics = {
             SuikaGame.particles.updateParticles();
             SuikaGame.physics.drawFruitRadiusOverlay();
         });
+    },
+
+    updateRenderResolution: function () {
+        const render = SuikaGame.config.render;
+        if (!render) return;
+        const ratio = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
+        if (render.options.pixelRatio !== ratio) {
+            Matter.Render.setPixelRatio(render, ratio);
+        }
+        // Matter sets fixed CSS dimensions when changing the backing resolution.
+        // Keep the responsive pot size and pointer coordinates unchanged.
+        render.canvas.style.width = '100%';
+        render.canvas.style.height = 'auto';
+        render.context.imageSmoothingEnabled = true;
+        render.context.imageSmoothingQuality = 'high';
     },
 
     createWalls: function () {

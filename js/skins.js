@@ -405,11 +405,16 @@ SuikaGame.skins = {
                         if (geometry) {
                             const [left, top, right, bottom] = geometry.bounds;
                             const canvas = document.createElement('canvas');
-                            canvas.width = canvas.height = 128;
+                            const density = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
+                            canvas.width = canvas.height = Math.round(128 * density);
+                            const context = canvas.getContext('2d');
+                            context.scale(density, density);
+                            context.imageSmoothingEnabled = true;
+                            context.imageSmoothingQuality = 'high';
                             const scale = 120 / Math.max(right - left, bottom - top);
                             const width = (right - left) * scale;
                             const height = (bottom - top) * scale;
-                            canvas.getContext('2d').drawImage(img, left, top, right - left, bottom - top,
+                            context.drawImage(img, left, top, right - left, bottom - top,
                                 (128 - width) / 2, (128 - height) / 2, width, height);
                             this.previewImages[path] = canvas.toDataURL();
                         }

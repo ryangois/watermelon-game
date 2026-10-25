@@ -1,4 +1,4 @@
-const CACHE_VERSION = '20261025-home';
+const CACHE_VERSION = '20261025-retina-skins';
 const CACHE_NAME = `suika-game-v${CACHE_VERSION}`;
 
 const VERSIONED_FILES = [
