@@ -44,6 +44,11 @@ SuikaGame.ui = {
         document.getElementById('game-return-menu-button').addEventListener('click', () => this.returnToMenuFromGame());
         document.getElementById('tutorial-next-button').addEventListener('click', () => this.nextTutorialStep());
         document.getElementById('tutorial-skip-button').addEventListener('click', () => this.closeTutorial(true));
+        const repositionTutorial = () => requestAnimationFrame(() => this.updateTutorialLayout());
+        window.addEventListener('resize', repositionTutorial);
+        window.addEventListener('scroll', repositionTutorial, { passive: true });
+        document.addEventListener('fullscreenchange', repositionTutorial);
+        document.addEventListener('webkitfullscreenchange', repositionTutorial);
         document.getElementById('pwa-install-button').addEventListener('click', () => this.installPwa());
         document.getElementById('pwa-dismiss-button').addEventListener('click', () => this.dismissPwaBanner());
         document.getElementById('pack-preview-close').addEventListener('click', () => this.closePackPreview());
@@ -126,7 +131,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20261025-retina-skins')
+            this.authLoadPromise = import('./auth.js?v=20261025-tutorial-align')
                 .then(() => true)
                 .catch(() => false);
         }
@@ -387,18 +392,83 @@ SuikaGame.ui = {
         this.tutorialIndex = 0;
         this.renderTutorial();
         this.openModal('tutorial-overlay');
+        document.getElementById('game-area').scrollIntoView({ block: 'start', behavior: 'instant' });
+        this.updateTutorialLayout();
     },
 
     renderTutorial: function () {
         const steps = [
-            { title: 'Mova a fruta', text: 'Arraste dentro do pote ou use os botões para posicionar a fruta antes de soltar.', hint: 'Arraste aqui', target: 'drop' },
-            { title: 'Solte com intenção', text: 'Toque no pote ou no botão Soltar. Frutas iguais se juntam e viram frutas maiores.', hint: 'Solte aqui', target: 'controls' },
-            { title: 'Olhe os atalhos', text: 'A próxima fruta fica no topo, os poderes ficam na lateral e a evolução aparece abaixo no celular.', hint: 'HUD e poderes', target: 'hud' }
+            { title: 'Escolha onde soltar', text: 'Mova o mouse ou arraste o dedo pelo pote para posicionar a fruta. Se preferir, ative os controles na tela em Opções.', hint: 'Posição da fruta', target: 'drop' },
+            { title: 'Solte a fruta', text: 'Clique ou toque no pote para soltar. Se os controles estiverem ativos, use o botão Soltar. Duas frutas iguais se juntam e formam uma maior.', hint: 'Soltar e juntar', target: 'controls' },
+            { title: 'Acompanhe a partida', text: 'Sua pontuação e a próxima fruta aparecem no topo. Abra a engrenagem para pausar ou ajustar o jogo.', hint: 'Topo do pote', target: 'hud' }
         ];
         const step = steps[this.tutorialIndex];
         document.getElementById('tutorial-overlay').dataset.target = step.target;
-        document.getElementById('tutorial-step').innerHTML = `<span>${step.hint}</span><h2>${step.title}</h2><p>${step.text}</p><strong>${this.tutorialIndex + 1}/3</strong>`;
+        document.getElementById('tutorial-step').innerHTML = `<span>${step.hint}</span><h2 id="tutorial-heading">${step.title}</h2><p>${step.text}</p><strong>Passo ${this.tutorialIndex + 1} de 3</strong>`;
         document.getElementById('tutorial-next-button').textContent = this.tutorialIndex === steps.length - 1 ? 'Jogar' : 'Próximo';
+        this.updateTutorialLayout();
+        requestAnimationFrame(() => this.updateTutorialLayout());
+    },
+
+    updateTutorialLayout: function () {
+        const overlay = document.getElementById('tutorial-overlay');
+        if (!overlay.classList.contains('open')) return;
+        const canvas = document.getElementById('game-canvas').getBoundingClientRect();
+        if (!canvas.width || !canvas.height) return;
+        let rect;
+        if (overlay.dataset.target === 'hud') {
+            rect = document.getElementById('game-header').getBoundingClientRect();
+        } else if (overlay.dataset.target === 'controls') {
+            const controls = document.getElementById('game-controls').getBoundingClientRect();
+            const height = Math.min(140, canvas.height * 0.25);
+            rect = controls.width && controls.height ? controls : {
+                left: canvas.left, top: canvas.bottom - height,
+                right: canvas.right, bottom: canvas.bottom
+            };
+        } else {
+            const scale = canvas.height / SuikaGame.config.GAME_HEIGHT;
+            rect = { left: canvas.left, right: canvas.right,
+                top: canvas.top + 25 * scale, bottom: canvas.top + 145 * scale };
+        }
+        const gap = 14;
+        const edge = 12;
+        // Short landscape screens may only show part of the pot at a time.
+        // Bring this step's target into view before measuring the spotlight.
+        const scrollTop = window.scrollY;
+        const scrollDelta = rect.top < edge ? rect.top - edge
+            : rect.bottom > window.innerHeight - edge ? rect.bottom - window.innerHeight + edge : 0;
+        if (scrollDelta) {
+            window.scrollBy({ top: scrollDelta, behavior: 'instant' });
+            const moved = window.scrollY - scrollTop;
+            rect = { left: rect.left, right: rect.right, top: rect.top - moved, bottom: rect.bottom - moved };
+        }
+        const left = Math.max(edge, rect.left - 5);
+        const top = Math.max(edge, rect.top - 5);
+        const right = Math.min(window.innerWidth - edge, rect.right + 5);
+        const bottom = Math.min(window.innerHeight - edge, rect.bottom + 5);
+        overlay.style.setProperty('--spot-x', `${left}px`);
+        overlay.style.setProperty('--spot-y', `${top}px`);
+        overlay.style.setProperty('--spot-width', `${Math.max(0, right - left)}px`);
+        overlay.style.setProperty('--spot-height', `${Math.max(0, bottom - top)}px`);
+
+        const card = overlay.querySelector('.tutorial-card');
+        const width = card.offsetWidth;
+        const height = card.offsetHeight;
+        let x = (left + right - width) / 2;
+        let y;
+        if (window.innerWidth - right >= width + gap + edge) {
+            x = right + gap;
+            y = (top + bottom - height) / 2;
+        } else if (left >= width + gap + edge) {
+            x = left - width - gap;
+            y = (top + bottom - height) / 2;
+        } else if (window.innerHeight - bottom >= height + gap + edge) {
+            y = bottom + gap;
+        } else {
+            y = top - height - gap;
+        }
+        card.style.left = `${Math.max(edge, Math.min(x, window.innerWidth - width - edge))}px`;
+        card.style.top = `${Math.max(edge, Math.min(y, window.innerHeight - height - edge))}px`;
     },
 
     nextTutorialStep: function () {

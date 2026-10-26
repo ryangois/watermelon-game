@@ -74,9 +74,9 @@
     background: rgba(255,255,255,.55);
 }
 .home-aside #how-to-play h2 { font-size: 18px; letter-spacing: -.4px; }
-.home-aside #how-to-play ol { margin: 14px 0; gap: 8px; }
-.home-aside #how-to-play li { background: none; padding: 0; font-size: 11px; line-height: 1.5; }
-.home-aside #how-to-play li::before { width: 28px; height: 28px; margin-bottom: 8px; box-shadow: 0 3px 0 rgba(26,103,87,.15); }
+.home-aside #how-to-play ol { grid-template-columns: 1fr; margin: 16px 0; gap: 14px; }
+.home-aside #how-to-play li { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 12px; background: none; padding: 0; font-size: 12px; line-height: 1.5; }
+.home-aside #how-to-play li::before { width: 28px; height: 28px; margin: 0; box-shadow: 0 3px 0 rgba(26,103,87,.15); }
 .home-aside #how-to-play p { border-top: 1px solid var(--border-soft); padding-top: 12px; font-size: 11px; line-height: 1.6; }
 .home-section-title { font-size: 13px; margin-bottom: 12px; line-height: 1.5; }
 .home-progress #medal-strip { grid-template-columns: minmax(0,1fr) repeat(2,auto); margin-bottom: 12px; }

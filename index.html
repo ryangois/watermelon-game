@@ -12,8 +12,8 @@
     <title>Suika Game</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/images/watermelon_emoji.png">
-    <link rel="stylesheet" href="styles.css?v=20261025-retina-skins">
-    <link rel="stylesheet" href="home.css?v=20261025-retina-skins">
+    <link rel="stylesheet" href="styles.css?v=20261025-tutorial-align">
+    <link rel="stylesheet" href="home.css?v=20261025-tutorial-align">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -22,7 +22,7 @@
         <section id="menu-container" class="panel" data-screen="home" aria-label="Página principal">
             <div class="menu-top">
                 <div class="home-brand">
-                    <span class="home-kicker">UM POTE. MUITAS POSSIBILIDADES.</span>
+                    <span class="home-kicker">JOGO DE JUNTAR FRUTAS</span>
                     <h1 id="game-title">Suika Game</h1>
                 </div>
                 <button id="mute-button" class="icon-button small" aria-label="Mutar música">♪</button>
@@ -38,8 +38,8 @@
                     <span class="home-spark spark-one">✦</span>
                     <span class="home-spark spark-two">✧</span>
                 </div>
-                <h2>Uma fruta puxa a outra.</h2>
-                <p>Junte iguais, crie combos e chegue à melancia.</p>
+                <h2>Junte frutas iguais</h2>
+                <p>Forme frutas maiores e tente chegar à melancia.</p>
             </div>
             <div class="menu-stats">
                 <div id="high-score">Melhor pontuação: 0</div>
@@ -85,11 +85,11 @@
             <section id="how-to-play">
                 <h2>Como jogar</h2>
                 <ol>
-                    <li>Mova a fruta</li>
-                    <li>Solte no pote</li>
-                    <li>Junte iguais para evoluir</li>
+                    <li>Mova a fruta para escolher onde ela vai cair.</li>
+                    <li>Toque ou clique no pote para soltar.</li>
+                    <li>Junte duas frutas iguais para formar uma maior.</li>
                 </ol>
-                <p>Fique de olho na linha: o pote não pode transbordar!</p>
+                <p>Não deixe as frutas acumularem acima da linha.</p>
             </section>
             <div class="home-progress">
             <h2 class="home-section-title">Seu progresso</h2>
@@ -190,7 +190,7 @@
         </div>
 
         <div id="toast" role="status" aria-live="polite"></div>
-        <div id="tutorial-overlay" aria-modal="true" role="dialog">
+        <div id="tutorial-overlay" aria-modal="true" role="dialog" aria-labelledby="tutorial-heading">
             <div class="tutorial-card">
                 <div id="tutorial-step"></div>
                 <div class="tutorial-actions">
@@ -225,15 +225,15 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js?v=20261025-retina-skins"></script>
-    <script src="js/sprite-metrics.js?v=20261025-retina-skins"></script>
-    <script src="js/skins.js?v=20261025-retina-skins"></script>
-    <script src="js/progress.js?v=20261025-retina-skins"></script>
-    <script src="js/fruits.js?v=20261025-retina-skins"></script>
-    <script src="js/particles.js?v=20261025-retina-skins"></script>
-    <script src="js/physics.js?v=20261025-retina-skins"></script>
-    <script src="js/ui.js?v=20261025-retina-skins"></script>
-    <script src="js/game.js?v=20261025-retina-skins"></script>
+    <script src="js/config.js?v=20261025-tutorial-align"></script>
+    <script src="js/sprite-metrics.js?v=20261025-tutorial-align"></script>
+    <script src="js/skins.js?v=20261025-tutorial-align"></script>
+    <script src="js/progress.js?v=20261025-tutorial-align"></script>
+    <script src="js/fruits.js?v=20261025-tutorial-align"></script>
+    <script src="js/particles.js?v=20261025-tutorial-align"></script>
+    <script src="js/physics.js?v=20261025-tutorial-align"></script>
+    <script src="js/ui.js?v=20261025-tutorial-align"></script>
+    <script src="js/game.js?v=20261025-tutorial-align"></script>
 </body>
 
 </html>
