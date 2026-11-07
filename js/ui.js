@@ -38,10 +38,16 @@ SuikaGame.ui = {
         document.getElementById('login-button').addEventListener('click', () => this.handleLoginClick());
         document.getElementById('mute-button').addEventListener('click', () => SuikaGame.audio.toggleMute());
         document.getElementById('game-options-button').addEventListener('click', () => this.setGameOptionsOpen(true));
-        document.getElementById('game-options-close-button').addEventListener('click', () => this.setGameOptionsOpen(false));
         document.getElementById('fullscreen-button').addEventListener('click', () => this.toggleFullscreen());
-        document.getElementById('pause-button').addEventListener('click', () => SuikaGame.game.togglePause());
-        document.getElementById('game-return-menu-button').addEventListener('click', () => this.returnToMenuFromGame());
+        document.getElementById('pause-button').addEventListener('click', () => this.setGameOptionsOpen(false));
+        document.getElementById('game-return-menu-button').addEventListener('click', () => this.showExitConfirmation(true));
+        document.getElementById('cancel-exit').addEventListener('click', () => this.showExitConfirmation(false));
+        document.getElementById('confirm-exit').addEventListener('click', () => this.returnToMenuFromGame());
+        document.getElementById('game-options-panel').addEventListener('cancel', event => {
+            event.preventDefault();
+            if (document.getElementById('pause-exit').hidden) this.setGameOptionsOpen(false);
+            else this.showExitConfirmation(false);
+        });
         document.getElementById('tutorial-next-button').addEventListener('click', () => this.nextTutorialStep());
         document.getElementById('tutorial-skip-button').addEventListener('click', () => this.closeTutorial(true));
         const repositionTutorial = () => requestAnimationFrame(() => this.updateTutorialLayout());
@@ -54,6 +60,24 @@ SuikaGame.ui = {
         document.getElementById('pack-preview-close').addEventListener('click', () => this.closePackPreview());
         document.getElementById('achievements-close').addEventListener('click', () => this.closeAchievements());
         this.bindModalDismissal();
+        const canvas = document.getElementById('game-canvas');
+        canvas.addEventListener('keydown', event => {
+            if (event.altKey || event.ctrlKey || event.metaKey || !SuikaGame.config.gameActive || SuikaGame.config.paused) return;
+            if (!['ArrowLeft', 'ArrowRight', ' '].includes(event.key)) return;
+            event.preventDefault();
+            if (event.key === ' ') {
+                if (!event.repeat) SuikaGame.physics.dropFruit();
+            } else {
+                SuikaGame.physics.moveBy(event.key === 'ArrowLeft' ? -20 : 20);
+            }
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) return;
+            this.stopTrackPreview();
+            if (SuikaGame.config.gameActive && !SuikaGame.config.paused) {
+                this.setGameOptionsOpen(true);
+            }
+        });
         document.addEventListener('fullscreenchange', () => this.updateFullscreenButton());
         document.addEventListener('webkitfullscreenchange', () => this.updateFullscreenButton());
         document.getElementById('easy-button').addEventListener('click', () => this.setDifficulty('easy'));
@@ -75,7 +99,7 @@ SuikaGame.ui = {
             SuikaGame.skins.setMuted(event.target.checked);
             if (SuikaGame.audio.backgroundMusic) {
                 SuikaGame.audio.backgroundMusic.muted = event.target.checked;
-                if (!event.target.checked) SuikaGame.audio.backgroundMusic.play().catch(function () {});
+                if (!event.target.checked && !SuikaGame.config.paused) SuikaGame.audio.backgroundMusic.play().catch(function () {});
             }
             this.updateMuteButton();
         });
@@ -131,7 +155,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20261025-tutorial-align')
+            this.authLoadPromise = import('./auth.js?v=20261107-visual')
                 .then(() => true)
                 .catch(() => false);
         }
@@ -399,8 +423,8 @@ SuikaGame.ui = {
     renderTutorial: function () {
         const steps = [
             { title: 'Escolha onde soltar', text: 'Mova o mouse ou arraste o dedo pelo pote para posicionar a fruta. Se preferir, ative os controles na tela em Opções.', hint: 'Posição da fruta', target: 'drop' },
-            { title: 'Solte a fruta', text: 'Clique ou toque no pote para soltar. Se os controles estiverem ativos, use o botão Soltar. Duas frutas iguais se juntam e formam uma maior.', hint: 'Soltar e juntar', target: 'controls' },
-            { title: 'Acompanhe a partida', text: 'Sua pontuação e a próxima fruta aparecem no topo. Abra a engrenagem para pausar ou ajustar o jogo.', hint: 'Topo do pote', target: 'hud' }
+            { title: 'Solte a fruta', text: 'Solte a cereja sobre a que está no fundo para formar um morango. Clique, toque ou aperte espaço.', hint: 'Soltar e juntar', target: 'controls' },
+            { title: 'Acompanhe a partida', text: 'Sua pontuação e a próxima fruta aparecem no topo. Use o botão de pausa para continuar depois, ajustar o jogo ou sair.', hint: 'Topo do pote', target: 'hud' }
         ];
         const step = steps[this.tutorialIndex];
         document.getElementById('tutorial-overlay').dataset.target = step.target;
@@ -482,6 +506,7 @@ SuikaGame.ui = {
 
     closeTutorial: function (persist) {
         this.closeModal('tutorial-overlay');
+        document.getElementById('game-canvas').focus({ preventScroll: true });
         if (persist) localStorage.setItem('suikaTutorialDone', 'true');
     },
 
@@ -567,12 +592,6 @@ SuikaGame.ui = {
         button.setAttribute('aria-label', isFullscreen ? 'Sair da tela cheia' : 'Abrir em tela cheia');
     },
 
-    updatePauseButton: function () {
-        const button = document.getElementById('pause-button');
-        if (!button) return;
-        button.textContent = SuikaGame.config.paused ? 'Continuar' : 'Pausar';
-    },
-
     showCombo: function (comboCount) {
         const badge = document.getElementById('combo-badge');
         if (!badge || comboCount < 2) return;
@@ -600,7 +619,15 @@ SuikaGame.ui = {
         document.getElementById('difficulty-status').textContent = `Dificuldade: ${settings.label}`;
 
         document.querySelectorAll('.difficulty-button').forEach(button => {
-            button.classList.toggle('selected', button.dataset.level === level);
+            const id = button.dataset.level;
+            const mode = SuikaGame.config.DIFFICULTY_LEVELS[id];
+            const pace = { easy: 'Queda lenta', normal: 'Queda moderada', hard: 'Queda rápida' };
+            const selected = id === level;
+            button.classList.toggle('selected', selected);
+            button.setAttribute('aria-pressed', String(selected));
+            const detail = document.createElement('small');
+            detail.textContent = pace[id] + ' · ' + mode.dangerSeconds + ' s de perigo · ' + mode.scoreMultiplier.toLocaleString('pt-BR') + '× pontos';
+            button.replaceChildren(mode.label, detail);
         });
     },
 
@@ -630,20 +657,39 @@ SuikaGame.ui = {
 
     setGameOptionsOpen: function (open) {
         const panel = document.getElementById('game-options-panel');
-        if (!panel) return;
+        if (!panel || panel.open === open) return;
+        if (!open) {
+            panel.close();
+            if (SuikaGame.config.gameActive) {
+                SuikaGame.game.setPaused(false);
+                document.getElementById('game-canvas').focus({ preventScroll: true });
+            }
+            return;
+        }
+        if (!SuikaGame.config.gameActive || SuikaGame.config.gameOver) return;
+        SuikaGame.game.setPaused(true);
+        document.getElementById('pause-settings').open = false;
         this.updateMuteButton();
         this.updateAccessibilityControls();
         this.updateFullscreenButton();
-        this.updatePauseButton();
-        panel.classList.toggle('open', open);
+        panel.showModal();
+        this.showExitConfirmation(false);
+    },
+
+    showExitConfirmation: function (confirming) {
+        document.getElementById('pause-title').textContent = confirming ? 'Sair da partida?' : 'Partida pausada';
+        document.getElementById('pause-choices').hidden = confirming;
+        document.getElementById('pause-exit').hidden = !confirming;
+        document.getElementById(confirming ? 'cancel-exit' : 'pause-button').focus();
     },
 
     returnToMenuFromGame: function () {
-        this.setGameOptionsOpen(false);
         SuikaGame.config.gameActive = false;
+        this.setGameOptionsOpen(false);
         SuikaGame.game.resetGame();
         SuikaGame.audio.stopBackgroundMusic();
         this.showMainMenu();
+        document.getElementById('start-button').focus();
     },
 
     showOptions: function () {
@@ -674,6 +720,7 @@ SuikaGame.ui = {
     },
 
     showMainMenu: function () {
+        this.stopTrackPreview();
         document.getElementById('menu-container').dataset.screen = 'home';
         SuikaGame.skins.applyActiveTheme();
         this.updateHighScoreDisplay();
@@ -733,7 +780,39 @@ SuikaGame.ui = {
         diagram.appendChild(row);
     },
 
+    stopTrackPreview: function () {
+        if (!this.trackPreview) return;
+        const { audio, button, timer } = this.trackPreview;
+        this.trackPreview = null;
+        clearTimeout(timer);
+        audio.pause();
+        button.textContent = 'Ouvir 10 segundos';
+    },
+
+    previewTrack: function (track, button) {
+        const wasPlaying = this.trackPreview?.button === button;
+        this.stopTrackPreview();
+        if (wasPlaying) return;
+        const audio = new Audio(track.src);
+        audio.volume = 0.35;
+        const preview = { audio, button };
+        this.trackPreview = preview;
+        button.textContent = 'Parar prévia';
+        const stop = () => {
+            if (this.trackPreview === preview) this.stopTrackPreview();
+        };
+        audio.addEventListener('ended', stop, { once: true });
+        audio.play().then(() => {
+            if (this.trackPreview === preview) preview.timer = setTimeout(stop, 10000);
+        }).catch(() => {
+            if (this.trackPreview !== preview) return;
+            stop();
+            this.showToast('Não foi possível tocar a prévia');
+        });
+    },
+
     setShopTab: function (tabName) {
+        this.stopTrackPreview();
         this.activeShopTab = tabName;
         document.querySelectorAll('.shop-tab').forEach(tab => {
             const active = tab.dataset.shopTab === tabName;
@@ -822,7 +901,7 @@ SuikaGame.ui = {
             listId: 'music-list',
             kind: 'Música',
             accentColor: '#4f5d75',
-            getItems: () => SuikaGame.skins.tracks,
+            getItems: () => SuikaGame.skins.tracks.filter(track => SuikaGame.skins.hasDistinctTrack(track) || SuikaGame.skins.isTrackUnlocked(track.id)),
             getActiveId: () => SuikaGame.skins.getActiveTrackId(),
             getPrice: track => track.price,
             isUnlocked: track => SuikaGame.skins.isTrackUnlocked(track.id),
@@ -831,10 +910,15 @@ SuikaGame.ui = {
                 const preview = card.querySelector('.shop-preview');
                 preview.textContent = track.icon || '♪';
                 preview.classList.add('music-preview');
+                const listen = document.createElement('button');
+                listen.className = 'shop-action preview-action';
+                listen.textContent = 'Ouvir 10 segundos';
+                listen.addEventListener('click', () => SuikaGame.ui.previewTrack(track, listen));
+                card.querySelector('.shop-card-footer').appendChild(listen);
                 return card;
             },
-            cardLabels: { equipped: 'Tocando', owned: 'Música comprada', buy: 'Comprar música' },
-            actionLabels: { active: 'Tocando', equip: 'Equipar música', buy: 'Comprar música' },
+            cardLabels: { equipped: 'Equipada', owned: 'Música comprada', buy: 'Comprar música' },
+            actionLabels: { active: 'Equipada', equip: 'Equipar música', buy: 'Comprar música' },
             stateNames: { buy: 'buy-music', equip: 'equip-music' },
             onEquip: track => {
                 SuikaGame.skins.setActiveTrack(track.id);
@@ -970,19 +1054,39 @@ SuikaGame.ui = {
         preview.classList.add('theme-preview');
         preview.style.background = mode === 'theme' ? theme.preview : theme.vars['--panel-soft'];
 
-        SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution).slice(0, mode === 'theme' ? 3 : 5).forEach(fruit => {
-            const icon = document.createElement('div');
+        const fruits = SuikaGame.fruits.types;
+        const samples = mode === 'theme' ? fruits.slice(0, 3) : fruits.filter(fruit => fruit.id === 'watermelon');
+        preview.classList.toggle('costume-cover', mode !== 'theme');
+        samples.forEach(fruit => {
             const view = SuikaGame.skins.getFruitViewForPack(pack, fruit);
+            if (mode !== 'theme') {
+                preview.appendChild(this.createSkinPreviewImage(fruit, view.image));
+                return;
+            }
+            const icon = document.createElement('div');
             icon.className = 'skin-preview-fruit';
             icon.style.backgroundColor = view.color;
             icon.appendChild(this.createSkinPreviewImage(fruit, view.image));
             preview.appendChild(icon);
         });
 
-        card.appendChild(this.createPackDetails(pack, category));
+        const details = this.createPackDetails(pack, category);
+        const toggle = document.createElement('button');
+        details.id = 'details-' + mode + '-' + pack.id;
+        toggle.className = 'shop-action preview-action';
+        toggle.textContent = 'Ver detalhes';
+        toggle.setAttribute('aria-controls', details.id);
+        toggle.setAttribute('aria-expanded', 'false');
+        const toggleDetails = () => {
+            const open = card.classList.toggle('expanded');
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.textContent = open ? 'Ocultar detalhes' : 'Ver detalhes';
+        };
+        toggle.addEventListener('click', toggleDetails);
+        card.querySelector('.shop-card-footer').appendChild(toggle);
+        card.appendChild(details);
         card.addEventListener('click', event => {
-            if (event.target.closest('button')) return;
-            card.classList.toggle('expanded');
+            if (!event.target.closest('button')) toggleDetails();
         });
     },
 
@@ -1055,13 +1159,15 @@ SuikaGame.ui = {
         button.className = 'shop-action bundle-action';
         button.dataset.state = coins >= price ? 'bundle' : 'locked';
         button.disabled = coins < price;
-        button.textContent = coins >= price ? `Comprar bundle (${price})` : `Faltam ${price - coins}`;
+        const partial = SuikaGame.skins.isSkinUnlocked(pack.id) || SuikaGame.skins.isThemeUnlocked(pack.id);
+        const label = partial ? 'Completar conjunto' : 'Levar skin + tema';
+        button.textContent = coins >= price ? label + ' · ' + price + ' moedas' : label + ' · faltam ' + (price - coins);
         button.addEventListener('click', event => {
             event.stopPropagation();
             if (SuikaGame.skins.buyBundle(pack.id)) {
                 SuikaGame.skins.setActive(pack.id);
                 SuikaGame.skins.setActiveTheme(pack.id);
-                this.afterShopAction('Bundle comprado e equipado');
+                this.afterShopAction('Conjunto comprado e equipado');
             } else {
                 this.showToast('Moedas insuficientes');
             }
@@ -1100,7 +1206,33 @@ SuikaGame.ui = {
                 meta.appendChild(item);
             });
 
-        stage.appendChild(row);
+        const demo = document.createElement('button');
+        demo.className = 'fusion-demo';
+        const pieces = document.createElement('span');
+        pieces.className = 'fusion-pieces';
+        const caption = document.createElement('span');
+        let index = 0;
+        let merged = false;
+        const visibleFruits = SuikaGame.fruits.types.filter(fruit => !fruit.hiddenFromEvolution);
+        const draw = () => {
+            const fruit = SuikaGame.fruits.types[index];
+            const view = SuikaGame.skins.getFruitViewForPack(pack, fruit);
+            pieces.replaceChildren(this.createSkinPreviewImage(fruit, view.image));
+            if (!merged) pieces.appendChild(this.createSkinPreviewImage(fruit, view.image));
+            caption.textContent = merged ? fruit.name + ' · Testar outra fusão' : 'Juntar duas frutas · ' + fruit.name;
+        };
+        draw();
+        demo.addEventListener('click', () => {
+            if (!merged) index += 1;
+            else if (index === visibleFruits.length - 1) index = 0;
+            merged = !merged;
+            draw();
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                pieces.animate([{ transform: 'scale(.75)' }, { transform: 'scale(1.1)' }, { transform: 'none' }], 320);
+            }
+        });
+        demo.append(pieces, caption);
+        stage.append(demo, row);
         content.appendChild(stage);
         content.appendChild(meta);
         this.openModal('pack-preview-modal');
@@ -1127,6 +1259,7 @@ SuikaGame.ui = {
         toolbar.innerHTML = '';
         SuikaGame.skins.powers.forEach(power => {
             const count = SuikaGame.skins.getPowerCount(power.id);
+            if (count <= 0) return;
             const button = document.createElement('button');
             button.className = 'power-button';
             button.disabled = count <= 0 || !SuikaGame.config.gameActive;
@@ -1220,25 +1353,39 @@ SuikaGame.ui = {
         const container = document.getElementById('daily-panel');
         if (!container) return;
 
-        const rewards = SuikaGame.progress.getDailyRewards();
-        container.innerHTML = '';
-        [
-            ['mission', rewards.mission],
-            ['chest', rewards.chest]
-        ].forEach(([type, reward]) => {
+        const results = document.getElementById('result-rewards');
+        container.replaceChildren();
+        results.replaceChildren();
+        Object.entries(SuikaGame.progress.getDailyRewards()).forEach(([type, reward]) => {
+            const available = reward.ready && !reward.claimed;
+            const unit = type === 'chest' ? 'partidas' : 'pontos';
+            const progress = Math.min(reward.progress, reward.target) + '/' + reward.target + ' ' + unit;
             const item = document.createElement('button');
             item.className = 'daily-reward';
-            item.disabled = !reward.ready || reward.claimed;
-            item.innerHTML = `<strong>${reward.title}</strong><span>${reward.description}</span><small>${reward.claimed ? 'Coletado' : reward.ready ? `Coletar ${reward.reward}` : type === 'chest' ? `${Math.min(reward.progress, 3)}/3 partidas` : `+${reward.reward} moedas`}</small>`;
-            item.addEventListener('click', () => {
+            item.disabled = !available;
+            const status = reward.claimed ? 'Coletado' : available ? 'Coletar ' + reward.reward + ' moedas' : progress + ' · +' + reward.reward + ' moedas';
+            item.innerHTML = '<strong>' + reward.title + '</strong><span>' + reward.description + '</span><small>' + status + '</small>';
+            const claim = () => {
                 const amount = type === 'mission' ? SuikaGame.progress.claimDailyMission() : SuikaGame.progress.claimDailyChest();
+                this.renderDailyPanel();
                 if (amount) {
                     this.updateCoinDisplays();
-                    this.renderDailyPanel();
-                    this.showToast(`+${amount} moedas`);
+                    this.renderMedalStrip();
+                    this.renderAchievements();
+                    this.showToast('+' + amount + ' moedas');
                 }
-            });
+            };
+            item.addEventListener('click', claim);
             container.appendChild(item);
+            if (available && SuikaGame.config.gameOver) {
+                const collect = document.createElement('button');
+                collect.textContent = reward.title + ' · Coletar ' + reward.reward + ' moedas';
+                collect.addEventListener('click', () => {
+                    claim();
+                    (results.firstElementChild || document.getElementById('restart-button')).focus({ preventScroll: true });
+                });
+                results.appendChild(collect);
+            }
         });
     },
 

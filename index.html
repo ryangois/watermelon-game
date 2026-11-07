@@ -12,8 +12,8 @@
     <title>Suika Game</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/images/watermelon_emoji.png">
-    <link rel="stylesheet" href="styles.css?v=20261025-tutorial-align">
-    <link rel="stylesheet" href="home.css?v=20261025-tutorial-align">
+    <link rel="stylesheet" href="styles.css?v=20261107-visual">
+    <link rel="stylesheet" href="home.css?v=20261107-visual">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -45,7 +45,7 @@
                 <div id="high-score">Melhor pontuação: 0</div>
                 <div id="coin-balance">Moedas: 0</div>
             </div>
-            <div id="difficulty-status">Dificuldade: Normal</div>
+            <div id="difficulty-status">Dificuldade: Médio</div>
             <div class="menu-actions">
                 <button id="start-button" class="menu-button">Jogar agora <span aria-hidden="true">→</span></button>
                 <button id="shop-button" class="menu-button accent">Loja de frutas</button>
@@ -67,7 +67,7 @@
             </div>
             <div id="difficulty-buttons">
                 <button id="easy-button" class="menu-button difficulty-button" data-level="easy">Fácil</button>
-                <button id="normal-button" class="menu-button difficulty-button" data-level="normal">Normal</button>
+                <button id="normal-button" class="menu-button difficulty-button" data-level="normal">Médio</button>
                 <button id="hard-button" class="menu-button difficulty-button" data-level="hard">Difícil</button>
                 <label class="settings-toggle">
                     <input id="accessibility-toggle" type="checkbox">
@@ -86,7 +86,7 @@
                 <h2>Como jogar</h2>
                 <ol>
                     <li>Mova a fruta para escolher onde ela vai cair.</li>
-                    <li>Toque ou clique no pote para soltar.</li>
+                    <li>Toque ou clique no pote para soltar. No teclado, use as setas para mirar e espaço para soltar.</li>
                     <li>Junte duas frutas iguais para formar uma maior.</li>
                 </ol>
                 <p>Não deixe as frutas acumularem acima da linha.</p>
@@ -101,6 +101,11 @@
             <div id="daily-panel" aria-label="Missões diárias"></div>
             </section>
             </aside>
+            </div>
+            <div id="pwa-install-banner">
+                <span>Instale o jogo para abrir sem barra do navegador.</span>
+                <button id="pwa-install-button">Adicionar</button>
+                <button id="pwa-dismiss-button" aria-label="Fechar">×</button>
             </div>
             <footer>Feito por Ryan Gois</footer>
         </section>
@@ -139,11 +144,12 @@
                             <span>Próxima</span>
                             <div id="next-fruit-preview"></div>
                         </div>
-                        <button id="game-options-button" class="icon-button small settings-button" aria-label="Abrir opções">⚙</button>
+                        <button id="game-options-button" class="icon-button small settings-button" aria-haspopup="dialog" aria-controls="game-options-panel" aria-label="Pausar partida" title="Pausar partida">⏸</button>
                     </div>
                 </div>
                 <div class="fruit-vessel">
-                    <canvas id="game-canvas" width="400" height="700" aria-label="Pote das frutas"></canvas>
+                    <div id="line-warning" role="status" aria-atomic="true"></div>
+                    <canvas tabindex="0" id="game-canvas" width="400" height="700" aria-label="Pote das frutas"></canvas>
                 </div>
                 <div id="combo-badge" aria-live="polite"></div>
                 <div id="game-controls" aria-label="Controles do jogo">
@@ -152,12 +158,16 @@
                     <button id="move-right-button" class="control-action" aria-label="Mover para direita">→</button>
                 </div>
                 <div id="power-toolbar" aria-label="Poderes disponíveis"></div>
-                <div id="game-options-panel" aria-label="Opções do jogo">
+                <dialog id="game-options-panel" aria-labelledby="pause-title">
                     <div class="game-options-card">
                         <div class="game-options-header">
-                            <h2>Opções</h2>
-                            <button id="game-options-close-button" class="icon-button" aria-label="Fechar opções">×</button>
+                            <h2 id="pause-title">Partida pausada</h2>
                         </div>
+                        <div id="pause-choices">
+                        <button id="pause-button" class="menu-button">Continuar</button>
+                        <button id="game-return-menu-button" class="menu-button secondary">Sair da partida</button>
+                        <details id="pause-settings">
+                            <summary>Opções do jogo</summary>
                         <label class="settings-toggle">
                             <input id="game-mute-toggle" type="checkbox">
                             <span>Mutar música</span>
@@ -171,10 +181,15 @@
                             <span>Mostrar raio das frutas</span>
                         </label>
                         <button id="fullscreen-button" class="menu-button accent">Tela cheia</button>
-                        <button id="pause-button" class="menu-button">Pausar</button>
-                        <button id="game-return-menu-button" class="menu-button secondary">Voltar ao menu</button>
+                        </details>
+                        </div>
+                        <div id="pause-exit" hidden>
+                            <p>A pontuação desta partida será descartada.</p>
+                            <button id="cancel-exit" class="menu-button">Ficar na partida</button>
+                            <button id="confirm-exit" class="menu-button secondary">Sair para o menu</button>
+                        </div>
                     </div>
-                </div>
+                </dialog>
             </div>
 
             <aside id="fruit-evolution" aria-label="Evolução das frutas">
@@ -184,8 +199,15 @@
 
         <div id="game-over-card" style="display: none;">
             <h2 id="game-over-message"></h2>
+            <div id="result-fruit"></div>
+            <dl class="result-stats">
+                <div><dt>Pontos</dt><dd id="result-score"></dd></div>
+                <div><dt>Moedas ganhas</dt><dd id="result-coins"></dd></div>
+                <div><dt>Recorde</dt><dd id="result-best"></dd></div>
+            </dl>
             <div id="earned-medals"></div>
-            <button id="restart-button">Reiniciar</button>
+            <div id="result-rewards" aria-label="Recompensas disponíveis"></div>
+            <button id="restart-button">Jogar de novo</button>
             <button id="return-button">Retornar ao menu</button>
         </div>
 
@@ -198,11 +220,6 @@
                     <button id="tutorial-next-button" class="menu-button">Próximo</button>
                 </div>
             </div>
-        </div>
-        <div id="pwa-install-banner">
-            <span>Instale o jogo para abrir sem barra do navegador.</span>
-            <button id="pwa-install-button">Adicionar</button>
-            <button id="pwa-dismiss-button" aria-label="Fechar">×</button>
         </div>
         <div id="pack-preview-modal" aria-modal="true" role="dialog">
             <div class="pack-preview-card">
@@ -224,16 +241,16 @@
         </div>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="js/config.js?v=20261025-tutorial-align"></script>
-    <script src="js/sprite-metrics.js?v=20261025-tutorial-align"></script>
-    <script src="js/skins.js?v=20261025-tutorial-align"></script>
-    <script src="js/progress.js?v=20261025-tutorial-align"></script>
-    <script src="js/fruits.js?v=20261025-tutorial-align"></script>
-    <script src="js/particles.js?v=20261025-tutorial-align"></script>
-    <script src="js/physics.js?v=20261025-tutorial-align"></script>
-    <script src="js/ui.js?v=20261025-tutorial-align"></script>
-    <script src="js/game.js?v=20261025-tutorial-align"></script>
+    <script src="js/vendor/matter-0.19.0.min.js"></script>
+    <script src="js/config.js?v=20261107-visual"></script>
+    <script src="js/sprite-metrics.js?v=20261107-visual"></script>
+    <script src="js/skins.js?v=20261107-visual"></script>
+    <script src="js/progress.js?v=20261107-visual"></script>
+    <script src="js/fruits.js?v=20261107-visual"></script>
+    <script src="js/particles.js?v=20261107-visual"></script>
+    <script src="js/physics.js?v=20261107-visual"></script>
+    <script src="js/ui.js?v=20261107-visual"></script>
+    <script src="js/game.js?v=20261107-visual"></script>
 </body>
 
 </html>

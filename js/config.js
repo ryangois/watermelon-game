@@ -14,23 +14,23 @@ SuikaGame.config = {
         easy: {
             label: 'Fácil',
             gravity: 0.0007,
-            fruitSizeMultiplier: 1.15,
+            fruitSizeMultiplier: 0.90,
             scoreMultiplier: 0.8,
-            coinMultiplier: 0.65
+            dangerSeconds: 7
         },
         normal: {
-            label: 'Normal',
+            label: 'Médio',
             gravity: 0.001,
             fruitSizeMultiplier: 1,
             scoreMultiplier: 1,
-            coinMultiplier: 0.85
+            dangerSeconds: 5
         },
         hard: {
             label: 'Difícil',
             gravity: 0.0015,
-            fruitSizeMultiplier: 0.85,
+            fruitSizeMultiplier: 1.08,
             scoreMultiplier: 1.5,
-            coinMultiplier: 1
+            dangerSeconds: 3
         }
     },
 
@@ -40,7 +40,6 @@ SuikaGame.config = {
     paused: false,
     usedPowersThisGame: false,
     lineInvisibleUntil: 0,
-    lineInvisibleTimer: null,
     bombSelectionRemaining: 0,
     comboCount: 0,
     lastMergeAt: 0,

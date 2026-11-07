@@ -110,7 +110,7 @@ SuikaGame.physics = {
 
     setupCollisionEvents: function () {
         const { Events, Composite } = Matter;
-        const fruitsOverLine = this.fruitsOverLine;
+        const engine = SuikaGame.config.engine;
 
         Events.on(SuikaGame.config.engine, 'collisionStart', function (event) {
             for (let i = 0; i < event.pairs.length; i++) {
@@ -122,97 +122,45 @@ SuikaGame.physics = {
             }
         });
 
-        Events.on(SuikaGame.config.engine, 'afterUpdate', function () {
-            const gameOverLine = Composite.allBodies(SuikaGame.config.engine.world)
-                .find(body => body.isGameOverLine);
-
-            if (!gameOverLine || SuikaGame.config.gameOver || !SuikaGame.config.gameActive) {
-                return;
+        Events.on(engine, 'afterUpdate', () => {
+            if (!SuikaGame.config.gameActive || SuikaGame.config.gameOver || SuikaGame.config.paused) return;
+            const line = this.getGameOverLine();
+            if (!line) return;
+            const now = engine.timing.timestamp;
+            if (line.isLineHidden) {
+                if (now < SuikaGame.config.lineInvisibleUntil) return;
+                line.isLineHidden = false;
+                SuikaGame.config.lineInvisibleUntil = 0;
+                this.applyTheme();
             }
 
-            if (SuikaGame.config.lineInvisibleUntil && Date.now() < SuikaGame.config.lineInvisibleUntil) {
-                return;
+            const bodies = Composite.allBodies(engine.world);
+            const above = bodies.filter(body => body.isFruit && !body.isStatic && !body.toRemove &&
+                body.position.y + body.circleRadius < line.position.y);
+            for (const body of this.fruitsOverLine.keys()) {
+                if (!above.includes(body)) this.fruitsOverLine.delete(body);
             }
 
-            const lineY = gameOverLine.position.y;
-
-            fruitsOverLine.forEach((data, id) => {
-                const fruit = data.body;
-
-                if (!Composite.get(SuikaGame.config.engine.world, id, 'body')) {
-                    clearInterval(data.interval);
-                    fruitsOverLine.delete(id);
-                    return;
-                }
-
-                if (fruit.position.y + fruit.circleRadius < lineY) {
-                    const timeSinceLaunch = Date.now() - data.launchTimestamp;
-                    const timeAboveLine = Date.now() - data.timestamp;
-
-                    if (timeSinceLaunch >= 2000 && timeAboveLine >= 5000) {
-                        clearInterval(data.interval);
-                        fruitsOverLine.clear();
-                        SuikaGame.game.endGame();
-                    }
-                } else {
-                    clearInterval(data.interval);
-                    fruitsOverLine.delete(id);
-                    SuikaGame.physics.restoreFruitRender(fruit);
-                }
-            });
-
-            Composite.allBodies(SuikaGame.config.engine.world).forEach(body => {
-                if (
-                    body.isFruit &&
-                    !body.isStatic &&
-                    !fruitsOverLine.has(body.id) &&
-                    body.position.y + body.circleRadius < lineY
-                ) {
-                    fruitsOverLine.set(body.id, {
-                        body: body,
-                        timestamp: Date.now(),
-                        launchTimestamp: body.launchTimestamp || Date.now(),
-                        interval: setInterval(() => {
-                            SuikaGame.physics.toggleWarningRender(body);
-                        }, 500)
-                    });
-                }
-            });
+            let longest = 0;
+            for (const body of above) {
+                if (!this.fruitsOverLine.has(body)) this.fruitsOverLine.set(body, now);
+                longest = Math.max(longest, Math.round(now - this.fruitsOverLine.get(body)));
+            }
+            const limit = SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty].dangerSeconds * 1000;
+            if (longest >= limit) {
+                this.clearLineWarnings();
+                SuikaGame.game.endGame();
+                return;
+            }
+            // Ignore momentary crossings while a dropped fruit is falling.
+            this.updateLineWarning(longest >= 500 ? Math.ceil((limit - longest) / 1000) : 0);
         });
     },
 
-    toggleWarningRender: function (body) {
-        if (SuikaGame.config.lineInvisibleUntil && Date.now() < SuikaGame.config.lineInvisibleUntil) {
-            this.restoreFruitRender(body);
-            return;
-        }
-
-        if (!body.render.originalFillStyle) {
-            body.render.originalFillStyle = body.render.fillStyle;
-            body.render.originalSprite = body.render.sprite ? { ...body.render.sprite } : null;
-        }
-
-        if (body.render.fillStyle === 'rgba(214, 40, 40, 0.75)') {
-            this.restoreFruitRender(body);
-        } else {
-            body.render.fillStyle = 'rgba(214, 40, 40, 0.75)';
-            body.render.sprite = null;
-        }
-    },
-
-    restoreFruitRender: function (body) {
-        if (!body.render.originalFillStyle) {
-            return;
-        }
-
-        body.render.fillStyle = body.render.originalFillStyle;
-
-        if (body.render.originalSprite) {
-            body.render.sprite = body.render.originalSprite;
-        }
-
-        body.render.originalFillStyle = null;
-        body.render.originalSprite = null;
+    updateLineWarning: function (seconds) {
+        if (seconds === this.warningSeconds) return;
+        this.warningSeconds = seconds;
+        document.getElementById('line-warning').textContent = seconds ? 'Fruta acima da linha · ' + seconds + ' s' : '';
     },
 
     updateGravity: function (newGravity) {
@@ -242,25 +190,15 @@ SuikaGame.physics = {
         const line = this.getGameOverLine();
         if (!line) return;
 
-        clearTimeout(SuikaGame.config.lineInvisibleTimer);
-        SuikaGame.config.lineInvisibleUntil = Date.now() + durationMs;
+        SuikaGame.config.lineInvisibleUntil = SuikaGame.config.engine.timing.timestamp + durationMs;
         line.isLineHidden = true;
         line.render.fillStyle = 'rgba(0, 0, 0, 0)';
         this.clearLineWarnings();
-
-        SuikaGame.config.lineInvisibleTimer = setTimeout(() => {
-            line.isLineHidden = false;
-            line.render.fillStyle = SuikaGame.skins.getActiveTheme().vars['--danger-line'];
-            SuikaGame.config.lineInvisibleUntil = 0;
-        }, durationMs);
     },
 
     clearLineWarnings: function () {
-        this.fruitsOverLine.forEach(data => {
-            clearInterval(data.interval);
-            this.restoreFruitRender(data.body);
-        });
         this.fruitsOverLine.clear();
+        this.updateLineWarning(0);
     },
 
     drawFruitRadiusOverlay: function () {
@@ -304,7 +242,7 @@ SuikaGame.physics = {
     moveCurrentFruit: function (clientX) {
         const currentFruit = SuikaGame.fruits.currentFruit;
 
-        if (!currentFruit || !currentFruit.isStatic || SuikaGame.config.gameOver) {
+        if (!currentFruit || !currentFruit.isStatic || SuikaGame.config.gameOver || SuikaGame.config.paused) {
             return;
         }
 
@@ -334,6 +272,7 @@ SuikaGame.physics = {
     },
 
     dropFruit: function (event) {
+        if (!SuikaGame.config.gameActive || SuikaGame.config.paused) return;
         if (SuikaGame.game.handleBombSelectionPointer(event)) {
             return;
         }
@@ -345,7 +284,6 @@ SuikaGame.physics = {
         }
 
         SuikaGame.config.canDropFruit = false;
-        currentFruit.launchTimestamp = Date.now();
         Matter.Body.setStatic(currentFruit, false);
         SuikaGame.ui.haptic(18);
 

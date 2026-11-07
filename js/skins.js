@@ -44,11 +44,11 @@ SuikaGame.skins = {
     ],
 
     powers: [
-        { id: 'clear-small', name: 'Limpeza de menores', icon: '🧹', description: 'Remove cerejas e morangos já soltos', price: 55 },
-        { id: 'hide-line', name: 'Linha invisível', icon: '👁', description: 'Esconde a linha final por 7 segundos', price: 90 },
-        { id: 'cherry-rain', name: 'Chuva de cerejas', icon: '🍒', description: 'Derruba cerejas extras para tentar combos', price: 70 },
-        { id: 'side-push', name: 'Chacoalhão', icon: '🌀', description: 'Chacoalha todas as frutas soltas no pote', price: 80 },
-        { id: 'small-bomb', name: 'Bomba pequena', icon: '💣', description: 'Escolha até 4 frutas soltas para eliminar', price: 130 }
+        { id: 'clear-small', name: 'Limpeza de menores', icon: '🧹', description: 'Remove cerejas e morangos já soltos', price: 18 },
+        { id: 'hide-line', name: 'Linha invisível', icon: '👁', description: 'Esconde a linha final por 7 segundos', price: 25 },
+        { id: 'cherry-rain', name: 'Chuva de cerejas', icon: '🍒', description: 'Derruba cerejas extras para tentar combos', price: 15 },
+        { id: 'side-push', name: 'Chacoalhão', icon: '🌀', description: 'Chacoalha todas as frutas soltas no pote', price: 20 },
+        { id: 'small-bomb', name: 'Bomba pequena', icon: '💣', description: 'Escolha até 4 frutas soltas para eliminar', price: 45 }
     ],
 
     testCoinGrant: 9999,
@@ -260,15 +260,22 @@ SuikaGame.skins = {
     },
 
     getSkinPrice: function (pack) {
-        return Math.ceil((pack ? pack.price : 0) * 0.62);
+        if (!pack) return 0;
+        if (this.isThemeUnlocked(pack.id) && !this.isSkinUnlocked(pack.id)) return this.getBundlePrice(pack);
+        return Math.ceil(pack.price * 0.62);
     },
 
     getThemePrice: function (pack) {
-        return Math.ceil((pack ? pack.price : 0) * 0.48);
+        if (!pack) return 0;
+        if (this.isSkinUnlocked(pack.id) && !this.isThemeUnlocked(pack.id)) return this.getBundlePrice(pack);
+        return Math.ceil(pack.price * 0.48);
     },
 
     getBundlePrice: function (pack) {
-        return Math.ceil((pack ? pack.price : 0) * 0.86);
+        if (!pack) return 0;
+        const skinCredit = this.isSkinUnlocked(pack.id) ? Math.ceil(pack.price * 0.62) : 0;
+        const themeCredit = this.isThemeUnlocked(pack.id) ? Math.ceil(pack.price * 0.48) : 0;
+        return Math.max(0, Math.ceil(pack.price * 0.86) - skinCredit - themeCredit);
     },
 
     setActive: function (packId) {
@@ -300,9 +307,13 @@ SuikaGame.skins = {
         return this.tracks.find(track => track.id === this.getActiveTrackId()) || this.tracks[0];
     },
 
+    hasDistinctTrack: function (track) {
+        return this.tracks.find(item => item.src === track.src).id === track.id;
+    },
+
     buyTrack: function (trackId) {
         const track = this.tracks.find(item => item.id === trackId);
-        if (!track || this.isTrackUnlocked(trackId) || this.getCoins() < track.price) return false;
+        if (!track || !this.hasDistinctTrack(track) || this.isTrackUnlocked(trackId) || this.getCoins() < track.price) return false;
         this.setCoins(this.getCoins() - track.price);
         localStorage.setItem(this.storageKeys.unlockedTracks, JSON.stringify(this.getUnlockedTracks().concat(trackId)));
         this.setActiveTrack(trackId);
@@ -429,8 +440,7 @@ SuikaGame.skins = {
     },
 
     getCoinsForScore: function (score) {
-        const difficulty = SuikaGame.config.DIFFICULTY_LEVELS[SuikaGame.config.currentDifficulty];
-        const baseCoins = Math.floor((score / 28) * difficulty.coinMultiplier);
+        const baseCoins = Math.floor(score / 28);
         const milestoneBonus = score >= 1000 ? 12 : score >= 650 ? 7 : score >= 350 ? 3 : 0;
         return Math.max(0, baseCoins + milestoneBonus);
     }

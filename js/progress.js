@@ -144,6 +144,8 @@ SuikaGame.progress = {
                 description: 'Faça 650 pontos em uma partida',
                 ready: daily.bestScore >= 650,
                 claimed: daily.claimedMission,
+                progress: daily.bestScore,
+                target: 650,
                 reward: 60
             },
             chest: {
@@ -152,6 +154,7 @@ SuikaGame.progress = {
                 ready: daily.games >= 3,
                 claimed: daily.claimedChest,
                 reward: 85,
+                target: 3,
                 progress: daily.games
             }
         };

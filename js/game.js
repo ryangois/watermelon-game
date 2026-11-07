@@ -4,6 +4,8 @@ SuikaGame.game = {
     initialize: function () {
         SuikaGame.ui.initializeUI();
         SuikaGame.physics.setupEngine();
+        const saved = localStorage.getItem('suikaDifficulty');
+        this.setDifficulty(Object.hasOwn(SuikaGame.config.DIFFICULTY_LEVELS, saved) ? saved : 'normal');
         this.resetGame();
     },
 
@@ -12,9 +14,6 @@ SuikaGame.game = {
         SuikaGame.skins.applyActiveTheme();
         SuikaGame.physics.applyTheme();
         this.resetGame();
-        if (SuikaGame.config.runner && SuikaGame.config.runner.enabled === false) {
-            Matter.Runner.run(SuikaGame.config.runner, SuikaGame.config.engine);
-        }
         SuikaGame.config.gameActive = true;
         SuikaGame.config.paused = false;
         SuikaGame.config.usedPowersThisGame = false;
@@ -26,15 +25,23 @@ SuikaGame.game = {
         document.getElementById('game-container').style.display = 'block';
         document.getElementById('fruit-evolution').style.display = 'block';
 
+        if (localStorage.getItem('suikaTutorialDone') !== 'true') {
+            const cherry = SuikaGame.fruits.types[0];
+            const base = SuikaGame.fruits.createFruitBody(SuikaGame.config.dropPosition, SuikaGame.config.GAME_HEIGHT - cherry.radius, cherry);
+            Matter.World.add(SuikaGame.config.engine.world, base);
+            SuikaGame.fruits.nextFruitIndex = 0;
+        }
         SuikaGame.fruits.createNewFruit();
         SuikaGame.audio.playBackgroundMusic();
         SuikaGame.ui.updatePowerToolbar();
-        SuikaGame.ui.updatePauseButton();
+        document.getElementById('game-canvas').focus({ preventScroll: true });
         SuikaGame.ui.maybeShowTutorial();
     },
 
     resetGame: function () {
         SuikaGame.config.score = 0;
+        this.bestMergeIndex = -1;
+        if (SuikaGame.config.runner) SuikaGame.config.runner.enabled = true;
         SuikaGame.config.gameOver = false;
         SuikaGame.config.paused = false;
         SuikaGame.config.usedPowersThisGame = false;
@@ -44,7 +51,6 @@ SuikaGame.game = {
         SuikaGame.config.bombSelectionRemaining = 0;
         SuikaGame.config.comboCount = 0;
         SuikaGame.config.lastMergeAt = 0;
-        clearTimeout(SuikaGame.config.lineInvisibleTimer);
         document.getElementById('game-container').classList.remove('bomb-selecting');
         SuikaGame.fruits.currentFruit = null;
         SuikaGame.particles.activeParticles = [];
@@ -94,6 +100,7 @@ SuikaGame.game = {
         SuikaGame.config.comboCount = now - SuikaGame.config.lastMergeAt <= 1800 ? SuikaGame.config.comboCount + 1 : 1;
         SuikaGame.config.lastMergeAt = now;
         if (SuikaGame.config.comboCount >= 4) SuikaGame.progress.unlock('combo-big');
+        this.bestMergeIndex = Math.max(this.bestMergeIndex, newFruitIndex);
         SuikaGame.progress.noteFruit(newFruitData.id, newFruitIndex);
         SuikaGame.ui.showCombo(SuikaGame.config.comboCount);
         SuikaGame.ui.haptic(35);
@@ -110,6 +117,7 @@ SuikaGame.game = {
 
     setDifficulty: function (level) {
         SuikaGame.config.currentDifficulty = level;
+        localStorage.setItem('suikaDifficulty', level);
         const diffSettings = SuikaGame.config.DIFFICULTY_LEVELS[level];
 
         SuikaGame.physics.updateGravity(diffSettings.gravity);
@@ -194,19 +202,14 @@ SuikaGame.game = {
 
         SuikaGame.config.paused = paused;
         if (paused) {
-            Matter.Runner.stop(SuikaGame.config.runner);
+            SuikaGame.config.runner.enabled = false;
             if (SuikaGame.audio.backgroundMusic) SuikaGame.audio.backgroundMusic.pause();
         } else {
-            Matter.Runner.run(SuikaGame.config.runner, SuikaGame.config.engine);
+            SuikaGame.config.runner.enabled = true;
             SuikaGame.audio.playBackgroundMusic();
         }
 
-        SuikaGame.ui.updatePauseButton();
         SuikaGame.ui.showToast(paused ? 'Jogo pausado' : 'Jogo retomado');
-    },
-
-    togglePause: function () {
-        this.setPaused(!SuikaGame.config.paused);
     },
 
     getLooseFruits: function () {
@@ -230,7 +233,6 @@ SuikaGame.game = {
             const x = 34 + (i * ((SuikaGame.config.GAME_WIDTH - 68) / (count - 1)));
             const y = 46 + (i % 2) * 18;
             const body = SuikaGame.fruits.createFruitBody(x, y, cherry);
-            body.launchTimestamp = Date.now();
             Matter.Body.setVelocity(body, { x: (i % 2 === 0 ? -0.6 : 0.6), y: 1.2 });
             Matter.World.add(SuikaGame.config.engine.world, body);
         }
@@ -316,9 +318,18 @@ SuikaGame.game = {
         const highScore = this.getHighScore();
         SuikaGame.progress.recordGame(SuikaGame.config.score);
         const medals = SuikaGame.progress.evaluateGame(SuikaGame.config.score);
-        const message = isNewHighScore
-            ? `Nova pontuação recorde!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`
-            : `Fim de jogo!\nPontuação: ${SuikaGame.config.score}\nMoedas ganhas: ${earnedCoins}\nMelhor pontuação: ${highScore}`;
+        const message = isNewHighScore ? 'Novo recorde!' : 'Fim de partida';
+        const fruit = SuikaGame.fruits.types[this.bestMergeIndex];
+        const highlight = document.getElementById('result-fruit');
+        highlight.replaceChildren();
+        if (fruit) {
+            const image = SuikaGame.fruits.createFruitPreview(fruit, 64);
+            image.alt = '';
+            highlight.append(image, 'Maior fusão: ' + fruit.name);
+        }
+        document.getElementById('result-score').textContent = SuikaGame.config.score;
+        document.getElementById('result-coins').textContent = '+' + earnedCoins;
+        document.getElementById('result-best').textContent = highScore;
 
         SuikaGame.ui.updateCoinDisplays();
         SuikaGame.ui.renderDailyPanel();
@@ -327,6 +338,7 @@ SuikaGame.game = {
         document.getElementById('game-over-message').textContent = message;
         document.getElementById('game-over-card').style.display = 'block';
 
+        document.getElementById('restart-button').focus({ preventScroll: true });
         document.getElementById('restart-button').onclick = () => {
             document.getElementById('game-over-card').style.display = 'none';
             this.startGame();
