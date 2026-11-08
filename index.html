@@ -12,8 +12,8 @@
     <title>Suika Game</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/images/watermelon_emoji.png">
-    <link rel="stylesheet" href="styles.css?v=20261107-visual">
-    <link rel="stylesheet" href="home.css?v=20261107-visual">
+    <link rel="stylesheet" href="styles.css?v=20261108-hall-29">
+    <link rel="stylesheet" href="home.css?v=20261108-hall-29">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -32,9 +32,9 @@
             <div class="home-intro">
                 <div class="home-fruits" aria-hidden="true">
                     <span class="home-fruit-shadow"></span>
-                    <img class="home-fruit cherry" src="assets/images/cherries_emoji.png" alt="">
-                    <img class="home-fruit watermelon" src="assets/images/watermelon_emoji.png" alt="">
-                    <img class="home-fruit orange" src="assets/images/orange_emoji.png" alt="">
+                    <img class="home-fruit cherry" src="assets/images/cherries_emoji.webp" alt="">
+                    <img class="home-fruit watermelon" src="assets/images/watermelon_emoji.webp" alt="">
+                    <img class="home-fruit orange" src="assets/images/orange_emoji.webp" alt="">
                     <span class="home-spark spark-one">✦</span>
                     <span class="home-spark spark-two">✧</span>
                 </div>
@@ -227,30 +227,32 @@
                 <div id="pack-preview-content"></div>
             </div>
         </div>
-        <div id="achievements-modal" aria-modal="true" role="dialog" aria-labelledby="achievements-title">
+        <dialog id="achievements-modal" aria-labelledby="achievements-title">
             <div class="achievements-card">
                 <div class="achievements-header">
                     <div>
-                        <h2 id="achievements-title">Conquistas</h2>
+                        <h2 id="achievements-title">Hall de conquistas</h2>
                         <p id="achievements-progress">0/0 desbloqueadas</p>
                     </div>
                     <button id="achievements-close" class="icon-button" aria-label="Fechar conquistas">×</button>
                 </div>
-                <div id="achievements-list"></div>
+                <div id="hall-prize"></div>
+                <div id="achievements-list" aria-label="Medalhas"></div>
+                <div id="achievement-detail" aria-live="polite" hidden></div>
             </div>
-        </div>
+        </dialog>
     </main>
 
     <script src="js/vendor/matter-0.19.0.min.js"></script>
-    <script src="js/config.js?v=20261107-visual"></script>
-    <script src="js/sprite-metrics.js?v=20261107-visual"></script>
-    <script src="js/skins.js?v=20261107-visual"></script>
-    <script src="js/progress.js?v=20261107-visual"></script>
-    <script src="js/fruits.js?v=20261107-visual"></script>
-    <script src="js/particles.js?v=20261107-visual"></script>
-    <script src="js/physics.js?v=20261107-visual"></script>
-    <script src="js/ui.js?v=20261107-visual"></script>
-    <script src="js/game.js?v=20261107-visual"></script>
+    <script src="js/config.js?v=20261108-hall-29"></script>
+    <script src="js/sprite-metrics.js?v=20261108-hall-29"></script>
+    <script src="js/skins.js?v=20261108-hall-29"></script>
+    <script src="js/progress.js?v=20261108-hall-29"></script>
+    <script src="js/fruits.js?v=20261108-hall-29"></script>
+    <script src="js/particles.js?v=20261108-hall-29"></script>
+    <script src="js/physics.js?v=20261108-hall-29"></script>
+    <script src="js/ui.js?v=20261108-hall-29"></script>
+    <script src="js/game.js?v=20261108-hall-29"></script>
 </body>
 
 </html>

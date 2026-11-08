@@ -30,11 +30,12 @@ SuikaGame.skins = {
 
     tracks: [
         { id: 'fruit-groove', name: 'Fruit Groove', icon: '♪', description: 'Trilha original animada', price: 0, src: 'assets/music/music-fruits.mp3' },
+        { id: 'fusion-groove', name: 'Fruit Fusion Groove', icon: '♫', description: 'Trilha alternativa para as fusões', price: 0, src: 'assets/music/fruit-fusion-groove.mp3' },
         { id: 'calm-harvest', name: 'Calm Harvest', icon: '~', description: 'Vibe mais calma para jogar focado', price: 120, src: 'assets/music/music-fruits.mp3' },
         { id: 'arcade-pop', name: 'Arcade Pop', icon: '⚡', description: 'Energia de fliperama para combos', price: 180, src: 'assets/music/music-fruits.mp3' },
         { id: 'boss-fruit', name: 'Boss Fruit', icon: '!', description: 'Trilha intensa para pontuações altas', price: 300, src: 'assets/music/music-fruits.mp3' },
-        { id: 'halloween-hop', name: 'Halloween Hop', icon: '☾', description: 'Beat travesso para pacotes assustadores', price: 150, src: 'assets/music/music-fruits.mp3' },
-        { id: 'snowy-sleigh', name: 'Snowy Sleigh', icon: '*', description: 'Natal leve com sinos e brilho arcade', price: 170, src: 'assets/music/music-fruits.mp3' },
+        { id: 'halloween-hop', name: 'Spooky Game Loop', icon: '☾', description: 'Beat travesso para pacotes assustadores', price: 150, src: 'assets/music/spooky-game-loop.mp3' },
+        { id: 'snowy-sleigh', name: 'Winter Arcade Fun', icon: '*', description: 'Natal leve com sinos e brilho arcade', price: 170, src: 'assets/music/winter-arcade-fun.mp3' },
         { id: 'cosmic-bounce', name: 'Cosmic Bounce', icon: '✦', description: 'Synth espacial para skins siderais', price: 220, src: 'assets/music/music-fruits.mp3' },
         { id: 'olympus-pop', name: 'Olympus Pop', icon: 'Ω', description: 'Mitologia pop com percussão heroica', price: 260, src: 'assets/music/music-fruits.mp3' },
         { id: 'tidal-combo', name: 'Tidal Combo', icon: '≈', description: 'Groove oceânico relaxado para partidas longas', price: 290, src: 'assets/music/music-fruits.mp3' },
@@ -52,11 +53,13 @@ SuikaGame.skins = {
     ],
 
     testCoinGrant: 9999,
-    assetAvailability: {},
-    previewImages: {},
-
     getPreviewImage: function (path) {
-        return this.previewImages[path] || path;
+        return path.replace('assets/images/', 'assets/previews/').replace('.png', '.webp');
+    },
+
+    getTextureImage: function (path) {
+        const folder = path.split('/').slice(0, -1).join('/');
+        return folder === 'assets/images' || folder === 'assets/images/Halloween' ? path.replace('.png', '.webp') : path;
     },
 
     themes: {
@@ -291,7 +294,7 @@ SuikaGame.skins = {
     },
 
     getUnlockedTracks: function () {
-        return Array.from(new Set(['fruit-groove'].concat(this.getJsonList(this.storageKeys.unlockedTracks, ['fruit-groove']))));
+        return Array.from(new Set(['fruit-groove', 'fusion-groove'].concat(this.getJsonList(this.storageKeys.unlockedTracks, ['fruit-groove']))));
     },
 
     isTrackUnlocked: function (trackId) {
@@ -398,45 +401,17 @@ SuikaGame.skins = {
         if (!pack.assetFolder) return null;
         const fileName = fruit.image.split('/').pop();
         const path = `${pack.assetFolder}/${fileName}`;
-        return this.assetAvailability[path] ? path : null;
+        return path;
     },
 
-    preloadAssets: function (fruits) {
-        if (typeof Image === 'undefined') return Promise.resolve();
-        const checks = [];
-        this.packs.forEach(pack => {
-            fruits.forEach(fruit => {
-                const fileName = fruit.image.split('/').pop();
-                const path = pack.assetFolder ? `${pack.assetFolder}/${fileName}` : fruit.image;
-                checks.push(new Promise(resolve => {
-                    const img = new Image();
-                    img.onload = () => {
-                        this.assetAvailability[path] = true;
-                        const geometry = (SuikaGame.spriteMetrics || {})[path];
-                        if (geometry) {
-                            const [left, top, right, bottom] = geometry.bounds;
-                            const canvas = document.createElement('canvas');
-                            const density = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
-                            canvas.width = canvas.height = Math.round(128 * density);
-                            const context = canvas.getContext('2d');
-                            context.scale(density, density);
-                            context.imageSmoothingEnabled = true;
-                            context.imageSmoothingQuality = 'high';
-                            const scale = 120 / Math.max(right - left, bottom - top);
-                            const width = (right - left) * scale;
-                            const height = (bottom - top) * scale;
-                            context.drawImage(img, left, top, right - left, bottom - top,
-                                (128 - width) / 2, (128 - height) / 2, width, height);
-                            this.previewImages[path] = canvas.toDataURL();
-                        }
-                        resolve();
-                    };
-                    img.onerror = () => { this.assetAvailability[path] = false; resolve(); };
-                    img.src = path;
-                }));
-            });
-        });
-        return Promise.all(checks);
+    preloadActivePack: function () {
+        const pack = this.getActivePack();
+        if (this.preloadedPack === pack.id) return;
+        this.preloadedPack = pack.id;
+        for (const fruit of SuikaGame.fruits.types) {
+            const image = new Image();
+            image.src = this.getTextureImage(this.getFruitViewForPack(pack, fruit).image);
+        }
     },
 
     getCoinsForScore: function (score) {

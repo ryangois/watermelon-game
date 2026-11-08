@@ -25,7 +25,17 @@ SuikaGame.progress = {
         { id: 'coin-bank', icon: '🪙', name: 'Cofrinho cheio', description: 'Tenha 500 moedas guardadas.', hint: 'Jogue partidas e colete recompensas até acumular 500 moedas.' },
         { id: 'score-1000-no-powers', icon: '✨', name: 'Puro talento', description: 'Faça 1000 pontos sem usar poderes.', hint: 'Não use poderes durante a partida e passe de 1000 pontos.' },
         { id: 'hard-watermelon', icon: '👑', name: 'Melancia difícil', description: 'Crie uma melancia no difícil.', hint: 'Escolha Difícil e evolua as frutas até a melancia.' },
-        { id: 'jackfruit-egg', icon: '❔', name: 'Easter egg', description: 'Você encontrou um segredo escondido no jogo.', hint: '???', secret: true }
+        { id: 'fruit-salad', icon: '🥗', name: 'Salada de cinco cores', description: 'Crie cinco tipos diferentes de fruta por fusão na mesma partida.', hint: 'Cada tipo conta uma vez. Frutas que já caem prontas não contam.' },
+        { id: 'pineapple-pair', icon: '🍍', name: 'Abacaxi em dobro', description: 'Crie dois abacaxis na mesma partida.', hint: 'Cada par de pêssegos produz um abacaxi.' },
+        { id: 'last-second', icon: '⏳', name: 'Por um fio', description: 'Livre o pote do perigo no último segundo da contagem.', hint: 'Quando o aviso marcar 1 s, faça espaço para as frutas baixarem ou use um poder.' },
+        { id: 'spooky-jam', icon: '🎃', name: 'Baile das abóboras', description: 'Faça uma fusão com a skin Halloween e a faixa Spooky Game Loop equipadas.', hint: 'Equipe a skin e a música na loja antes de jogar.' },
+        { id: 'fruit-staircase', icon: '🪜', name: 'Escadinha', description: 'Faça três fusões seguidas, cada uma criando a fruta seguinte da evolução.', hint: 'Por exemplo: forme um morango, depois uma uva e depois uma laranja. Não há limite de tempo.' },
+        { id: 'both-walls', icon: '↔️', name: 'De ponta a ponta', description: 'Faça uma fusão no quarto esquerdo e outra no quarto direito do pote na mesma partida.', hint: 'Vale o ponto onde as duas frutas se encontram. Você pode começar por qualquer lado.' },
+        { id: 'berry-trio', icon: '🍓', name: 'Geleia de morango', description: 'Faça três fusões seguidas que produzam morangos.', hint: 'Separe três pares de cerejas. Se outra fruta se formar entre eles, a sequência recomeça.' },
+        { id: 'apple-bullseye', icon: '🎯', name: 'Na mosca', description: 'Forme uma maçã bem no centro horizontal do pote.', hint: 'Junte duas laranjas a até meia cereja de distância do eixo central.' },
+        { id: 'power-duet', icon: '🪄', name: 'Plano B', description: 'Use dois poderes diferentes na mesma partida.', hint: 'Só conta quando o poder é consumido. Dois usos do mesmo poder contam como um tipo.' },
+        { id: 'daily-double', icon: '🎟️', name: 'Dose dupla', description: 'Resgate a missão e o cofre do mesmo dia.', hint: 'Faça 650 pontos em uma partida, termine três partidas e colete os dois prêmios.' },
+        { id: 'jackfruit-egg', icon: '❔', name: 'Easter egg', description: 'Junte duas melancias para criar a jaca secreta.', hint: '???', secret: true }
     ],
 
     getUnlocked: function () {
@@ -40,6 +50,15 @@ SuikaGame.progress = {
         const ids = this.getUnlocked();
         const set = new Set(ids);
         return { ids, set, list: this.medals.filter(medal => set.has(medal.id)) };
+    },
+
+    hasGoldenVessel: function () {
+        const ids = this.getUnlocked();
+        if (ids.includes('golden-vessel')) return true;
+        // A cloud merge can complete the collection across two devices.
+        if (!this.medals.every(medal => ids.includes(medal.id))) return false;
+        localStorage.setItem(this.storageKey, JSON.stringify([...ids, 'golden-vessel']));
+        return true;
     },
 
     getStats: function () {
@@ -112,6 +131,7 @@ SuikaGame.progress = {
         }
 
         unlocked.push(medalId);
+        if (!unlocked.includes('golden-vessel') && this.medals.every(medal => unlocked.includes(medal.id))) unlocked.push('golden-vessel');
         localStorage.setItem(this.storageKey, JSON.stringify(unlocked));
         this.newlyUnlocked.push(medalId);
         return true;
@@ -169,6 +189,7 @@ SuikaGame.progress = {
         this.saveDaily(daily);
         SuikaGame.skins.addCoins(rewards.mission.reward);
         this.unlock('daily-claim');
+        if (daily.claimedChest && daily.claimedMission) this.unlock('daily-double');
         return rewards.mission.reward;
     },
 
@@ -181,6 +202,7 @@ SuikaGame.progress = {
         this.saveDaily(daily);
         SuikaGame.skins.addCoins(rewards.chest.reward);
         this.unlock('daily-claim');
+        if (daily.claimedChest && daily.claimedMission) this.unlock('daily-double');
         return rewards.chest.reward;
     }
 };

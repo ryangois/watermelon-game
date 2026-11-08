@@ -38,7 +38,7 @@ SuikaGame.fruits = {
             render: {
                 fillStyle: view.color,
                 sprite: {
-                    texture: view.image,
+                    texture: SuikaGame.skins.getTextureImage(view.image),
                     xScale: scale,
                     yScale: scale
                 }
@@ -72,6 +72,7 @@ SuikaGame.fruits = {
         img.height = size;
         img.loading = 'eager';
         img.onerror = function () {
+            img.onerror = null;
             img.src = fruitData.image;
         };
 

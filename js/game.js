@@ -41,6 +41,11 @@ SuikaGame.game = {
     resetGame: function () {
         SuikaGame.config.score = 0;
         this.bestMergeIndex = -1;
+        this.fusedKinds = new Set();
+        this.recentMerges = [];
+        this.mergedSides = new Set();
+        this.usedPowerIds = new Set();
+        this.pineapplesCreated = 0;
         if (SuikaGame.config.runner) SuikaGame.config.runner.enabled = true;
         SuikaGame.config.gameOver = false;
         SuikaGame.config.paused = false;
@@ -101,6 +106,13 @@ SuikaGame.game = {
         SuikaGame.config.lastMergeAt = now;
         if (SuikaGame.config.comboCount >= 4) SuikaGame.progress.unlock('combo-big');
         this.bestMergeIndex = Math.max(this.bestMergeIndex, newFruitIndex);
+        this.checkMergeChallenges(newFruitIndex, midX);
+        this.fusedKinds.add(newFruitIndex);
+        if (this.fusedKinds.size === 5) SuikaGame.progress.unlock('fruit-salad');
+        if (newFruitData.id === 'pineapple' && ++this.pineapplesCreated === 2) SuikaGame.progress.unlock('pineapple-pair');
+        if (SuikaGame.skins.getActiveId() === 'halloween' && SuikaGame.skins.getActiveTrackId() === 'halloween-hop') {
+            SuikaGame.progress.unlock('spooky-jam');
+        }
         SuikaGame.progress.noteFruit(newFruitData.id, newFruitIndex);
         SuikaGame.ui.showCombo(SuikaGame.config.comboCount);
         SuikaGame.ui.haptic(35);
@@ -113,6 +125,24 @@ SuikaGame.game = {
             Matter.World.remove(SuikaGame.config.engine.world, [fruitA, fruitB]);
             Matter.World.add(SuikaGame.config.engine.world, newFruit);
         }, 80);
+    },
+
+    checkMergeChallenges: function (index, x) {
+        this.recentMerges.push(index);
+        if (this.recentMerges.length > 3) this.recentMerges.shift();
+        const [first, second, third] = this.recentMerges;
+        if (third === second + 1 && second === first + 1) SuikaGame.progress.unlock('fruit-staircase');
+        const fruit = SuikaGame.fruits.types[index];
+        if (fruit.id === 'strawberry' && first === index && second === index && third === index) {
+            SuikaGame.progress.unlock('berry-trio');
+        }
+        const width = SuikaGame.config.GAME_WIDTH;
+        if (x <= width / 4) this.mergedSides.add('left');
+        if (x >= width * 3 / 4) this.mergedSides.add('right');
+        if (this.mergedSides.size === 2) SuikaGame.progress.unlock('both-walls');
+        if (fruit.id === 'apple' && Math.abs(x - width / 2) <= SuikaGame.fruits.types[0].radius) {
+            SuikaGame.progress.unlock('apple-bullseye');
+        }
     },
 
     setDifficulty: function (level) {
@@ -192,6 +222,8 @@ SuikaGame.game = {
             this.startBombSelection(Math.min(4, fruits.length));
         }
 
+        this.usedPowerIds.add(powerId);
+        if (this.usedPowerIds.size === 2) SuikaGame.progress.unlock('power-duet');
         SuikaGame.ui.updatePowerToolbar();
         SuikaGame.ui.updateCoinDisplays();
         return true;

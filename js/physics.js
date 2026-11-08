@@ -153,6 +153,7 @@ SuikaGame.physics = {
                 return;
             }
             // Ignore momentary crossings while a dropped fruit is falling.
+            if (this.warningSeconds === 1 && !above.length) SuikaGame.progress.unlock('last-second');
             this.updateLineWarning(longest >= 500 ? Math.ceil((limit - longest) / 1000) : 0);
         });
     },
@@ -193,6 +194,7 @@ SuikaGame.physics = {
         SuikaGame.config.lineInvisibleUntil = SuikaGame.config.engine.timing.timestamp + durationMs;
         line.isLineHidden = true;
         line.render.fillStyle = 'rgba(0, 0, 0, 0)';
+        if (this.warningSeconds === 1) SuikaGame.progress.unlock('last-second');
         this.clearLineWarnings();
     },
 

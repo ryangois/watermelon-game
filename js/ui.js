@@ -16,16 +16,11 @@ SuikaGame.ui = {
         this.updateMuteButton();
         this.updateAccessibilityControls();
         this.createEvolutionDiagram();
-        this.renderShop();
         this.renderMedalStrip();
         this.renderRankingStats();
         this.renderDailyPanel();
         this.setupPwaInstall();
-        SuikaGame.skins.preloadAssets(SuikaGame.fruits.types).then(() => {
-            this.createEvolutionDiagram();
-            this.renderShop();
-            SuikaGame.fruits.updateNextFruitPreview();
-        });
+        SuikaGame.skins.preloadActivePack();
         this.showMainMenu();
     },
 
@@ -60,6 +55,8 @@ SuikaGame.ui = {
         document.getElementById('pack-preview-close').addEventListener('click', () => this.closePackPreview());
         document.getElementById('achievements-close').addEventListener('click', () => this.closeAchievements());
         this.bindModalDismissal();
+        const hall = document.getElementById('achievements-modal');
+        hall.addEventListener('click', event => { if (event.target === hall) hall.close(); });
         const canvas = document.getElementById('game-canvas');
         canvas.addEventListener('keydown', event => {
             if (event.altKey || event.ctrlKey || event.metaKey || !SuikaGame.config.gameActive || SuikaGame.config.paused) return;
@@ -123,7 +120,7 @@ SuikaGame.ui = {
         });
     },
 
-    dismissibleModals: ['pack-preview-modal', 'achievements-modal'],
+    dismissibleModals: ['pack-preview-modal'],
 
     openModal: function (id, focusId) {
         const modal = document.getElementById(id);
@@ -155,7 +152,7 @@ SuikaGame.ui = {
 
     ensureAuthLoaded: function () {
         if (!this.authLoadPromise) {
-            this.authLoadPromise = import('./auth.js?v=20261107-visual')
+            this.authLoadPromise = import('./auth.js?v=20261108-hall-29')
                 .then(() => true)
                 .catch(() => false);
         }
@@ -202,7 +199,8 @@ SuikaGame.ui = {
             this.renderMedalStrip();
             this.renderAchievements();
             this.renderRankingStats();
-            this.renderShop();
+            SuikaGame.skins.preloadActivePack();
+            if (document.getElementById('shop-container').style.display === 'flex') this.renderShop();
             this.showToast(replaced ? 'Progresso desta conta carregado' : 'Progresso sincronizado com a nuvem');
         });
     },
@@ -814,6 +812,8 @@ SuikaGame.ui = {
     setShopTab: function (tabName) {
         this.stopTrackPreview();
         this.activeShopTab = tabName;
+        const categories = { skins: 'skin', themes: 'theme', music: 'music', powers: 'power' };
+        this.renderShopCategory(this.shopCategories[categories[tabName]]);
         document.querySelectorAll('.shop-tab').forEach(tab => {
             const active = tab.dataset.shopTab === tabName;
             tab.classList.toggle('active', active);
@@ -1005,10 +1005,6 @@ SuikaGame.ui = {
     },
 
     renderShop: function () {
-        this.renderShopCategory(this.shopCategories.skin);
-        this.renderShopCategory(this.shopCategories.theme);
-        this.renderShopCategory(this.shopCategories.music);
-        this.renderShopCategory(this.shopCategories.power);
         this.setShopTab(this.activeShopTab);
     },
 
@@ -1070,7 +1066,8 @@ SuikaGame.ui = {
             preview.appendChild(icon);
         });
 
-        const details = this.createPackDetails(pack, category);
+        const details = document.createElement('div');
+        details.className = 'pack-details';
         const toggle = document.createElement('button');
         details.id = 'details-' + mode + '-' + pack.id;
         toggle.className = 'shop-action preview-action';
@@ -1079,6 +1076,7 @@ SuikaGame.ui = {
         toggle.setAttribute('aria-expanded', 'false');
         const toggleDetails = () => {
             const open = card.classList.toggle('expanded');
+            if (open && !details.hasChildNodes()) this.fillPackDetails(details, pack, category);
             toggle.setAttribute('aria-expanded', String(open));
             toggle.textContent = open ? 'Ocultar detalhes' : 'Ver detalhes';
         };
@@ -1090,8 +1088,7 @@ SuikaGame.ui = {
         });
     },
 
-    createPackDetails: function (pack, category) {
-        const details = document.createElement('div');
+    fillPackDetails: function (details, pack, category) {
         const theme = SuikaGame.skins.getThemeForPack(pack);
         const fruitRow = document.createElement('div');
         const swatches = document.createElement('div');
@@ -1130,7 +1127,6 @@ SuikaGame.ui = {
             actions.appendChild(this.createBundleButton(pack, category));
         }
         details.appendChild(actions);
-        return details;
     },
 
     addRarityBadge: function (card, pack) {
@@ -1243,6 +1239,7 @@ SuikaGame.ui = {
     },
 
     afterShopAction: function (message) {
+        SuikaGame.skins.preloadActivePack();
         SuikaGame.skins.applyActiveTheme();
         SuikaGame.fruits.updateNextFruitPreview();
         this.createEvolutionDiagram();
@@ -1275,6 +1272,7 @@ SuikaGame.ui = {
         const strip = document.getElementById('medal-strip');
         const { ids, list } = SuikaGame.progress.getUnlockedMedals();
         const total = SuikaGame.progress.medals.length;
+        document.querySelector('.fruit-vessel').classList.toggle('golden-vessel', SuikaGame.progress.hasGoldenVessel());
         strip.innerHTML = '';
 
         const summary = document.createElement('button');
@@ -1284,7 +1282,7 @@ SuikaGame.ui = {
         summary.addEventListener('click', () => this.openAchievements());
         strip.appendChild(summary);
 
-        ids.slice(-5).map(medalId => SuikaGame.progress.getMedal(medalId)).filter(Boolean).forEach(medal => {
+        ids.map(medalId => SuikaGame.progress.getMedal(medalId)).filter(Boolean).slice(-5).forEach(medal => {
             const badge = document.createElement('span');
             badge.className = 'medal unlocked';
             badge.title = medal.description;
@@ -1301,32 +1299,51 @@ SuikaGame.ui = {
         const { set: unlockedSet, list: unlockedMedals } = SuikaGame.progress.getUnlockedMedals();
         const medals = SuikaGame.progress.medals;
         progressEl.textContent = `${unlockedMedals.length}/${medals.length} desbloqueadas`;
-        list.innerHTML = '';
-
+        const prize = document.getElementById('hall-prize');
+        const complete = SuikaGame.progress.hasGoldenVessel();
+        prize.classList.toggle('awarded', complete);
+        prize.textContent = complete ? '🏆 Pote de Ouro desbloqueado · equipado nas partidas' : '🏆 Complete a coleção para ganhar o Pote de Ouro';
+        const detail = document.getElementById('achievement-detail');
+        list.replaceChildren();
+        detail.hidden = true;
         medals.forEach(medal => {
-            const isUnlocked = unlockedSet.has(medal.id);
-            const item = document.createElement('article');
-            const visibleName = medal.secret && !isUnlocked ? 'Conquista secreta' : medal.name;
-            item.className = isUnlocked ? 'achievement unlocked' : 'achievement';
-            item.innerHTML = `
-                <div class="achievement-icon" aria-hidden="true">${isUnlocked ? medal.icon || '🏅' : medal.secret ? '❔' : '🔒'}</div>
-                <div class="achievement-copy">
-                    <h3>${visibleName}</h3>
-                    <p>${isUnlocked || !medal.secret ? medal.description : '???'}</p>
-                    <small>${isUnlocked ? 'Desbloqueada' : medal.secret ? 'Continue explorando.' : medal.hint}</small>
-                </div>
-            `;
-            list.appendChild(item);
+            const owned = unlockedSet.has(medal.id);
+            const secret = medal.secret && !owned;
+            const name = secret ? 'Conquista secreta' : medal.name;
+            const tile = document.createElement('button');
+            tile.type = 'button';
+            tile.className = owned ? 'achievement unlocked' : 'achievement';
+            tile.setAttribute('aria-label', name + (owned ? ', desbloqueada' : ', bloqueada'));
+            tile.setAttribute('aria-controls', detail.id);
+            tile.setAttribute('aria-pressed', 'false');
+            tile.innerHTML = '<span class="achievement-icon" aria-hidden="true">' + (secret ? '❔' : medal.icon) + '</span><strong>' + name + '</strong>';
+            tile.addEventListener('click', () => {
+                const previous = list.querySelector('[aria-pressed="true"]');
+                if (previous) previous.setAttribute('aria-pressed', 'false');
+                if (previous === tile) { detail.hidden = true; return; }
+                tile.setAttribute('aria-pressed', 'true');
+                detail.hidden = false;
+                detail.innerHTML = '<strong>' + name + '</strong><small>' + (owned ? '✓ Desbloqueada' : '🔒 Bloqueada') + '</small><p>' +
+                    (secret ? 'Existe uma surpresa depois da melancia.' : medal.description) + '</p>';
+                if (!owned && !secret) {
+                    const hint = document.createElement('p');
+                    hint.textContent = medal.hint;
+                    detail.appendChild(hint);
+                }
+                tile.scrollIntoView({ block: 'nearest' });
+            });
+            list.appendChild(tile);
         });
     },
 
     openAchievements: function () {
         this.renderAchievements();
-        this.openModal('achievements-modal', 'achievements-close');
+        document.getElementById('achievements-modal').showModal();
+        document.getElementById('achievements-close').focus();
     },
 
     closeAchievements: function () {
-        this.closeModal('achievements-modal');
+        document.getElementById('achievements-modal').close();
     },
 
     renderRankingStats: function () {
@@ -1409,6 +1426,7 @@ SuikaGame.ui = {
         img.src = SuikaGame.skins.getPreviewImage(image);
         img.alt = fruit.name;
         img.onerror = function () {
+            img.onerror = null;
             img.src = fruit.image;
         };
         return img;

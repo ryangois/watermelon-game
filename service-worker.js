@@ -1,4 +1,4 @@
-const CACHE_VERSION = '20261107-visual';
+const CACHE_VERSION = '20261108-hall-29';
 const CACHE_NAME = `suika-game-v${CACHE_VERSION}`;
 
 const VERSIONED_FILES = [
@@ -20,18 +20,9 @@ const APP_SHELL = [
   './index.html',
   './manifest.json',
   './js/vendor/matter-0.19.0.min.js',
-  './assets/images/jackfruit_emoji.png',
-  './assets/images/melon_emoji.png',
-  './assets/images/peach_emoji.png',
-  './assets/images/pineapple_emoji.png',
-  ...VERSIONED_FILES.map(path => `${path}?v=${CACHE_VERSION}`),
-  './assets/images/apple_emoji.png',
-  './assets/images/cherries_emoji.png',
-  './assets/images/grapes_emoji.png',
-  './assets/images/orange_emoji.png',
-  './assets/images/pear_emoji.png',
-  './assets/images/strawberry_emoji.png',
-  './assets/images/watermelon_emoji.png'
+  ...VERSIONED_FILES.map(path => path + '?v=' + CACHE_VERSION),
+  ...['apple', 'cherries', 'grapes', 'jackfruit', 'melon', 'orange', 'peach', 'pear', 'pineapple', 'strawberry', 'watermelon']
+    .flatMap(name => ['./assets/images/', './assets/previews/'].map(folder => folder + name + '_emoji.webp'))
 ];
 
 self.addEventListener('install', event => {
@@ -60,7 +51,10 @@ self.addEventListener('fetch', event => {
     } catch (error) {
       if (request.mode === 'navigate') return await cache.match('./index.html') || Response.error();
       const filename = new URL(request.url).pathname.split('/').pop();
-      if (filename.endsWith('_emoji.png')) return await cache.match('./assets/images/' + filename) || Response.error();
+      if (/_emoji\.(webp|png)$/.test(filename)) {
+        const folder = new URL(request.url).pathname.includes('/previews/') ? './assets/previews/' : './assets/images/';
+        return await cache.match(folder + filename.replace('.png', '.webp')) || Response.error();
+      }
       throw error;
     }
   })());
